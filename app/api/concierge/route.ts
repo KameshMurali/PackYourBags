@@ -51,6 +51,18 @@ ${prompt.trim()}`,
     return Response.json(output);
   } catch (error) {
     console.error("Concierge generation failed", error);
+    const message = error instanceof Error ? error.message : "";
+
+    if (message.includes("valid credit card")) {
+      return Response.json(
+        {
+          error:
+            "AI Gateway is connected, but Vercel requires billing verification before it can generate itineraries. Add a card in your Vercel AI Gateway settings, then try again.",
+        },
+        { status: 403 },
+      );
+    }
+
     return Response.json(
       { error: "The concierge could not generate an itinerary. Please try again." },
       { status: 502 },
