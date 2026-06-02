@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowRight, Check, Sparkles } from "lucide-react";
 import { Logo } from "@/components/logo";
 import {
   getSignedInAccount,
+  getLatestTripDraft,
   saveTripDraft,
   TripDraft,
 } from "@/lib/local-auth";
@@ -15,6 +16,7 @@ export default function NewTrip() {
   const router = useRouter();
   const [ready, setReady] = useState(false);
   const [savedTrip, setSavedTrip] = useState<TripDraft | null>(null);
+  const [draft, setDraft] = useState<TripDraft | null>(null);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -23,6 +25,7 @@ export default function NewTrip() {
         return;
       }
 
+      setDraft(getLatestTripDraft());
       setReady(true);
     }, 0);
 
@@ -111,28 +114,30 @@ export default function NewTrip() {
             >
               <div className="grid gap-5 sm:grid-cols-2">
                 <Field label="Destination or region">
-                  <input className="field" name="destination" placeholder="e.g. Japan or somewhere coastal" />
+                  <input className="field" defaultValue={draft?.destination} name="destination" placeholder="e.g. Japan or somewhere coastal" />
                 </Field>
                 <Field label="Timing">
-                  <input className="field" name="dates" placeholder="e.g. Late September, 5 nights" required />
+                  <input className="field" defaultValue={draft?.dates} name="dates" placeholder="e.g. Late September, 5 nights" required />
                 </Field>
                 <Field label="Travellers">
-                  <input className="field" name="travellers" placeholder="e.g. 2 adults" required />
+                  <input className="field" defaultValue={draft?.travellers} name="travellers" placeholder="e.g. 2 adults" required />
                 </Field>
                 <Field label="Trip mood">
-                  <select className="field" defaultValue="" name="mood" required>
+                  <select className="field" defaultValue={draft?.mood || ""} name="mood" required>
                     <option disabled value="">Choose a mood</option>
                     <option>Quiet luxury</option>
                     <option>Food and culture</option>
                     <option>Beach reset</option>
                     <option>Remote-work escape</option>
                     <option>Adventure</option>
+                    <option>Concierge brief</option>
                   </select>
                 </Field>
               </div>
               <Field label="Anything else the concierge should know?" className="mt-5">
                 <textarea
                   className="field min-h-36 resize-y"
+                  defaultValue={draft?.notes}
                   name="notes"
                   placeholder="Flight preferences, budget, hotel style, passport, pace, or one thing the trip must include."
                 />

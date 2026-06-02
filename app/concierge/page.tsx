@@ -3,14 +3,21 @@
 import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
 import { Logo } from "@/components/logo";
-import { getSignedInAccount, saveTripDraft } from "@/lib/local-auth";
+import {
+  generateLocalItinerary,
+  GeneratedItinerary,
+  getSignedInAccount,
+  saveGeneratedItinerary,
+  saveTripDraft,
+} from "@/lib/local-auth";
 
 export default function Concierge() {
   const router = useRouter();
   const [ready, setReady] = useState(false);
   const [prompt, setPrompt] = useState("");
+  const [itinerary, setItinerary] = useState<GeneratedItinerary | null>(null);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -28,14 +35,16 @@ export default function Concierge() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
+    const generatedItinerary = generateLocalItinerary(prompt.trim());
     saveTripDraft({
-      destination: "AI concierge escape",
+      destination: generatedItinerary.destination,
       dates: "Timing to refine",
       travellers: "Traveller details to refine",
       mood: "Concierge brief",
       notes: prompt.trim(),
     });
-    router.push("/dashboard");
+    saveGeneratedItinerary(generatedItinerary);
+    setItinerary(generatedItinerary);
   }
 
   if (!ready) {
@@ -68,6 +77,35 @@ export default function Concierge() {
         <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-muted">
           Keep it loose. Mention timing, mood, budget, passport, or one thing the trip must include.
         </p>
+        {itinerary ? (
+          <div className="glass-panel hero-shadow mt-9 rounded-[2rem] border border-black/10 p-6 text-left md:p-8">
+            <div className="flex items-start gap-4">
+              <CheckCircle2 className="mt-1 h-6 w-6 shrink-0 text-[#305247]" />
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#53786b]">
+                  Concierge itinerary generated
+                </p>
+                <h2 className="mt-2 font-display text-4xl text-ink">{itinerary.destination}</h2>
+                <p className="mt-3 text-sm leading-7 text-muted">{itinerary.summary}</p>
+              </div>
+            </div>
+            <div className="mt-7 space-y-3">
+              {itinerary.days.map((day) => (
+                <div key={day.day} className="rounded-[1.35rem] border border-black/10 bg-white/70 p-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-clay">Day {day.day}</p>
+                  <h3 className="mt-2 font-semibold text-ink">{day.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-muted">{day.plan}</p>
+                </div>
+              ))}
+            </div>
+            <Link
+              className="mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ink px-6 text-sm font-semibold text-white"
+              href="/dashboard"
+            >
+              Save and return to dashboard <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        ) : (
         <form className="glass-panel hero-shadow mt-9 rounded-[2rem] border border-black/10 p-5 md:p-7" onSubmit={handleSubmit}>
           <textarea
             className="field min-h-48 resize-y text-base leading-7"
@@ -80,11 +118,12 @@ export default function Concierge() {
             className="mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ink px-6 text-sm font-semibold text-white shadow-[0_18px_48px_rgba(32,25,20,0.22)]"
             type="submit"
           >
-            Save concierge brief <ArrowRight className="h-4 w-4" />
+            Generate itinerary <ArrowRight className="h-4 w-4" />
           </button>
         </form>
+        )}
         <p className="mt-5 text-xs leading-5 text-muted">
-          Prototype mode: this saves your concierge prompt locally. AI itinerary generation is the next integration step.
+          Prototype mode: itinerary generation runs locally from your prompt. A model-backed concierge is the next integration step.
         </p>
       </section>
     </main>

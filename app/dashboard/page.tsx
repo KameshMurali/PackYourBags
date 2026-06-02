@@ -16,7 +16,9 @@ import {
 import { Logo } from "@/components/logo";
 import {
   getSignedInAccount,
+  getLatestGeneratedItinerary,
   getLatestTripDraft,
+  GeneratedItinerary,
   LocalAccount,
   signOutLocally,
   TripDraft,
@@ -32,6 +34,7 @@ export default function Dashboard() {
   const router = useRouter();
   const [account, setAccount] = useState<LocalAccount | null>(null);
   const [latestTrip, setLatestTrip] = useState<TripDraft | null>(null);
+  const [itinerary, setItinerary] = useState<GeneratedItinerary | null>(null);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -44,6 +47,7 @@ export default function Dashboard() {
 
       setAccount(signedInAccount);
       setLatestTrip(getLatestTripDraft());
+      setItinerary(getLatestGeneratedItinerary());
     }, 0);
 
     return () => window.clearTimeout(timeout);
@@ -133,6 +137,36 @@ export default function Dashboard() {
               >
                 Edit brief <ArrowRight className="h-4 w-4" />
               </button>
+            </div>
+          </section>
+        )}
+
+        {itinerary && (
+          <section className="mt-5 rounded-[2rem] border border-black/10 bg-white/70 p-6 backdrop-blur md:p-7">
+            <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-start">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-clay">
+                  Generated itinerary
+                </p>
+                <h2 className="mt-2 font-display text-3xl text-ink">{itinerary.destination}</h2>
+                <p className="mt-2 max-w-3xl text-sm leading-6 text-muted">{itinerary.summary}</p>
+              </div>
+              <button
+                className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-full border border-black/10 bg-white px-5 text-sm font-semibold text-ink"
+                onClick={() => router.push("/concierge")}
+                type="button"
+              >
+                Generate another <Sparkles className="h-4 w-4 text-clay" />
+              </button>
+            </div>
+            <div className="mt-6 grid gap-3 md:grid-cols-3">
+              {itinerary.days.slice(0, 3).map((day) => (
+                <div key={day.day} className="rounded-[1.35rem] border border-black/10 bg-[#fffcf7] p-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-clay">Day {day.day}</p>
+                  <h3 className="mt-2 text-sm font-semibold text-ink">{day.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-muted">{day.plan}</p>
+                </div>
+              ))}
             </div>
           </section>
         )}
