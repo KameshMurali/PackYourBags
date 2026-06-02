@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
 import { Logo } from "@/components/logo";
 import {
-  generateLocalItinerary,
   GeneratedItinerary,
   getSignedInAccount,
   saveGeneratedItinerary,
@@ -18,6 +17,8 @@ export default function Concierge() {
   const [ready, setReady] = useState(false);
   const [prompt, setPrompt] = useState("");
   const [itinerary, setItinerary] = useState<GeneratedItinerary | null>(null);
+  const [error, setError] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -32,19 +33,40 @@ export default function Concierge() {
     return () => window.clearTimeout(timeout);
   }, [router]);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setError("");
+    setIsGenerating(true);
 
-    const generatedItinerary = generateLocalItinerary(prompt.trim());
-    saveTripDraft({
-      destination: generatedItinerary.destination,
-      dates: "Timing to refine",
-      travellers: "Traveller details to refine",
-      mood: "Concierge brief",
-      notes: prompt.trim(),
-    });
-    saveGeneratedItinerary(generatedItinerary);
-    setItinerary(generatedItinerary);
+    try {
+      const response = await fetch("/api/concierge", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: prompt.trim() }),
+      });
+      const result = (await response.json()) as GeneratedItinerary | { error: string };
+
+      if (!response.ok || "error" in result) {
+        setError("error" in result ? result.error : "The concierge could not generate an itinerary.");
+        setIsGenerating(false);
+        return;
+      }
+
+      const generatedItinerary = result;
+      saveTripDraft({
+        destination: generatedItinerary.destination,
+        dates: "Timing to refine",
+        travellers: "Traveller details to refine",
+        mood: "Concierge brief",
+        notes: prompt.trim(),
+      });
+      saveGeneratedItinerary(generatedItinerary);
+      setItinerary(generatedItinerary);
+    } catch {
+      setError("The concierge could not reach the model service. Please try again.");
+    } finally {
+      setIsGenerating(false);
+    }
   }
 
   if (!ready) {
@@ -115,15 +137,17 @@ export default function Concierge() {
             value={prompt}
           />
           <button
-            className="mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ink px-6 text-sm font-semibold text-white shadow-[0_18px_48px_rgba(32,25,20,0.22)]"
+            className="mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ink px-6 text-sm font-semibold text-white shadow-[0_18px_48px_rgba(32,25,20,0.22)] disabled:cursor-wait disabled:opacity-60"
+            disabled={isGenerating}
             type="submit"
           >
-            Generate itinerary <ArrowRight className="h-4 w-4" />
+            {isGenerating ? "Planning your itinerary..." : "Generate itinerary"} <ArrowRight className="h-4 w-4" />
           </button>
+          {error && <p className="mt-4 text-left text-sm leading-6 text-red-700">{error}</p>}
         </form>
         )}
         <p className="mt-5 text-xs leading-5 text-muted">
-          Prototype mode: itinerary generation runs locally from your prompt. A model-backed concierge is the next integration step.
+          The concierge uses a language model to create a destination-specific itinerary from your prompt.
         </p>
       </section>
     </main>
