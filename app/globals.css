@@ -49,6 +49,12 @@ h6,
   }
 }
 
+@layer components {
+  .field {
+    @apply w-full rounded-[1.15rem] border border-black/10 bg-white/80 px-4 py-3 text-sm text-ink outline-none transition placeholder:text-muted focus:border-clay focus:ring-2 focus:ring-clay/15;
+  }
+}
+
 @layer utilities {
   .page-grid {
     background-image:
@@ -112,4 +118,3 @@ h6,
     transform: translateX(12px);
   }
 }
-

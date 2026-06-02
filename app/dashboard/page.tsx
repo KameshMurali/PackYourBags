@@ -88,6 +88,7 @@ export default function Dashboard() {
           </div>
           <button
             className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-ink px-6 text-sm font-semibold text-white shadow-[0_18px_48px_rgba(32,25,20,0.22)]"
+            onClick={() => router.push("/trips/new")}
             type="button"
           >
             <Plus className="h-4 w-4" />
@@ -141,7 +142,11 @@ export default function Dashboard() {
             <p className="mt-4 text-sm leading-7 text-muted">
               Describe the mood, timing, and budget. PackYourBags will shape a visa-aware shortlist.
             </p>
-            <button className="mt-7 flex w-full items-center justify-between rounded-full border border-black/10 bg-white/70 px-5 py-4 text-left text-sm font-semibold text-ink" type="button">
+            <button
+              className="mt-7 flex w-full items-center justify-between rounded-full border border-black/10 bg-white/70 px-5 py-4 text-left text-sm font-semibold text-ink"
+              onClick={() => router.push("/trips/new")}
+              type="button"
+            >
               Ask AI to plan an escape <ArrowRight className="h-4 w-4" />
             </button>
           </section>
