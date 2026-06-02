@@ -1,7 +1,33 @@
-import { ButtonLink } from "@/components/button";
+"use client";
+
+import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Logo } from "@/components/logo";
+import { signInLocally } from "@/lib/local-auth";
 
 export default function SignIn() {
+  const router = useRouter();
+  const [error, setError] = useState("");
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const email = String(formData.get("email") ?? "").trim();
+    const password = String(formData.get("password") ?? "");
+
+    if (!email || !password) {
+      setError("Enter your email and password.");
+      return;
+    }
+
+    if (!signInLocally(email)) {
+      setError("No browser-local account was found for that email. Create an account first.");
+      return;
+    }
+
+    router.push("/dashboard");
+  }
+
   return (
     <main className="flex min-h-screen items-center justify-center px-5 py-10">
       <div className="glass-panel hero-shadow w-full max-w-md rounded-[2rem] border border-black/10 p-8">
@@ -11,27 +37,36 @@ export default function SignIn() {
           Continue with your trips, visa shortlists, and travel concierge plans.
         </p>
 
-        <div className="mt-8 space-y-3">
+        <form className="mt-8 space-y-3" onSubmit={handleSubmit}>
           <input
             className="w-full rounded-[1.2rem] border border-black/10 bg-white/80 px-4 py-3 text-ink placeholder:text-muted focus:border-clay"
+            name="email"
             placeholder="Email"
+            required
             type="email"
           />
           <input
             className="w-full rounded-[1.2rem] border border-black/10 bg-white/80 px-4 py-3 text-ink placeholder:text-muted focus:border-clay"
+            name="password"
             placeholder="Password"
+            required
             type="password"
           />
-        </div>
-
-        <ButtonLink href="/" className="mt-6 h-12 w-full">
-          Continue
-        </ButtonLink>
-        <ButtonLink href="/register" variant="ghost" className="mt-3 w-full">
+          {error && <p className="text-sm leading-6 text-red-700">{error}</p>}
+          <button
+            className="inline-flex h-12 w-full items-center justify-center rounded-full bg-ink px-5 text-sm font-semibold text-white shadow-[0_18px_48px_rgba(32,25,20,0.22)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#120f0c]"
+            type="submit"
+          >
+            Continue
+          </button>
+        </form>
+        <a
+          href="/register"
+          className="mt-3 inline-flex h-11 w-full items-center justify-center rounded-full px-5 text-sm font-semibold text-ink/70 transition-all duration-200 hover:bg-white/45 hover:text-ink"
+        >
           Need an account?
-        </ButtonLink>
+        </a>
       </div>
     </main>
   );
 }
-
