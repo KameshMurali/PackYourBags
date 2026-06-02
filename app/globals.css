@@ -1,0 +1,115 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --font-sans: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
+  --font-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  --page-bg:
+    radial-gradient(circle at top left, rgba(233, 211, 183, 0.55), transparent 28%),
+    radial-gradient(circle at 85% 14%, rgba(170, 196, 188, 0.24), transparent 22%),
+    linear-gradient(180deg, #f7f0e6 0%, #fbf7f1 40%, #fffdf9 100%);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  background: var(--page-bg);
+  color: #201914;
+  font-family: var(--font-sans);
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.font-display {
+  font-family: var(--font-display);
+}
+
+::selection {
+  background: rgba(210, 145, 92, 0.28);
+}
+
+@layer base {
+  * {
+    @apply border-black/10;
+  }
+
+  a,
+  button {
+    @apply outline-none;
+  }
+}
+
+@layer utilities {
+  .page-grid {
+    background-image:
+      linear-gradient(rgba(39, 29, 22, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(39, 29, 22, 0.05) 1px, transparent 1px);
+    background-size: 72px 72px;
+  }
+
+  .glass-panel {
+    background: rgba(255, 252, 246, 0.72);
+    backdrop-filter: blur(20px);
+  }
+
+  .hero-shadow {
+    box-shadow: 0 32px 100px rgba(55, 39, 27, 0.12);
+  }
+
+  .story-shadow {
+    box-shadow: 0 22px 70px rgba(43, 30, 20, 0.09);
+  }
+
+  .display-balance {
+    text-wrap: balance;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .animate-float-slow {
+    animation: float-slow 9s ease-in-out infinite;
+  }
+
+  .animate-float-delayed {
+    animation: float-slow 11s ease-in-out infinite;
+    animation-delay: 1.2s;
+  }
+
+  .animate-drift {
+    animation: drift 20s linear infinite alternate;
+  }
+}
+
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: translate3d(0, -10px, 0);
+  }
+}
+
+@keyframes drift {
+  0% {
+    transform: translateX(-10px);
+  }
+
+  100% {
+    transform: translateX(12px);
+  }
+}
+
