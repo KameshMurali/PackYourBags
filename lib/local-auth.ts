@@ -60,3 +60,18 @@ export function signOutLocally() {
 export function saveTripDraft(trip: TripDraft) {
   localStorage.setItem(TRIP_KEY, JSON.stringify(trip));
 }
+
+export function getLatestTripDraft(): TripDraft | null {
+  const storedTrip = localStorage.getItem(TRIP_KEY);
+
+  if (!storedTrip) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(storedTrip) as TripDraft;
+  } catch {
+    localStorage.removeItem(TRIP_KEY);
+    return null;
+  }
+}

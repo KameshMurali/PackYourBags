@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   ArrowRight,
   CalendarDays,
+  CheckCircle2,
   Compass,
   LogOut,
   MapPinned,
@@ -15,8 +16,10 @@ import {
 import { Logo } from "@/components/logo";
 import {
   getSignedInAccount,
+  getLatestTripDraft,
   LocalAccount,
   signOutLocally,
+  TripDraft,
 } from "@/lib/local-auth";
 
 const recommendations = [
@@ -28,6 +31,7 @@ const recommendations = [
 export default function Dashboard() {
   const router = useRouter();
   const [account, setAccount] = useState<LocalAccount | null>(null);
+  const [latestTrip, setLatestTrip] = useState<TripDraft | null>(null);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -39,6 +43,7 @@ export default function Dashboard() {
       }
 
       setAccount(signedInAccount);
+      setLatestTrip(getLatestTripDraft());
     }, 0);
 
     return () => window.clearTimeout(timeout);
@@ -98,9 +103,39 @@ export default function Dashboard() {
 
         <div className="mt-10 grid gap-4 md:grid-cols-3">
           <Stat icon={CalendarDays} label="Leave available" value="18 days" detail="UAE office calendar synced" />
-          <Stat icon={PlaneTakeoff} label="Trips planned" value="3 escapes" detail="1 itinerary ready to book" />
+          <Stat icon={PlaneTakeoff} label="Trips planned" value={latestTrip ? "4 escapes" : "3 escapes"} detail={latestTrip ? "1 new brief saved" : "1 itinerary ready to book"} />
           <Stat icon={Compass} label="Shortlisted" value="12 places" detail="Filtered for your passport" />
         </div>
+
+        {latestTrip && (
+          <section className="mt-5 rounded-[2rem] border border-[#b7d4c8] bg-[#eff8f4]/90 p-6 shadow-[0_22px_70px_rgba(43,85,69,0.08)] md:p-7">
+            <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
+              <div className="flex items-start gap-4">
+                <span className="mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-[#305247]">
+                  <CheckCircle2 className="h-5 w-5" />
+                </span>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#53786b]">
+                    Latest saved brief
+                  </p>
+                  <h2 className="mt-2 font-display text-3xl text-ink">
+                    {latestTrip.destination || "Your next escape"}
+                  </h2>
+                  <p className="mt-2 text-sm leading-6 text-muted">
+                    {latestTrip.dates} · {latestTrip.travellers} · {latestTrip.mood}
+                  </p>
+                </div>
+              </div>
+              <button
+                className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-full bg-[#305247] px-5 text-sm font-semibold text-white"
+                onClick={() => router.push("/trips/new")}
+                type="button"
+              >
+                Edit brief <ArrowRight className="h-4 w-4" />
+              </button>
+            </div>
+          </section>
+        )}
 
         <div className="mt-5 grid gap-5 lg:grid-cols-[1.08fr_0.92fr]">
           <section className="story-shadow overflow-hidden rounded-[2rem] border border-black/10 bg-[#201914] p-7 text-white md:p-8">
@@ -144,7 +179,7 @@ export default function Dashboard() {
             </p>
             <button
               className="mt-7 flex w-full items-center justify-between rounded-full border border-black/10 bg-white/70 px-5 py-4 text-left text-sm font-semibold text-ink"
-              onClick={() => router.push("/trips/new")}
+              onClick={() => router.push("/concierge")}
               type="button"
             >
               Ask AI to plan an escape <ArrowRight className="h-4 w-4" />
