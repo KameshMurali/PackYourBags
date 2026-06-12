@@ -39,6 +39,8 @@ export default function SignIn() {
 
         <form className="mt-8 space-y-3" onSubmit={handleSubmit}>
           <input
+            aria-label="Email"
+            autoComplete="email"
             className="w-full rounded-[1.2rem] border border-black/10 bg-white/80 px-4 py-3 text-ink placeholder:text-muted focus:border-clay"
             name="email"
             placeholder="Email"
@@ -46,6 +48,8 @@ export default function SignIn() {
             type="email"
           />
           <input
+            aria-label="Password"
+            autoComplete="current-password"
             className="w-full rounded-[1.2rem] border border-black/10 bg-white/80 px-4 py-3 text-ink placeholder:text-muted focus:border-clay"
             name="password"
             placeholder="Password"
@@ -66,6 +70,9 @@ export default function SignIn() {
         >
           Need an account?
         </a>
+        <p className="mt-6 text-xs leading-5 text-muted">
+          Prototype mode: accounts live in this browser only and passwords are not stored or checked.
+        </p>
       </div>
     </main>
   );

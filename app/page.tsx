@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   ArrowRight,
   Compass,
@@ -274,7 +275,7 @@ export default function Home() {
             <h2 className="mt-4 font-display text-4xl leading-tight md:text-5xl">
               From “we should go somewhere” to “everything is sorted.”
             </h2>
-            <p className="mt-5 max-w-xl text-base leading-8 text-white/68">
+            <p className="mt-5 max-w-xl text-base leading-8 text-white/[0.68]">
               Built for people who want premium travel outcomes without juggling six tools and
               a dozen loose documents.
             </p>
@@ -321,7 +322,7 @@ export default function Home() {
                 {[
                   "Trip boards and itinerary drafts",
                   "Leave tracking and planning windows",
-                  "Destination shortlist generation",
+                  "3 AI concierge itineraries included",
                   "Beautiful shareable planning spaces",
                 ].map((item) => (
                   <div key={item} className="flex gap-3">
@@ -346,8 +347,8 @@ export default function Home() {
           <span className="font-semibold text-ink">PackYourBags</span>
         </div>
         <div className="flex gap-5">
-          <a href="/signin">Sign in</a>
-          <a href="/register">Register</a>
+          <Link href="/signin">Sign in</Link>
+          <Link href="/register">Register</Link>
           <a href="#product">Product</a>
         </div>
         <p>© 2026 PackYourBags. Designed for calmer travel planning.</p>

@@ -1,6 +1,15 @@
 # PackYourBags
 
-PackYourBags is a premium minimal travel planning landing page built with Next.js App Router, TypeScript, and Tailwind CSS.
+PackYourBags is a premium minimal travel planning app built with Next.js App Router, TypeScript, and Tailwind CSS.
+
+## Features
+
+- **Landing page** — product story for leave tracking, visa discovery, trip planning, and the AI concierge.
+- **Prototype accounts** — register and sign in with a browser-local account (stored in `localStorage`; no passwords are stored or checked).
+- **Trip briefs** — capture destination, timing, travellers, mood, and notes at `/trips/new`, then hand the brief to the concierge.
+- **AI concierge** — `/concierge` turns a free-text brief into a 3–7 day itinerary using Claude Sonnet (`claude-sonnet-4-6`). Supports `?from=brief` (prefill from the saved trip brief) and `?view=latest` (reopen the last generated itinerary).
+- **Free tier + Pro** — Starter accounts get 3 free itineraries, enforced server-side via a signed HTTP-only cookie. After that the API returns 402 and the concierge shows an upgrade card. `/api/subscribe` is a demo checkout that unlocks unlimited Pro in the current browser — swap it for a real billing provider before launch.
+- **Dashboard** — greeting, saved brief, latest itinerary preview, and visa-aware inspiration.
 
 ## Local development
 
@@ -14,14 +23,17 @@ Then open `http://localhost:3000`.
 
 ## AI concierge
 
-Create a Vercel AI Gateway key and add it to `.env.local`:
+Create an Anthropic API key at [platform.claude.com](https://platform.claude.com) and add it to `.env.local`:
 
 ```bash
-AI_GATEWAY_API_KEY=your_gateway_key
+ANTHROPIC_API_KEY=your_anthropic_api_key
 ```
 
-Restart the dev server after adding the key. The concierge route uses `openai/gpt-5.4`
-by default. Set `AI_GATEWAY_MODEL` to another Gateway model slug to override it.
+Restart the dev server after adding the key. The concierge uses `claude-sonnet-4-6`
+by default; set `ANTHROPIC_MODEL` to another Claude model ID to override it.
+
+Set `USAGE_COOKIE_SECRET` to a long random string in production so the free-tier
+quota cookie cannot be forged.
 
 ## Quality checks
 
@@ -39,4 +51,4 @@ This project is ready for zero-config deployment on Vercel.
 3. Use Node.js 20 or newer.
 4. Deploy.
 
-Add `AI_GATEWAY_API_KEY` in Vercel project settings to enable concierge generation.
+Add `ANTHROPIC_API_KEY` (and `USAGE_COOKIE_SECRET`) in Vercel project settings to enable concierge generation.

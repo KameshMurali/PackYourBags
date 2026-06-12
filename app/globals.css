@@ -47,6 +47,15 @@ h6,
   button {
     @apply outline-none;
   }
+
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: 2px solid rgba(201, 131, 79, 0.85);
+    outline-offset: 2px;
+  }
 }
 
 @layer components {

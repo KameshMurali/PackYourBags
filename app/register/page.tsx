@@ -36,12 +36,16 @@ export default function Register() {
 
         <form className="mt-8 space-y-3" onSubmit={handleSubmit}>
           <input
+            aria-label="Name"
+            autoComplete="name"
             className="w-full rounded-[1.2rem] border border-black/10 bg-white/80 px-4 py-3 text-ink placeholder:text-muted focus:border-clay"
             name="name"
             placeholder="Name"
             required
           />
           <input
+            aria-label="Email"
+            autoComplete="email"
             className="w-full rounded-[1.2rem] border border-black/10 bg-white/80 px-4 py-3 text-ink placeholder:text-muted focus:border-clay"
             name="email"
             placeholder="Email"
@@ -49,6 +53,8 @@ export default function Register() {
             type="email"
           />
           <input
+            aria-label="Password"
+            autoComplete="new-password"
             className="w-full rounded-[1.2rem] border border-black/10 bg-white/80 px-4 py-3 text-ink placeholder:text-muted focus:border-clay"
             minLength={6}
             name="password"

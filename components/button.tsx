@@ -16,7 +16,7 @@ export function ButtonLink({
     <Link
       href={href}
       className={cn(
-        "inline-flex h-11 items-center justify-center rounded-full px-5 text-sm font-semibold transition-all duration-200",
+        "inline-flex h-11 items-center justify-center whitespace-nowrap rounded-full px-5 text-sm font-semibold transition-all duration-200",
         variant === "primary" &&
           "bg-ink text-white shadow-[0_18px_48px_rgba(32,25,20,0.22)] hover:-translate-y-0.5 hover:bg-[#120f0c]",
         variant === "secondary" &&

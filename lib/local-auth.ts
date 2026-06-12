@@ -28,7 +28,15 @@ const SESSION_KEY = "packyourbags.session";
 const TRIP_KEY = "packyourbags.latest-trip";
 const ITINERARY_KEY = "packyourbags.latest-itinerary";
 
+function storageAvailable() {
+  return typeof window !== "undefined" && typeof window.localStorage !== "undefined";
+}
+
 export function createLocalAccount(account: LocalAccount) {
+  if (!storageAvailable()) {
+    return;
+  }
+
   localStorage.setItem(ACCOUNT_KEY, JSON.stringify(account));
   localStorage.setItem(SESSION_KEY, account.email);
 }
@@ -45,6 +53,10 @@ export function signInLocally(email: string) {
 }
 
 export function getLocalAccount(): LocalAccount | null {
+  if (!storageAvailable()) {
+    return null;
+  }
+
   const storedAccount = localStorage.getItem(ACCOUNT_KEY);
 
   if (!storedAccount) {
@@ -60,6 +72,10 @@ export function getLocalAccount(): LocalAccount | null {
 }
 
 export function getSignedInAccount() {
+  if (!storageAvailable()) {
+    return null;
+  }
+
   const account = getLocalAccount();
   const sessionEmail = localStorage.getItem(SESSION_KEY);
 
@@ -67,14 +83,26 @@ export function getSignedInAccount() {
 }
 
 export function signOutLocally() {
+  if (!storageAvailable()) {
+    return;
+  }
+
   localStorage.removeItem(SESSION_KEY);
 }
 
 export function saveTripDraft(trip: TripDraft) {
+  if (!storageAvailable()) {
+    return;
+  }
+
   localStorage.setItem(TRIP_KEY, JSON.stringify(trip));
 }
 
 export function getLatestTripDraft(): TripDraft | null {
+  if (!storageAvailable()) {
+    return null;
+  }
+
   const storedTrip = localStorage.getItem(TRIP_KEY);
 
   if (!storedTrip) {
@@ -90,10 +118,18 @@ export function getLatestTripDraft(): TripDraft | null {
 }
 
 export function saveGeneratedItinerary(itinerary: GeneratedItinerary) {
+  if (!storageAvailable()) {
+    return;
+  }
+
   localStorage.setItem(ITINERARY_KEY, JSON.stringify(itinerary));
 }
 
 export function getLatestGeneratedItinerary(): GeneratedItinerary | null {
+  if (!storageAvailable()) {
+    return null;
+  }
+
   const storedItinerary = localStorage.getItem(ITINERARY_KEY);
 
   if (!storedItinerary) {

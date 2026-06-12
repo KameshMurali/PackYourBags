@@ -65,7 +65,7 @@ export function LeaveCard() {
 
 export function MapCard() {
   return (
-    <div className="story-shadow relative overflow-hidden rounded-[2rem] border border-black/10 bg-white/82 p-6">
+    <div className="story-shadow relative overflow-hidden rounded-[2rem] border border-black/10 bg-white/[0.82] p-6">
       <div className="page-grid absolute inset-0 opacity-65" />
       <div className="absolute -right-8 top-10 h-36 w-36 rounded-full bg-[#e8d7bf] blur-3xl" />
       <div className="relative min-h-[360px]">
@@ -199,14 +199,14 @@ export function ChatCard() {
       </div>
 
       <div className="mt-5 grid gap-3 sm:grid-cols-2">
-        <div className="rounded-[1.35rem] bg-white/8 p-4">
+        <div className="rounded-[1.35rem] bg-white/[0.08] p-4">
           <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-white/50">
             <MapPinned className="h-3.5 w-3.5" />
             Route
           </div>
           <p className="mt-2 font-semibold text-white">Dubai → Bodrum → Istanbul</p>
         </div>
-        <div className="rounded-[1.35rem] bg-white/8 p-4">
+        <div className="rounded-[1.35rem] bg-white/[0.08] p-4">
           <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-white/50">
             <Stars className="h-3.5 w-3.5" />
             Style
@@ -215,7 +215,7 @@ export function ChatCard() {
         </div>
       </div>
 
-      <button className="mt-6 flex w-full items-center justify-between rounded-full border border-white/10 bg-white/6 px-4 py-3 text-left text-sm text-white/70">
+      <button className="mt-6 flex w-full items-center justify-between rounded-full border border-white/10 bg-white/[0.06] px-4 py-3 text-left text-sm text-white/70" type="button">
         Ask AI to build the next itinerary
         <ArrowRight className="h-4 w-4" />
       </button>

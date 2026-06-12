@@ -77,15 +77,23 @@ export default function NewTrip() {
               Your {savedTrip.destination || "next escape"} draft is ready.
             </h1>
             <p className="mt-5 text-base leading-8 text-muted">
-              We saved the brief in this browser. The next product step is generating itinerary options,
-              visa guidance, and a booking checklist from it.
+              We saved the brief in this browser. Hand it to the concierge to turn it into a
+              day-by-day itinerary, or head back to your dashboard.
             </p>
-            <Link
-              className="mt-8 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-ink px-6 text-sm font-semibold text-white"
-              href="/dashboard"
-            >
-              Return to dashboard <ArrowRight className="h-4 w-4" />
-            </Link>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+              <Link
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-ink px-6 text-sm font-semibold text-white"
+                href="/concierge?from=brief"
+              >
+                Generate itinerary with AI <Sparkles className="h-4 w-4" />
+              </Link>
+              <Link
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-black/10 bg-white/70 px-6 text-sm font-semibold text-ink transition hover:bg-white"
+                href="/dashboard"
+              >
+                Return to dashboard <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
           </div>
         ) : (
           <div className="grid gap-8 lg:grid-cols-[0.82fr_1.18fr] lg:items-start">

@@ -1,7 +1,11 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 const siteUrl = "https://packyourbags.vercel.app";
+
+export const viewport: Viewport = {
+  themeColor: "#f7f0e6",
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
