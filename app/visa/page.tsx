@@ -17,6 +17,7 @@ import {
   CATEGORY_META,
   CredentialCode,
   HELDVISAS,
+  matchesQuery,
   NATIONALITIES,
   RESIDENCIES,
   resolveDestinations,
@@ -60,13 +61,10 @@ export default function VisaExplorer() {
     [nationality, credentials],
   );
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return resolved;
-    return resolved.filter(
-      (d) => d.name.toLowerCase().includes(q) || d.region.toLowerCase().includes(q),
-    );
-  }, [resolved, query]);
+  const filtered = useMemo(
+    () => resolved.filter((d) => matchesQuery(d, query)),
+    [resolved, query],
+  );
 
   const stats = useMemo(() => summarise(resolved), [resolved]);
   const selectedNationality = NATIONALITIES.find((n) => n.code === nationality);
@@ -327,7 +325,20 @@ export default function VisaExplorer() {
                 );
               })}
               {filtered.length === 0 && (
-                <p className="text-sm text-muted">No destinations match “{query}”.</p>
+                <div className="rounded-[1.4rem] border border-black/10 bg-white/60 p-6">
+                  <p className="font-semibold text-ink">We don&apos;t track “{query}” yet.</p>
+                  <p className="mt-2 text-sm leading-6 text-muted">
+                    Coverage is expanding. If it&apos;s a European country, search{" "}
+                    <button
+                      type="button"
+                      onClick={() => setQuery("Schengen")}
+                      className="font-semibold text-clay underline-offset-2 hover:underline"
+                    >
+                      Schengen
+                    </button>
+                    . Always confirm the latest rules with the destination&apos;s official source.
+                  </p>
+                </div>
               )}
             </div>
           </>

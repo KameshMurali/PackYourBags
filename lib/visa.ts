@@ -72,7 +72,68 @@ export type DestinationRule = {
   source: string;
   overrides?: Override[];
   guide?: string; // key into VISA_GUIDES for visa-required destinations
+  aliases?: string[]; // extra searchable terms (member countries, cities, common names)
 };
+
+// The Schengen Area is one dataset entry, but travellers search by member country
+// or city — so those terms resolve to it.
+const SCHENGEN_MEMBERS = [
+  "Austria",
+  "Belgium",
+  "Bulgaria",
+  "Croatia",
+  "Czechia",
+  "Czech Republic",
+  "Denmark",
+  "Estonia",
+  "Finland",
+  "France",
+  "Germany",
+  "Greece",
+  "Hungary",
+  "Iceland",
+  "Italy",
+  "Latvia",
+  "Liechtenstein",
+  "Lithuania",
+  "Luxembourg",
+  "Malta",
+  "Netherlands",
+  "Norway",
+  "Poland",
+  "Portugal",
+  "Romania",
+  "Slovakia",
+  "Slovenia",
+  "Spain",
+  "Sweden",
+  "Switzerland",
+];
+
+const SCHENGEN_CITIES = [
+  "Paris",
+  "Berlin",
+  "Munich",
+  "Rome",
+  "Milan",
+  "Venice",
+  "Madrid",
+  "Barcelona",
+  "Amsterdam",
+  "Lisbon",
+  "Vienna",
+  "Prague",
+  "Athens",
+  "Zurich",
+  "Geneva",
+  "Brussels",
+  "Copenhagen",
+  "Stockholm",
+  "Oslo",
+  "Reykjavik",
+  "Budapest",
+  "Nice",
+];
 
 // ---------------------------------------------------------------------------
 // Dataset — Indian passport. Reviewed 2026-10. Indicative only.
@@ -99,11 +160,11 @@ const INDIA_DESTINATIONS: DestinationRule[] = [
   { code: "HK", name: "Hong Kong", flag: "🇭🇰", region: "East Asia", base: "visa-free", days: 14, note: "Pre-arrival registration required.", source: "https://www.immd.gov.hk/" },
 
   // Middle East
-  { code: "AE", name: "United Arab Emirates", flag: "🇦🇪", region: "Middle East", base: "evisa", days: 30, note: "eVisa; 14-day VOA if you hold a qualifying US/EU/… visa or residence.", source: "https://www.icp.gov.ae/", overrides: [{ credentials: ["US", "SCHENGEN", "CA", "AU"], category: "visa-on-arrival", days: 14, note: "14-day visa on arrival with qualifying visa/residence (UK no longer qualifies as of 2026 — confirm)." }] },
+  { code: "AE", name: "United Arab Emirates", flag: "🇦🇪", region: "Middle East", base: "evisa", days: 30, note: "eVisa; 14-day VOA if you hold a qualifying US/EU/… visa or residence.", source: "https://www.icp.gov.ae/", aliases: ["UAE", "Dubai", "Abu Dhabi", "Emirates"], overrides: [{ credentials: ["US", "SCHENGEN", "CA", "AU"], category: "visa-on-arrival", days: 14, note: "14-day visa on arrival with qualifying visa/residence (UK no longer qualifies as of 2026 — confirm)." }] },
   { code: "QA", name: "Qatar", flag: "🇶🇦", region: "Middle East", base: "visa-on-arrival", days: 30, note: "VOA / eligible for free waiver for some residents.", source: "https://www.visitqatar.com/" },
   { code: "OM", name: "Oman", flag: "🇴🇲", region: "Middle East", base: "evisa", note: "e-Visa; GCC residents may be eligible for easier entry.", source: "https://evisa.rop.gov.om/" },
   { code: "JO", name: "Jordan", flag: "🇯🇴", region: "Middle East", base: "visa-on-arrival", note: "VOA; free with Jordan Pass.", source: "https://www.visitjordan.com/" },
-  { code: "TR", name: "Türkiye", flag: "🇹🇷", region: "Middle East", base: "visa-required", note: "e-Visa available if you hold a valid US/UK/Schengen visa.", source: "https://www.evisa.gov.tr/", overrides: [{ credentials: ["US", "UK", "SCHENGEN"], category: "evisa", days: 30, note: "e-Visa eligible with a valid supporting visa/residence (single entry, conditions apply)." }] },
+  { code: "TR", name: "Türkiye", flag: "🇹🇷", region: "Middle East", base: "visa-required", note: "e-Visa available if you hold a valid US/UK/Schengen visa.", source: "https://www.evisa.gov.tr/", aliases: ["Turkey", "Turkiye", "Istanbul"], overrides: [{ credentials: ["US", "UK", "SCHENGEN"], category: "evisa", days: 30, note: "e-Visa eligible with a valid supporting visa/residence (single entry, conditions apply)." }] },
 
   // Caucasus / Central Asia
   { code: "GE", name: "Georgia", flag: "🇬🇪", region: "Caucasus", base: "visa-required", note: "Visa-free for holders of valid visa/residence of US, EU/Schengen, GCC, etc.", source: "https://www.geoconsul.gov.ge/", overrides: [{ credentials: ["US", "SCHENGEN", "UK", "CA", "AE"], category: "visa-free", days: 90, note: "Visa-free for up to 1 year for holders of qualifying visas/residence (confirm)." }] },
@@ -111,13 +172,13 @@ const INDIA_DESTINATIONS: DestinationRule[] = [
   { code: "KZ", name: "Kazakhstan", flag: "🇰🇿", region: "Central Asia", base: "visa-required", note: "Visa required; some exemptions apply.", source: "https://www.vmp.gov.kz/" },
 
   // Europe (Schengen + others)
-  { code: "SCHENGEN", name: "Schengen Area (26 countries)", flag: "🇪🇺", region: "Europe", base: "visa-required", note: "Short-stay (90/180) Schengen visa required.", source: "https://www.schengenvisainfo.com/", guide: "schengen" },
-  { code: "GB", name: "United Kingdom", flag: "🇬🇧", region: "Europe", base: "visa-required", note: "Standard Visitor visa required.", source: "https://www.gov.uk/standard-visitor", guide: "uk" },
+  { code: "SCHENGEN", name: "Schengen Area (29 countries)", flag: "🇪🇺", region: "Europe", base: "visa-required", note: "Short-stay (90/180) Schengen visa required — covers Germany, France, Italy, Spain, Netherlands and more.", source: "https://www.schengenvisainfo.com/", guide: "schengen", aliases: [...SCHENGEN_MEMBERS, ...SCHENGEN_CITIES, "Europe", "EU", "Schengen"] },
+  { code: "GB", name: "United Kingdom", flag: "🇬🇧", region: "Europe", base: "visa-required", note: "Standard Visitor visa required.", source: "https://www.gov.uk/standard-visitor", guide: "uk", aliases: ["UK", "Britain", "England", "Great Britain", "London", "Scotland"] },
   { code: "RS", name: "Serbia", flag: "🇷🇸", region: "Europe", base: "visa-required", note: "Visa-free with a valid multiple-entry Schengen/US/UK visa.", source: "https://www.mfa.gov.rs/", overrides: [{ credentials: ["SCHENGEN", "US", "UK"], category: "visa-free", days: 90, note: "Visa-free with a valid supporting visa (confirm current rule)." }] },
   { code: "AL", name: "Albania", flag: "🇦🇱", region: "Europe", base: "visa-required", note: "Visa-free with a valid multiple-entry Schengen/US/UK visa.", source: "https://punetejashtme.gov.al/en/", overrides: [{ credentials: ["SCHENGEN", "US", "UK"], category: "visa-free", days: 90, note: "Visa-free with a valid supporting visa (seasonal rules may also apply)." }] },
 
   // Americas
-  { code: "US", name: "United States", flag: "🇺🇸", region: "Americas", base: "visa-required", note: "B1/B2 visitor visa required.", source: "https://travel.state.gov/", guide: "us" },
+  { code: "US", name: "United States", flag: "🇺🇸", region: "Americas", base: "visa-required", note: "B1/B2 visitor visa required.", source: "https://travel.state.gov/", guide: "us", aliases: ["USA", "America", "United States", "New York", "Los Angeles"] },
   { code: "MX", name: "Mexico", flag: "🇲🇽", region: "Americas", base: "visa-required", note: "Visa-free with a valid US visa.", source: "https://www.gob.mx/inm", overrides: [{ credentials: ["US", "UK", "SCHENGEN", "CA"], category: "visa-free", days: 180, note: "Visa-free with a valid visa of these countries (confirm)." }] },
   { code: "CA", name: "Canada", flag: "🇨🇦", region: "Americas", base: "visa-required", note: "Visitor visa (or eTA if previously issued US/Canada visa — confirm).", source: "https://www.canada.ca/en/immigration-refugees-citizenship.html" },
   { code: "PA", name: "Panama", flag: "🇵🇦", region: "Americas", base: "visa-required", note: "Visa-free with a valid US/UK/Schengen/Canada visa.", source: "https://www.migracion.gob.pa/", overrides: [{ credentials: ["US", "UK", "SCHENGEN", "CA"], category: "visa-free", days: 90, note: "Visa-free with a used, valid supporting visa (confirm conditions)." }] },
@@ -309,6 +370,16 @@ export function resolveDestinations(
         CATEGORY_META[a.effective].order - CATEGORY_META[b.effective].order;
       return byCat !== 0 ? byCat : a.name.localeCompare(b.name);
     });
+}
+
+// Matches a destination against a free-text query across name, region, and aliases
+// (so "germany" / "paris" / "dubai" resolve to the right entry).
+export function matchesQuery(d: DestinationRule, query: string) {
+  const q = query.trim().toLowerCase();
+  if (!q) return true;
+  if (d.name.toLowerCase().includes(q)) return true;
+  if (d.region.toLowerCase().includes(q)) return true;
+  return (d.aliases ?? []).some((a) => a.toLowerCase().includes(q) || q.includes(a.toLowerCase()));
 }
 
 export function summarise(resolved: ResolvedDestination[]) {

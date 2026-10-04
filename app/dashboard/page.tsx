@@ -197,15 +197,37 @@ export default function Dashboard() {
                   <p className="mt-2 text-sm leading-6 text-muted">
                     {latestTrip.dates} · {latestTrip.travellers} · {latestTrip.mood}
                   </p>
+                  <p className="mt-3 text-sm font-semibold text-[#305247]">
+                    {itinerary ? "Next: refine or regenerate the plan." : "Next: turn this into a day-by-day plan."}
+                  </p>
                 </div>
               </div>
-              <button
-                className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-full bg-[#305247] px-5 text-sm font-semibold text-white"
-                onClick={() => router.push("/trips/new")}
-                type="button"
-              >
-                Edit brief <ArrowRight className="h-4 w-4" />
-              </button>
+              <div className="flex shrink-0 flex-col gap-2 sm:items-end">
+                <button
+                  className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-[#305247] px-5 text-sm font-semibold text-white"
+                  onClick={() => router.push("/concierge?from=brief")}
+                  type="button"
+                >
+                  Generate itinerary <Sparkles className="h-4 w-4" />
+                </button>
+                <div className="flex gap-2">
+                  <button
+                    className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-[#b7d4c8] bg-white/70 px-4 text-sm font-semibold text-[#305247] transition hover:bg-white"
+                    onClick={() => router.push("/visa")}
+                    type="button"
+                  >
+                    <Globe2 className="h-4 w-4" />
+                    Check visas
+                  </button>
+                  <button
+                    className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-[#b7d4c8] bg-white/70 px-4 text-sm font-semibold text-[#305247] transition hover:bg-white"
+                    onClick={() => router.push("/trips/new")}
+                    type="button"
+                  >
+                    Edit brief
+                  </button>
+                </div>
+              </div>
             </div>
           </section>
         )}

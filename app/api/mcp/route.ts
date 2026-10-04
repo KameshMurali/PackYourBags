@@ -5,6 +5,7 @@ import { store, SyncedItem } from "@/lib/store";
 import {
   CATEGORY_META,
   CredentialCode,
+  matchesQuery,
   resolveDestinations,
   summarise,
   VISA_GUIDES,
@@ -189,7 +190,7 @@ const baseHandler = createMcpHandler(
         const q = args.destination.toLowerCase();
         const match =
           resolved.find((d) => d.name.toLowerCase() === q || d.code.toLowerCase() === q) ??
-          resolved.find((d) => d.name.toLowerCase().includes(q));
+          resolved.find((d) => matchesQuery(d, args.destination));
         if (!match) {
           return text(`No visa record for '${args.destination}'. It may not be in the dataset yet — check official sources.`);
         }
