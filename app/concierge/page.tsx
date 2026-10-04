@@ -3,8 +3,9 @@
 import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ArrowRight, CheckCircle2, Lock, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, CalendarDays, CheckCircle2, Lock, MapPin, Sparkles } from "lucide-react";
 import { Logo } from "@/components/logo";
+import { ItineraryTimeline } from "@/components/itinerary";
 import {
   GeneratedItinerary,
   getLatestGeneratedItinerary,
@@ -157,7 +158,9 @@ export default function Concierge() {
         </Link>
       </header>
 
-      <section className="mx-auto max-w-3xl px-5 pt-14 text-center lg:px-8">
+      <section
+        className={`mx-auto px-5 pt-14 text-center lg:px-8 ${itinerary ? "max-w-4xl" : "max-w-3xl"}`}
+      >
         <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#f2e7d9] text-clay">
           <Sparkles className="h-6 w-6" />
         </span>
@@ -181,39 +184,56 @@ export default function Concierge() {
           </p>
         )}
         {itinerary ? (
-          <div className="glass-panel hero-shadow mt-9 rounded-[2rem] border border-black/10 p-6 text-left md:p-8">
-            <div className="flex items-start gap-4">
-              <CheckCircle2 className="mt-1 h-6 w-6 shrink-0 text-[#305247]" />
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#53786b]">
-                  Concierge itinerary generated
+          <div className="glass-panel hero-shadow mt-9 overflow-hidden rounded-[2rem] border border-black/10 text-left">
+            <div className="relative overflow-hidden border-b border-black/10 bg-gradient-to-br from-[#f5ead9] via-[#fbf5ec] to-[#eaf2ed] p-6 md:p-9">
+              <div className="pointer-events-none absolute -right-10 -top-10 h-44 w-44 rounded-full bg-[#e7d4ba] opacity-50 blur-3xl" />
+              <div className="relative">
+                <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-[#53786b]">
+                  <CheckCircle2 className="h-4 w-4 text-[#305247]" />
+                  Concierge itinerary
                 </p>
-                <h2 className="mt-2 font-display text-4xl text-ink">{itinerary.destination}</h2>
-                <p className="mt-3 text-sm leading-7 text-muted">{itinerary.summary}</p>
+                <h2 className="mt-3 font-display text-4xl leading-[0.96] tracking-tight text-ink md:text-5xl">
+                  {itinerary.destination}
+                </h2>
+                <p className="mt-4 max-w-2xl text-base leading-7 text-muted">{itinerary.summary}</p>
+                <div className="mt-5 flex flex-wrap gap-2">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white/70 px-3 py-1.5 text-xs font-semibold text-ink">
+                    <CalendarDays className="h-3.5 w-3.5 text-clay" />
+                    {itinerary.days.length} {itinerary.days.length === 1 ? "day" : "days"}
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white/70 px-3 py-1.5 text-xs font-semibold text-ink">
+                    <MapPin className="h-3.5 w-3.5 text-clay" />
+                    {itinerary.destination}
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white/70 px-3 py-1.5 text-xs font-semibold text-ink">
+                    <Sparkles className="h-3.5 w-3.5 text-clay" />
+                    Day-by-day plan
+                  </span>
+                </div>
               </div>
             </div>
-            <div className="mt-7 space-y-3">
-              {itinerary.days.map((day) => (
-                <div key={day.day} className="rounded-[1.35rem] border border-black/10 bg-white/70 p-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-clay">Day {day.day}</p>
-                  <h3 className="mt-2 font-semibold text-ink">{day.title}</h3>
-                  <p className="mt-2 text-sm leading-6 text-muted">{day.plan}</p>
-                </div>
-              ))}
+
+            <div className="p-6 md:p-9">
+              <ItineraryTimeline days={itinerary.days} />
             </div>
-            <Link
-              className="mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ink px-6 text-sm font-semibold text-white"
-              href="/dashboard"
-            >
-              Save and return to dashboard <ArrowRight className="h-4 w-4" />
-            </Link>
-            <button
-              className="mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full border border-black/10 bg-white/70 px-6 text-sm font-semibold text-ink transition hover:bg-white"
-              onClick={handleStartOver}
-              type="button"
-            >
-              Plan another trip <Sparkles className="h-4 w-4 text-clay" />
-            </button>
+
+            <div className="border-t border-black/10 bg-white/40 p-6 md:px-9">
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <Link
+                  className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-full bg-ink px-6 text-sm font-semibold text-white shadow-[0_18px_48px_rgba(32,25,20,0.22)] transition hover:-translate-y-0.5 hover:bg-[#120f0c]"
+                  href="/dashboard"
+                >
+                  Save and return to dashboard <ArrowRight className="h-4 w-4" />
+                </Link>
+                <button
+                  className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-black/10 bg-white/70 px-6 text-sm font-semibold text-ink transition hover:bg-white"
+                  onClick={handleStartOver}
+                  type="button"
+                >
+                  Plan another trip <Sparkles className="h-4 w-4 text-clay" />
+                </button>
+              </div>
+            </div>
           </div>
         ) : outOfFreeGenerations ? (
           <div className="glass-panel hero-shadow mt-9 rounded-[2rem] border border-black/10 p-6 text-left md:p-8">

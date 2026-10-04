@@ -47,6 +47,9 @@ function Header() {
         <a href="#product" className="transition hover:text-ink">
           Product
         </a>
+        <Link href="/visa" className="transition hover:text-ink">
+          Visas
+        </Link>
         <a href="#workflow" className="transition hover:text-ink">
           Workflow
         </a>

@@ -1,19 +1,23 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   ArrowRight,
   CalendarDays,
   CheckCircle2,
   Compass,
+  Globe2,
   LogOut,
   MapPinned,
   PlaneTakeoff,
+  Plug,
   Plus,
   Sparkles,
 } from "lucide-react";
 import { Logo } from "@/components/logo";
+import { ItineraryTimeline } from "@/components/itinerary";
 import {
   getSignedInAccount,
   getLatestGeneratedItinerary,
@@ -81,6 +85,22 @@ export default function Dashboard() {
       <header className="mx-auto flex max-w-7xl items-center justify-between px-5 py-6 lg:px-8">
         <Logo />
         <div className="flex items-center gap-3">
+          <nav className="mr-1 hidden items-center gap-1 md:flex">
+            <Link
+              href="/visa"
+              className="inline-flex h-11 items-center gap-2 rounded-full px-4 text-sm font-semibold text-ink/70 transition hover:bg-white/60 hover:text-ink"
+            >
+              <Globe2 className="h-4 w-4" />
+              Visas
+            </Link>
+            <Link
+              href="/connect"
+              className="inline-flex h-11 items-center gap-2 rounded-full px-4 text-sm font-semibold text-ink/70 transition hover:bg-white/60 hover:text-ink"
+            >
+              <Plug className="h-4 w-4" />
+              Connect
+            </Link>
+          </nav>
           <div className="hidden text-right sm:block">
             <p className="text-sm font-semibold text-ink">{account.name}</p>
             <p className="text-xs text-muted">{account.email}</p>
@@ -125,6 +145,39 @@ export default function Dashboard() {
           <Stat icon={CalendarDays} label="Leave available" value="18 days" detail="UAE office calendar synced" />
           <Stat icon={PlaneTakeoff} label="Trips planned" value={latestTrip ? "4 escapes" : "3 escapes"} detail={latestTrip ? "1 new brief saved" : "1 itinerary ready to book"} />
           <Stat icon={Compass} label="Shortlisted" value="12 places" detail="Filtered for your passport" />
+        </div>
+
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <Link
+            href="/visa"
+            className="group glass-panel flex items-center justify-between gap-4 rounded-[1.7rem] border border-black/10 p-5 transition hover:-translate-y-0.5 hover:border-clay/40 hover:bg-white"
+          >
+            <div className="flex items-center gap-4">
+              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#f2e7d9] text-clay">
+                <Globe2 className="h-5 w-5" />
+              </span>
+              <div>
+                <p className="font-semibold text-ink">Visa intelligence</p>
+                <p className="mt-1 text-sm text-muted">Where can you go, visa-free?</p>
+              </div>
+            </div>
+            <ArrowRight className="h-5 w-5 text-muted transition group-hover:translate-x-0.5 group-hover:text-ink" />
+          </Link>
+          <Link
+            href="/connect"
+            className="group glass-panel flex items-center justify-between gap-4 rounded-[1.7rem] border border-black/10 p-5 transition hover:-translate-y-0.5 hover:border-clay/40 hover:bg-white"
+          >
+            <div className="flex items-center gap-4">
+              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#f2e7d9] text-clay">
+                <Plug className="h-5 w-5" />
+              </span>
+              <div>
+                <p className="font-semibold text-ink">Connect ChatGPT or Claude</p>
+                <p className="mt-1 text-sm text-muted">Plan in chat, keep it here</p>
+              </div>
+            </div>
+            <ArrowRight className="h-5 w-5 text-muted transition group-hover:translate-x-0.5 group-hover:text-ink" />
+          </Link>
         </div>
 
         {latestTrip && (
@@ -184,15 +237,19 @@ export default function Dashboard() {
                 </button>
               </div>
             </div>
-            <div className="mt-6 grid gap-3 md:grid-cols-3">
-              {itinerary.days.slice(0, 3).map((day) => (
-                <div key={day.day} className="rounded-[1.35rem] border border-black/10 bg-[#fffcf7] p-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-clay">Day {day.day}</p>
-                  <h3 className="mt-2 text-sm font-semibold text-ink">{day.title}</h3>
-                  <p className="mt-2 text-sm leading-6 text-muted">{day.plan}</p>
-                </div>
-              ))}
+            <div className="mt-6">
+              <ItineraryTimeline days={itinerary.days.slice(0, 3)} />
             </div>
+            {itinerary.days.length > 3 && (
+              <button
+                className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-clay transition hover:text-ink"
+                onClick={() => router.push("/concierge?view=latest")}
+                type="button"
+              >
+                +{itinerary.days.length - 3} more {itinerary.days.length - 3 === 1 ? "day" : "days"} in the full itinerary
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            )}
           </section>
         )}
 
@@ -258,19 +315,35 @@ export default function Dashboard() {
               <p className="text-sm text-muted">Visa-aware inspiration</p>
               <h2 className="mt-2 font-display text-3xl text-ink">Easy places for your next long weekend</h2>
             </div>
-            <Compass className="hidden h-6 w-6 text-clay sm:block" />
+            <Link
+              href="/visa"
+              className="hidden shrink-0 items-center gap-2 rounded-full border border-black/10 bg-white/70 px-4 py-2 text-sm font-semibold text-ink transition hover:bg-white sm:inline-flex"
+            >
+              <Globe2 className="h-4 w-4 text-clay" />
+              Open visa explorer
+            </Link>
           </div>
           <div className="mt-6 grid gap-3 md:grid-cols-3">
             {recommendations.map(([place, visa, detail]) => (
-              <div key={place} className="rounded-[1.45rem] border border-black/10 bg-white/70 p-5">
+              <Link
+                href="/visa"
+                key={place}
+                className="group rounded-[1.45rem] border border-black/10 bg-white/70 p-5 transition hover:-translate-y-0.5 hover:border-clay/40 hover:bg-white"
+              >
                 <div className="flex items-center justify-between gap-4">
                   <p className="font-semibold text-ink">{place}</p>
                   <span className="rounded-full bg-[#f2e7d9] px-3 py-1 text-xs font-semibold text-ink">{visa}</span>
                 </div>
                 <p className="mt-3 text-sm leading-6 text-muted">{detail}</p>
-              </div>
+              </Link>
             ))}
           </div>
+          <Link
+            href="/visa"
+            className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-clay transition hover:text-ink sm:hidden"
+          >
+            Open visa explorer <ArrowRight className="h-4 w-4" />
+          </Link>
         </section>
       </section>
     </main>
