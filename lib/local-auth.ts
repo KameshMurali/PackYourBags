@@ -1,7 +1,8 @@
-export type LocalAccount = {
-  name: string;
-  email: string;
-};
+// Browser-local storage for trip drafts and generated itineraries.
+//
+// Account/session identity has moved to Auth.js (see auth.ts / auth.config.ts).
+// Only the trip + itinerary data below still lives in this browser's
+// localStorage — intentionally, so drafts stay device-local.
 
 export type TripDraft = {
   destination: string;
@@ -23,71 +24,11 @@ export type GeneratedItinerary = {
   days: ItineraryDay[];
 };
 
-const ACCOUNT_KEY = "packyourbags.account";
-const SESSION_KEY = "packyourbags.session";
 const TRIP_KEY = "packyourbags.latest-trip";
 const ITINERARY_KEY = "packyourbags.latest-itinerary";
 
 function storageAvailable() {
   return typeof window !== "undefined" && typeof window.localStorage !== "undefined";
-}
-
-export function createLocalAccount(account: LocalAccount) {
-  if (!storageAvailable()) {
-    return;
-  }
-
-  localStorage.setItem(ACCOUNT_KEY, JSON.stringify(account));
-  localStorage.setItem(SESSION_KEY, account.email);
-}
-
-export function signInLocally(email: string) {
-  const account = getLocalAccount();
-
-  if (!account || account.email.toLowerCase() !== email.toLowerCase()) {
-    return false;
-  }
-
-  localStorage.setItem(SESSION_KEY, account.email);
-  return true;
-}
-
-export function getLocalAccount(): LocalAccount | null {
-  if (!storageAvailable()) {
-    return null;
-  }
-
-  const storedAccount = localStorage.getItem(ACCOUNT_KEY);
-
-  if (!storedAccount) {
-    return null;
-  }
-
-  try {
-    return JSON.parse(storedAccount) as LocalAccount;
-  } catch {
-    localStorage.removeItem(ACCOUNT_KEY);
-    return null;
-  }
-}
-
-export function getSignedInAccount() {
-  if (!storageAvailable()) {
-    return null;
-  }
-
-  const account = getLocalAccount();
-  const sessionEmail = localStorage.getItem(SESSION_KEY);
-
-  return account && account.email === sessionEmail ? account : null;
-}
-
-export function signOutLocally() {
-  if (!storageAvailable()) {
-    return;
-  }
-
-  localStorage.removeItem(SESSION_KEY);
 }
 
 export function saveTripDraft(trip: TripDraft) {

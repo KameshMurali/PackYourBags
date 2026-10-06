@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import {
   ArrowLeft,
   Check,
@@ -17,7 +18,6 @@ import {
 } from "lucide-react";
 import { Logo } from "@/components/logo";
 import {
-  getSignedInAccount,
   GeneratedItinerary,
   saveGeneratedItinerary,
   saveTripDraft,
@@ -35,6 +35,7 @@ type SyncedItem = {
 
 export default function Connect() {
   const router = useRouter();
+  const { status } = useSession();
   const [ready, setReady] = useState(false);
   const [token, setToken] = useState<string | null>(null);
   const [origin, setOrigin] = useState("");
@@ -45,24 +46,38 @@ export default function Connect() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    const timeout = window.setTimeout(async () => {
-      if (!getSignedInAccount()) {
-        router.replace("/signin");
-        return;
-      }
+    if (status === "loading") {
+      return;
+    }
+
+    if (status === "unauthenticated") {
+      router.replace("/signin");
+      return;
+    }
+
+    let cancelled = false;
+
+    (async () => {
       setOrigin(window.location.origin);
       try {
         const res = await fetch("/api/connect");
         const data = (await res.json()) as { token: string | null };
-        setToken(data.token);
+        if (!cancelled) {
+          setToken(data.token);
+        }
       } catch {
         /* ignore */
       }
       await refreshInbox();
-      setReady(true);
-    }, 0);
-    return () => window.clearTimeout(timeout);
-  }, [router]);
+      if (!cancelled) {
+        setReady(true);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [status, router]);
 
   async function refreshInbox() {
     try {
