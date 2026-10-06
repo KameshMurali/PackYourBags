@@ -188,7 +188,7 @@ Environment variables in Vercel project settings:
 | `ANTHROPIC_API_KEY` | Required for concierge itinerary generation |
 | `ANTHROPIC_MODEL` | Optional — override the default `claude-sonnet-4-6` |
 | `USAGE_COOKIE_SECRET` | Sign the free-tier quota cookie so it can't be forged |
-| `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | Durable MCP sync storage (recommended) |
+| `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | Durable MCP sync storage (recommended). The Vercel Marketplace "Upstash for Redis" integration sets `KV_REST_API_URL` / `KV_REST_API_TOKEN` instead; both are accepted. |
 
 > After adding `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET`, make sure the production
 > redirect URI `https://packyourbags.tonewbeginning.com/api/auth/callback/google`

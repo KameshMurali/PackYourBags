@@ -48,8 +48,10 @@ const memoryStore: Store = {
 };
 
 // --- Upstash Redis (REST) --------------------------------------------------
-const UPSTASH_URL = process.env.UPSTASH_REDIS_REST_URL;
-const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
+// Upstash's own variable names, or the KV_* names that Vercel's Marketplace
+// "Upstash for Redis" integration sets automatically.
+const UPSTASH_URL = process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL;
+const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN;
 
 async function upstash(command: unknown[]): Promise<unknown> {
   const response = await fetch(UPSTASH_URL as string, {
