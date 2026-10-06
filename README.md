@@ -5,7 +5,7 @@ PackYourBags is a premium minimal travel planning app built with Next.js App Rou
 ## Features
 
 - **Landing page** — product story for leave tracking, visa discovery, trip planning, and the AI concierge.
-- **Prototype accounts** — register and sign in with a browser-local account (stored in `localStorage`; no passwords are stored or checked).
+- **Accounts** — real authentication with [Auth.js](https://authjs.dev) (NextAuth v5) and Google sign-in. JWT sessions mean login works with or without a database; an optional Postgres database persists users. See [Authentication](#authentication).
 - **Trip briefs** — capture destination, timing, travellers, mood, and notes at `/trips/new`, then hand the brief to the concierge.
 - **AI concierge** — `/concierge` turns a free-text brief into a 3–7 day itinerary using Claude Sonnet (`claude-sonnet-4-6`). Supports `?from=brief` (prefill from the saved trip brief) and `?view=latest` (reopen the last generated itinerary).
 - **Free tier + Pro** — Starter accounts get 3 free itineraries, enforced server-side via a signed HTTP-only cookie. After that the API returns 402 and the concierge shows an upgrade card. `/api/subscribe` is a demo checkout that unlocks unlimited Pro in the current browser — swap it for a real billing provider before launch.
@@ -37,6 +37,79 @@ by default; set `ANTHROPIC_MODEL` to another Claude model ID to override it.
 Set `USAGE_COOKIE_SECRET` to a long random string in production so the free-tier
 quota cookie cannot be forged.
 
+## Authentication
+
+Accounts use [Auth.js](https://authjs.dev) (NextAuth v5) with **Google** as the
+sign-in provider. Sessions are **JWT-based**, so authentication works even with
+no database. A **Postgres database is optional**: when configured it persists
+users (via the Drizzle adapter); when absent the app runs JWT-only.
+
+How it fits together (the Auth.js split-config pattern keeps middleware
+edge-safe):
+
+- `auth.config.ts` — edge-safe providers + callbacks (no database, no node-only
+  imports). Imported by `middleware.ts`.
+- `auth.ts` — imports `auth.config.ts`, conditionally adds the Drizzle adapter
+  when `DATABASE_URL` is set, and exports `{ handlers, auth, signIn, signOut }`.
+- `app/api/auth/[...nextauth]/route.ts` — exposes the Auth.js handlers.
+- `middleware.ts` — protects `/dashboard`, `/concierge`, `/trips/*`, `/connect`,
+  and `/admin` (redirecting unauthenticated visitors to `/signin`). `/` and
+  `/visa` stay public.
+
+Trips and itineraries intentionally remain in browser `localStorage`
+(`lib/local-auth.ts`); only account/session identity moved to Auth.js.
+
+### Environment variables
+
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `AUTH_SECRET` | Yes (prod) | Encrypts the session JWT. Generate with `npx auth secret`. |
+| `AUTH_GOOGLE_ID` | For sign-in | Google OAuth client ID. |
+| `AUTH_GOOGLE_SECRET` | For sign-in | Google OAuth client secret. |
+| `ADMIN_EMAILS` | Optional | Comma-separated admin emails. Defaults to `kameshwar.murali@gmail.com` when unset. |
+| `DATABASE_URL` | Optional | Postgres connection string. Enables user persistence + the admin user list. |
+
+Sign-in is only enabled when **both** `AUTH_GOOGLE_ID` and `AUTH_GOOGLE_SECRET`
+are present. Without them the app still builds and runs — `/signin` shows a
+friendly "Google sign-in isn't configured yet" message.
+
+### Setup steps
+
+1. **Create a Google OAuth client.** Go to the
+   [Google Cloud Console → Credentials](https://console.cloud.google.com/apis/credentials),
+   create an **OAuth client ID** of type **Web application**, and add these
+   **Authorized redirect URIs**:
+   - `https://packyourbags.tonewbeginning.com/api/auth/callback/google`
+   - `http://localhost:3000/api/auth/callback/google`
+
+   Copy the client ID and secret into `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET`.
+2. **Generate the session secret:** `npx auth secret` and set the result as
+   `AUTH_SECRET`.
+3. **(Optional) Create a Postgres database** — e.g. a free
+   [Neon](https://neon.tech) or Vercel Postgres database — and set its
+   connection string as `DATABASE_URL`.
+4. **(Optional) Push the schema:** with `DATABASE_URL` set, run
+   `npm run db:push` once to create the Auth.js tables (`user`, `account`,
+   `session`, `verificationToken`). This uses `drizzle-kit push` — no migration
+   files are generated.
+5. **(Optional) Set `ADMIN_EMAILS`** to a comma-separated list of admin emails.
+   When unset, `kameshwar.murali@gmail.com` is the default admin.
+
+### Admin
+
+`kameshwar.murali@gmail.com` is the built-in admin. Admin status is derived from
+`ADMIN_EMAILS` on every request, so it is always correct with or without a
+database; when a database is present, a `role` column on `user` is also kept in
+sync on each sign-in. Admins see an **Admin** link in the dashboard header and
+can open `/admin`:
+
+- **With a database** — lists users (email, name, role, created).
+- **Without a database** — shows the signed-in admin's status plus a note that
+  user listing requires `DATABASE_URL`.
+
+Non-admins are redirected away from `/admin` by the middleware and also shown a
+"not authorized" panel by the in-page guard.
+
 ## Connect to ChatGPT / Claude (MCP server)
 
 PackYourBags exposes a remote [MCP](https://modelcontextprotocol.io) server over
@@ -52,26 +125,41 @@ An assistant connected to it can call these tools:
 | `check_visa` | Visa requirement + documentation checklist for a destination |
 | `list_visa_free` | Destinations reachable without a prior visa |
 
-**Auth** is a bearer token. The traveller generates one at `/connect`, which stores it
-in a cookie (so the web app reads the same private namespace) and displays it to paste
-into their assistant's connector config as `Authorization: Bearer <token>`. The token's
-SHA-256 hash is the storage namespace — the raw secret is never used as a key.
+**Auth is OAuth 2.1** (the MCP authorization spec), so connecting only needs the URL:
+
+1. The client calls `/api/mcp` without a token and gets a `401` whose `WWW-Authenticate`
+   header points at `/.well-known/oauth-protected-resource`. That names this site as the
+   authorization server (`/.well-known/oauth-authorization-server`).
+2. It registers itself at `/api/oauth/register` (Dynamic Client Registration, RFC 7591).
+3. It opens `/oauth/authorize`: the traveller signs in with Google and clicks **Allow**.
+4. It swaps the code for tokens at `/api/oauth/token` (PKCE S256 required; refresh supported).
+
+The server is **stateless**: client IDs, codes, and tokens are HMAC-signed with
+`AUTH_SECRET` (or `MCP_OAUTH_SECRET`), so it works across serverless instances with no
+storage. Codes expire after 5 minutes and access tokens after 1 hour; refresh tokens last
+30 days, and rotating the secret revokes everything. Assistant data lands in a namespace
+derived from the traveller's verified Google email, so every connector they authorize
+writes to the same inbox their signed-in `/connect` page reads. The core logic is in
+`lib/oauth.ts`.
+
+Manual bearer tokens (`pyb_...`, generated under **Advanced** on `/connect`) still work for
+clients without OAuth, such as the `mcp-remote` bridge.
 
 **Storage** is pluggable (`lib/store.ts`): in-memory for local dev, or **Upstash Redis**
 in production when `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` are set (via the
 Upstash REST API — no SDK). In-memory data is dropped on serverless cold starts, so set
 Upstash for reliable sync.
 
-Connecting:
+Connecting (connector URL: `https://<your-domain>/api/mcp`):
 
-- **Claude Desktop** — add a remote MCP server with the `/api/mcp` URL and an
-  `Authorization: Bearer <token>` header (or use the `mcp-remote` bridge with
-  `--header`).
-- **Claude.ai** — Settings → Connectors → add a custom connector with the URL + token.
-- **ChatGPT** — enable Developer mode / Connectors and add the MCP server URL + bearer header.
+- **Claude (web & desktop)** — Settings → Connectors → Add custom connector → paste the URL
+  → Connect → continue with Google → Allow.
+- **ChatGPT** — turn on Developer mode, create a connector with the URL, choose OAuth, then
+  continue with Google → Allow.
+- **Claude Code / other MCP clients** — e.g. `claude mcp add --transport http packyourbags <URL>`;
+  the browser opens for sign-in.
 
-Full per-client steps are on the in-app `/connect` page. OAuth 2.1 (one-click connect for
-hosted connectors) is the production upgrade path — see `docs/ROADMAP.md`.
+Full per-client steps are on the in-app `/connect` page.
 
 ## Quality checks
 
@@ -93,7 +181,15 @@ Environment variables in Vercel project settings:
 
 | Variable | Purpose |
 | --- | --- |
+| `AUTH_SECRET` | Encrypts the Auth.js session JWT — generate with `npx auth secret` (required in production) |
+| `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` | Google OAuth credentials; sign-in is enabled only when both are set |
+| `ADMIN_EMAILS` | Comma-separated admin emails (defaults to `kameshwar.murali@gmail.com` when unset) |
+| `DATABASE_URL` | Optional Postgres connection string for user persistence; run `npm run db:push` after setting it |
 | `ANTHROPIC_API_KEY` | Required for concierge itinerary generation |
 | `ANTHROPIC_MODEL` | Optional — override the default `claude-sonnet-4-6` |
 | `USAGE_COOKIE_SECRET` | Sign the free-tier quota cookie so it can't be forged |
-| `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | Durable MCP sync storage (recommended) |
+| `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | Durable MCP sync storage (recommended). The Vercel Marketplace "Upstash for Redis" integration sets `KV_REST_API_URL` / `KV_REST_API_TOKEN` instead; both are accepted. |
+
+> After adding `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET`, make sure the production
+> redirect URI `https://packyourbags.tonewbeginning.com/api/auth/callback/google`
+> is registered on the Google OAuth client.

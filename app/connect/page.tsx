@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import {
   ArrowLeft,
   Check,
@@ -17,7 +18,6 @@ import {
 } from "lucide-react";
 import { Logo } from "@/components/logo";
 import {
-  getSignedInAccount,
   GeneratedItinerary,
   saveGeneratedItinerary,
   saveTripDraft,
@@ -35,6 +35,8 @@ type SyncedItem = {
 
 export default function Connect() {
   const router = useRouter();
+  const { data: session, status } = useSession();
+  const isAdmin = session?.user?.role === "admin";
   const [ready, setReady] = useState(false);
   const [token, setToken] = useState<string | null>(null);
   const [origin, setOrigin] = useState("");
@@ -45,24 +47,38 @@ export default function Connect() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    const timeout = window.setTimeout(async () => {
-      if (!getSignedInAccount()) {
-        router.replace("/signin");
-        return;
-      }
+    if (status === "loading") {
+      return;
+    }
+
+    if (status === "unauthenticated") {
+      router.replace("/signin");
+      return;
+    }
+
+    let cancelled = false;
+
+    (async () => {
       setOrigin(window.location.origin);
       try {
         const res = await fetch("/api/connect");
         const data = (await res.json()) as { token: string | null };
-        setToken(data.token);
+        if (!cancelled) {
+          setToken(data.token);
+        }
       } catch {
         /* ignore */
       }
       await refreshInbox();
-      setReady(true);
-    }, 0);
-    return () => window.clearTimeout(timeout);
-  }, [router]);
+      if (!cancelled) {
+        setReady(true);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [status, router]);
 
   async function refreshInbox() {
     try {
@@ -146,109 +162,66 @@ export default function Connect() {
           trips and itineraries into your workspace, and check visas — straight from a chat.
         </p>
 
-        {/* Step 1 — token */}
+        {/* Step 1 — connect (OAuth: just the URL) */}
         <div className="glass-panel hero-shadow mt-9 rounded-[2rem] border border-black/10 p-6 md:p-8">
-          <div className="flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#f2e7d9] text-clay">
-              <KeyRound className="h-5 w-5" />
-            </span>
-            <h2 className="font-display text-2xl text-ink">1. Your connection token</h2>
-          </div>
-          <p className="mt-3 text-sm leading-7 text-muted">
-            This is a secret, like a password. It links your assistant to your private workspace.
-            Keep it safe; generating a new one replaces the old.
-          </p>
-          {token ? (
-            <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <code className="flex-1 overflow-x-auto rounded-[1rem] border border-black/10 bg-[#fffcf7] px-4 py-3 font-mono text-sm text-ink">
-                {token}
-              </code>
-              <button
-                type="button"
-                onClick={() => copy("token", token)}
-                className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-full border border-black/10 bg-white/70 px-5 text-sm font-semibold text-ink transition hover:bg-white"
-              >
-                {copied === "token" ? <Check className="h-4 w-4 text-[#305247]" /> : <Copy className="h-4 w-4" />}
-                {copied === "token" ? "Copied" : "Copy"}
-              </button>
-            </div>
-          ) : (
-            <p className="mt-4 text-sm text-muted">No token yet — generate one to get started.</p>
-          )}
-          <button
-            type="button"
-            onClick={generate}
-            disabled={busy}
-            className="mt-4 inline-flex h-11 items-center justify-center gap-2 rounded-full bg-ink px-5 text-sm font-semibold text-white shadow-[0_18px_48px_rgba(32,25,20,0.22)] disabled:opacity-60"
-          >
-            <RefreshCw className="h-4 w-4" />
-            {token ? "Regenerate token" : "Generate token"}
-          </button>
-        </div>
-
-        {/* Step 2 — connect */}
-        <div className="glass-panel hero-shadow mt-5 rounded-[2rem] border border-black/10 p-6 md:p-8">
           <div className="flex items-center gap-3">
             <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#f2e7d9] text-clay">
               <Plug className="h-5 w-5" />
             </span>
-            <h2 className="font-display text-2xl text-ink">2. Add it to your assistant</h2>
+            <h2 className="font-display text-2xl text-ink">1. Add PackYourBags to your assistant</h2>
           </div>
+          <p className="mt-3 text-sm leading-7 text-muted">
+            All you need is this address. Your assistant opens a PackYourBags sign-in, you continue
+            with Google and approve, and it&apos;s connected. No keys to copy.
+          </p>
 
-          <div className="mt-5 space-y-3">
-            <Field label="MCP server URL" value={mcpUrl} copied={copied === "url"} onCopy={() => copy("url", mcpUrl)} />
-            <Field
-              label="Authorization header"
-              value={token ? `Authorization: Bearer ${token}` : "Generate a token first"}
-              copied={copied === "hdr"}
-              onCopy={() => token && copy("hdr", `Authorization: Bearer ${token}`)}
-            />
+          <div className="mt-5">
+            <Field label="Connector URL" value={mcpUrl} copied={copied === "url"} onCopy={() => copy("url", mcpUrl)} />
           </div>
 
           <div className="mt-6 grid gap-4 md:grid-cols-3">
             <ClientCard
-              title="Claude Desktop"
-              steps={[
-                "Settings → Developer → Edit config",
-                "Add a remote MCP server with the URL above",
-                "Set the Authorization: Bearer header to your token",
-                "Restart Claude Desktop",
-              ]}
-            />
-            <ClientCard
-              title="Claude.ai"
+              title="Claude (web & desktop)"
               steps={[
                 "Settings → Connectors → Add custom connector",
-                "Paste the MCP server URL",
-                "Add the bearer token when prompted",
-                "Enable it in a new chat",
+                "Name it PackYourBags and paste the URL",
+                "Click Connect, continue with Google, then Allow",
+                "Turn it on in a chat from the tools menu",
               ]}
             />
             <ClientCard
               title="ChatGPT"
               steps={[
-                "Enable Developer mode / Connectors",
-                "Add an MCP server with the URL above",
-                "Set the Authorization bearer header",
-                "Turn the connector on for the chat",
+                "Settings → Apps & Connectors → Advanced → turn on Developer mode",
+                "Create a connector and paste the URL",
+                "Choose OAuth, continue with Google, then Allow",
+                "Enable it for the chat",
+              ]}
+            />
+            <ClientCard
+              title="Claude Code, Cursor & other MCP apps"
+              steps={[
+                "Add a remote (HTTP) MCP server with the URL",
+                "e.g. claude mcp add --transport http packyourbags <URL>",
+                "Sign in with Google when the browser opens",
+                "Ask it to save or list your trips",
               ]}
             />
           </div>
           <p className="mt-4 text-xs leading-6 text-muted">
-            Tip: in Claude Desktop you can also use the <code className="font-mono">mcp-remote</code>{" "}
-            bridge with <code className="font-mono">--header &quot;Authorization: Bearer &lt;token&gt;&quot;</code>. Some
-            hosted connectors expect OAuth — bearer-token auth works today; OAuth is on the roadmap.
+            Your assistant only gets access to PackYourBags trips, itineraries, and visa checks, never
+            your Google account. Remove the connector in its settings to disconnect.
           </p>
         </div>
 
-        {/* Step 3 — inbox */}
+        {/* Step 2 — inbox */}
         <div className="glass-panel hero-shadow mt-5 rounded-[2rem] border border-black/10 p-6 md:p-8">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#f2e7d9] text-clay">
                 <Inbox className="h-5 w-5" />
               </span>
-              <h2 className="font-display text-2xl text-ink">3. From your assistant</h2>
+              <h2 className="font-display text-2xl text-ink">2. From your assistant</h2>
             </div>
             <div className="flex items-center gap-3">
               <button
@@ -270,12 +243,14 @@ export default function Connect() {
             </div>
           </div>
 
-          {!durable && (
+          {!durable && isAdmin && (
             <p className="mt-4 flex items-start gap-2 rounded-[1.1rem] border border-[#e7d3a9] bg-[#fbf3e3] p-3 text-xs leading-5 text-[#7a5a1e]">
               <Sparkles className="mt-0.5 h-4 w-4 shrink-0" />
-              Demo storage is in-memory and may reset between requests on serverless. Set{" "}
-              <code className="font-mono">UPSTASH_REDIS_REST_URL</code> and{" "}
-              <code className="font-mono">UPSTASH_REDIS_REST_TOKEN</code> for durable sync.
+              <span>
+                Admin note: assistant storage is in-memory, so items can disappear between requests on
+                Vercel. Set <code className="font-mono">UPSTASH_REDIS_REST_URL</code> and{" "}
+                <code className="font-mono">UPSTASH_REDIS_REST_TOKEN</code> for durable sync.
+              </span>
             </p>
           )}
 
@@ -321,6 +296,44 @@ export default function Connect() {
             </div>
           )}
         </div>
+
+        {/* Advanced — manual token for MCP clients without OAuth */}
+        <details className="glass-panel mt-5 rounded-[2rem] border border-black/10 p-6 md:p-8">
+          <summary className="flex cursor-pointer list-none items-center gap-3">
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#f2e7d9] text-clay">
+              <KeyRound className="h-5 w-5" />
+            </span>
+            <span className="font-display text-2xl text-ink">Advanced: connect with a manual token</span>
+          </summary>
+          <p className="mt-4 text-sm leading-7 text-muted">
+            Only for MCP clients that can&apos;t sign in with OAuth (for example the{" "}
+            <code className="font-mono">mcp-remote</code> bridge with{" "}
+            <code className="font-mono">--header &quot;Authorization: Bearer &lt;token&gt;&quot;</code>). The token is a
+            secret, like a password. Generating a new one replaces the old.
+          </p>
+          {token ? (
+            <div className="mt-4 space-y-3">
+              <Field label="Connection token" value={token} copied={copied === "token"} onCopy={() => copy("token", token)} />
+              <Field
+                label="Authorization header"
+                value={`Authorization: Bearer ${token}`}
+                copied={copied === "hdr"}
+                onCopy={() => copy("hdr", `Authorization: Bearer ${token}`)}
+              />
+            </div>
+          ) : (
+            <p className="mt-4 text-sm text-muted">No token yet.</p>
+          )}
+          <button
+            type="button"
+            onClick={generate}
+            disabled={busy}
+            className="mt-4 inline-flex h-11 items-center justify-center gap-2 rounded-full bg-ink px-5 text-sm font-semibold text-white shadow-[0_18px_48px_rgba(32,25,20,0.22)] disabled:opacity-60"
+          >
+            <RefreshCw className="h-4 w-4" />
+            {token ? "Regenerate token" : "Generate token"}
+          </button>
+        </details>
       </section>
     </main>
   );

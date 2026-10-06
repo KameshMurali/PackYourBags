@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { signOut, useSession } from "next-auth/react";
 import {
   ArrowRight,
   CalendarDays,
@@ -14,17 +15,15 @@ import {
   PlaneTakeoff,
   Plug,
   Plus,
+  Shield,
   Sparkles,
 } from "lucide-react";
 import { Logo } from "@/components/logo";
 import { ItineraryTimeline } from "@/components/itinerary";
 import {
-  getSignedInAccount,
   getLatestGeneratedItinerary,
   getLatestTripDraft,
   GeneratedItinerary,
-  LocalAccount,
-  signOutLocally,
   TripDraft,
 } from "@/lib/local-auth";
 
@@ -50,35 +49,43 @@ function getGreeting() {
 
 export default function Dashboard() {
   const router = useRouter();
-  const [account, setAccount] = useState<LocalAccount | null>(null);
+  const { data: session, status } = useSession();
   const [latestTrip, setLatestTrip] = useState<TripDraft | null>(null);
   const [itinerary, setItinerary] = useState<GeneratedItinerary | null>(null);
 
   useEffect(() => {
+    if (status === "loading") {
+      return;
+    }
+
+    if (status === "unauthenticated") {
+      router.replace("/signin");
+      return;
+    }
+
+    // Trips & itineraries continue to live in this browser's localStorage.
+    // Deferred so setState isn't called synchronously inside the effect body.
     const timeout = window.setTimeout(() => {
-      const signedInAccount = getSignedInAccount();
-
-      if (!signedInAccount) {
-        router.replace("/signin");
-        return;
-      }
-
-      setAccount(signedInAccount);
       setLatestTrip(getLatestTripDraft());
       setItinerary(getLatestGeneratedItinerary());
     }, 0);
 
     return () => window.clearTimeout(timeout);
-  }, [router]);
+  }, [status, router]);
 
   function handleSignOut() {
-    signOutLocally();
-    router.push("/");
+    signOut({ callbackUrl: "/" });
   }
 
-  if (!account) {
+  const user = session?.user;
+
+  if (status !== "authenticated" || !user) {
     return <main className="min-h-screen" />;
   }
+
+  const displayName = user.name?.trim() || user.email || "Traveller";
+  const firstName = displayName.split(" ")[0];
+  const isAdmin = user.role === "admin";
 
   return (
     <main className="min-h-screen pb-12">
@@ -100,10 +107,19 @@ export default function Dashboard() {
               <Plug className="h-4 w-4" />
               Connect
             </Link>
+            {isAdmin && (
+              <Link
+                href="/admin"
+                className="inline-flex h-11 items-center gap-2 rounded-full px-4 text-sm font-semibold text-ink/70 transition hover:bg-white/60 hover:text-ink"
+              >
+                <Shield className="h-4 w-4" />
+                Admin
+              </Link>
+            )}
           </nav>
           <div className="hidden text-right sm:block">
-            <p className="text-sm font-semibold text-ink">{account.name}</p>
-            <p className="text-xs text-muted">{account.email}</p>
+            <p className="text-sm font-semibold text-ink">{displayName}</p>
+            <p className="text-xs text-muted">{user.email}</p>
           </div>
           <button
             className="inline-flex h-11 items-center gap-2 rounded-full border border-black/10 bg-white/70 px-4 text-sm font-semibold text-ink transition hover:bg-white"
@@ -123,7 +139,7 @@ export default function Dashboard() {
               Your travel workspace
             </p>
             <h1 className="mt-4 max-w-3xl font-display text-5xl leading-[0.94] tracking-tight text-ink md:text-7xl">
-              {getGreeting()}, {account.name.split(" ")[0]}.
+              {getGreeting()}, {firstName}.
             </h1>
             <p className="mt-5 max-w-2xl text-lg leading-8 text-muted">
               {latestTrip
