@@ -4,12 +4,13 @@
 import type { DestinationRule } from "../types";
 import { EGYPT_DESTINATIONS } from "./eg";
 import { INDIA_DESTINATIONS } from "./in";
+import { INDIA_EXTRA_DESTINATIONS } from "./in-extra";
 import { NIGERIA_DESTINATIONS } from "./ng";
 import { PHILIPPINES_DESTINATIONS } from "./ph";
 import { PAKISTAN_DESTINATIONS } from "./pk";
 
 export const DATASETS: Readonly<Record<string, readonly DestinationRule[]>> = {
-  IN: INDIA_DESTINATIONS,
+  IN: [...INDIA_DESTINATIONS, ...INDIA_EXTRA_DESTINATIONS],
   PK: PAKISTAN_DESTINATIONS,
   PH: PHILIPPINES_DESTINATIONS,
   NG: NIGERIA_DESTINATIONS,
