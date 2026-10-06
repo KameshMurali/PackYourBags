@@ -27,19 +27,23 @@ export const authConfig = {
         Google({
           clientId: process.env.AUTH_GOOGLE_ID,
           clientSecret: process.env.AUTH_GOOGLE_SECRET,
-          allowDangerousEmailAccountLinking: true,
         }),
       ]
     : [],
   callbacks: {
-    // Stamp the role onto the token. Admin status is derived from ADMIN_EMAILS
-    // (edge-safe), so it is always correct even without a database.
-    jwt({ token, user }) {
-      if (user?.email) {
-        token.role = roleForEmail(user.email);
-      } else if (token.email && !token.role) {
-        token.role = roleForEmail(token.email);
+    // Admin access is granted by email address, so only accept Google accounts
+    // whose email Google has verified.
+    signIn({ account, profile }) {
+      if (account?.provider === "google") {
+        return (profile as { email_verified?: boolean } | undefined)?.email_verified === true;
       }
+      return true;
+    },
+    // Recompute the role on every request (it's a cheap env lookup) rather than
+    // freezing it at sign-in, so removing someone from ADMIN_EMAILS takes effect
+    // immediately instead of when their 30-day session expires.
+    jwt({ token, user }) {
+      token.role = roleForEmail(user?.email ?? token.email);
       return token;
     },
     // Surface the role on the session for client + server components.

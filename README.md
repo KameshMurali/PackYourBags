@@ -125,26 +125,41 @@ An assistant connected to it can call these tools:
 | `check_visa` | Visa requirement + documentation checklist for a destination |
 | `list_visa_free` | Destinations reachable without a prior visa |
 
-**Auth** is a bearer token. The traveller generates one at `/connect`, which stores it
-in a cookie (so the web app reads the same private namespace) and displays it to paste
-into their assistant's connector config as `Authorization: Bearer <token>`. The token's
-SHA-256 hash is the storage namespace — the raw secret is never used as a key.
+**Auth is OAuth 2.1** (the MCP authorization spec), so connecting only needs the URL:
+
+1. The client calls `/api/mcp` without a token and gets a `401` whose `WWW-Authenticate`
+   header points at `/.well-known/oauth-protected-resource`. That names this site as the
+   authorization server (`/.well-known/oauth-authorization-server`).
+2. It registers itself at `/api/oauth/register` (Dynamic Client Registration, RFC 7591).
+3. It opens `/oauth/authorize`: the traveller signs in with Google and clicks **Allow**.
+4. It swaps the code for tokens at `/api/oauth/token` (PKCE S256 required; refresh supported).
+
+The server is **stateless**: client IDs, codes, and tokens are HMAC-signed with
+`AUTH_SECRET` (or `MCP_OAUTH_SECRET`), so it works across serverless instances with no
+storage. Codes expire after 5 minutes and access tokens after 1 hour; refresh tokens last
+30 days, and rotating the secret revokes everything. Assistant data lands in a namespace
+derived from the traveller's verified Google email, so every connector they authorize
+writes to the same inbox their signed-in `/connect` page reads. The core logic is in
+`lib/oauth.ts`.
+
+Manual bearer tokens (`pyb_...`, generated under **Advanced** on `/connect`) still work for
+clients without OAuth, such as the `mcp-remote` bridge.
 
 **Storage** is pluggable (`lib/store.ts`): in-memory for local dev, or **Upstash Redis**
 in production when `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` are set (via the
 Upstash REST API — no SDK). In-memory data is dropped on serverless cold starts, so set
 Upstash for reliable sync.
 
-Connecting:
+Connecting (connector URL: `https://<your-domain>/api/mcp`):
 
-- **Claude Desktop** — add a remote MCP server with the `/api/mcp` URL and an
-  `Authorization: Bearer <token>` header (or use the `mcp-remote` bridge with
-  `--header`).
-- **Claude.ai** — Settings → Connectors → add a custom connector with the URL + token.
-- **ChatGPT** — enable Developer mode / Connectors and add the MCP server URL + bearer header.
+- **Claude (web & desktop)** — Settings → Connectors → Add custom connector → paste the URL
+  → Connect → continue with Google → Allow.
+- **ChatGPT** — turn on Developer mode, create a connector with the URL, choose OAuth, then
+  continue with Google → Allow.
+- **Claude Code / other MCP clients** — e.g. `claude mcp add --transport http packyourbags <URL>`;
+  the browser opens for sign-in.
 
-Full per-client steps are on the in-app `/connect` page. OAuth 2.1 (one-click connect for
-hosted connectors) is the production upgrade path — see `docs/ROADMAP.md`.
+Full per-client steps are on the in-app `/connect` page.
 
 ## Quality checks
 
