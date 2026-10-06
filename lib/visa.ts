@@ -181,6 +181,7 @@ const INDIA_DESTINATIONS: DestinationRule[] = [
   { code: "US", name: "United States", flag: "🇺🇸", region: "Americas", base: "visa-required", note: "B1/B2 visitor visa required.", source: "https://travel.state.gov/", guide: "us", aliases: ["USA", "America", "United States", "New York", "Los Angeles"] },
   { code: "MX", name: "Mexico", flag: "🇲🇽", region: "Americas", base: "visa-required", note: "Visa-free with a valid US visa.", source: "https://www.gob.mx/inm", overrides: [{ credentials: ["US", "UK", "SCHENGEN", "CA"], category: "visa-free", days: 180, note: "Visa-free with a valid visa of these countries (confirm)." }] },
   { code: "CA", name: "Canada", flag: "🇨🇦", region: "Americas", base: "visa-required", note: "Visitor visa (or eTA if previously issued US/Canada visa — confirm).", source: "https://www.canada.ca/en/immigration-refugees-citizenship.html" },
+  { code: "BR", name: "Brazil", flag: "🇧🇷", region: "Americas", base: "visa-required", note: "Visitor Visa (VIVIS) required — apply on Brazil's e-Consular portal through the Brazilian mission where you live (UAE residents: Brazil's embassy or consulate in the UAE). Brazil's tourist e-Visa is only for US, Canadian and Australian passports; Indian citizens can use a business e-Visa for business trips.", source: "https://www.gov.br/mre/pt-br/embaixada-nova-delhi/embassy-of-brazil-in-new-delhi/visas", aliases: ["Brasil", "Rio de Janeiro", "São Paulo"] },
   { code: "PA", name: "Panama", flag: "🇵🇦", region: "Americas", base: "visa-required", note: "Visa-free with a valid US/UK/Schengen/Canada visa.", source: "https://www.migracion.gob.pa/", overrides: [{ credentials: ["US", "UK", "SCHENGEN", "CA"], category: "visa-free", days: 90, note: "Visa-free with a used, valid supporting visa (confirm conditions)." }] },
   { code: "DO", name: "Dominican Republic", flag: "🇩🇴", region: "Americas", base: "visa-free", days: 30, note: "E-ticket required.", source: "https://eticket.migracion.gob.do/" },
   { code: "BB", name: "Barbados", flag: "🇧🇧", region: "Americas", base: "visa-free", days: 90, source: "https://www.gov.bb/" },
@@ -374,12 +375,31 @@ export function resolveDestinations(
 
 // Matches a destination against a free-text query across name, region, and aliases
 // (so "germany" / "paris" / "dubai" resolve to the right entry).
+// Lowercase, strip accents, and turn punctuation into spaces so "turkiye" finds
+// "Türkiye", "sao paulo" finds "São Paulo", and "Amsterdam, Netherlands" still
+// matches on "amsterdam".
+function normalize(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
 export function matchesQuery(d: DestinationRule, query: string) {
-  const q = query.trim().toLowerCase();
+  const q = normalize(query);
   if (!q) return true;
-  if (d.name.toLowerCase().includes(q)) return true;
-  if (d.region.toLowerCase().includes(q)) return true;
-  return (d.aliases ?? []).some((a) => a.toLowerCase().includes(q) || q.includes(a.toLowerCase()));
+  if (normalize(d.name).includes(q)) return true;
+  if (normalize(d.region).includes(q)) return true;
+  const paddedQuery = ` ${q} `;
+  return (d.aliases ?? []).some((alias) => {
+    const a = normalize(alias);
+    // Alias starts with or contains the query ("bras" -> "Brasil"), or the query
+    // contains the alias as a whole word ("amsterdam netherlands"), never a
+    // fragment (so "jerusalem" doesn't hit "USA").
+    return a.includes(q) || paddedQuery.includes(` ${a} `);
+  });
 }
 
 export function summarise(resolved: ResolvedDestination[]) {

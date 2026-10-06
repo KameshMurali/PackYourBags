@@ -326,9 +326,21 @@ export default function VisaExplorer() {
               })}
               {filtered.length === 0 && (
                 <div className="rounded-[1.4rem] border border-black/10 bg-white/60 p-6">
-                  <p className="font-semibold text-ink">We don&apos;t track “{query}” yet.</p>
+                  <p className="font-semibold text-ink">
+                    We haven&apos;t verified “{query}” for this passport yet.
+                  </p>
                   <p className="mt-2 text-sm leading-6 text-muted">
-                    Coverage is expanding. If it&apos;s a European country, search{" "}
+                    You can check the current rule right now on the{" "}
+                    <a
+                      href="https://www.iatatravelcentre.com/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 font-semibold text-clay underline-offset-2 hover:underline"
+                    >
+                      IATA Travel Centre <ExternalLink className="h-3 w-3" />
+                    </a>
+                    , the same database airlines check at boarding, or on the destination&apos;s
+                    embassy website. Planning Europe? Try{" "}
                     <button
                       type="button"
                       onClick={() => setQuery("Schengen")}
@@ -336,7 +348,7 @@ export default function VisaExplorer() {
                     >
                       Schengen
                     </button>
-                    . Always confirm the latest rules with the destination&apos;s official source.
+                    .
                   </p>
                 </div>
               )}
