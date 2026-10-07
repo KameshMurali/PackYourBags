@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { ArrowLeft, ArrowRight, CalendarDays, CheckCircle2, Lock, MapPin, Sparkles } from "lucide-react";
 import { Logo } from "@/components/logo";
 import { ItineraryTimeline } from "@/components/itinerary";
@@ -10,7 +11,6 @@ import {
   GeneratedItinerary,
   getLatestGeneratedItinerary,
   getLatestTripDraft,
-  getSignedInAccount,
   saveGeneratedItinerary,
   saveTripDraft,
   TripDraft,
@@ -33,6 +33,7 @@ function promptFromDraft(draft: TripDraft) {
 
 export default function Concierge() {
   const router = useRouter();
+  const { status } = useSession();
   const [ready, setReady] = useState(false);
   const [prompt, setPrompt] = useState("");
   const [itinerary, setItinerary] = useState<GeneratedItinerary | null>(null);
@@ -42,12 +43,17 @@ export default function Concierge() {
   const [isUpgrading, setIsUpgrading] = useState(false);
 
   useEffect(() => {
-    const timeout = window.setTimeout(() => {
-      if (!getSignedInAccount()) {
-        router.replace("/signin");
-        return;
-      }
+    if (status === "loading") {
+      return;
+    }
 
+    if (status === "unauthenticated") {
+      router.replace("/signin");
+      return;
+    }
+
+    // Deferred so setState isn't called synchronously inside the effect body.
+    const timeout = window.setTimeout(() => {
       const params = new URLSearchParams(window.location.search);
 
       if (params.get("view") === "latest") {
@@ -69,7 +75,7 @@ export default function Concierge() {
     }, 0);
 
     return () => window.clearTimeout(timeout);
-  }, [router]);
+  }, [status, router]);
 
   function handleStartOver() {
     setItinerary(null);

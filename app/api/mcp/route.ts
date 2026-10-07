@@ -1,6 +1,7 @@
 import { createMcpHandler, withMcpAuth } from "mcp-handler";
 import { z } from "zod";
 import { isValidTokenShape, namespaceFor } from "@/lib/connection";
+import { readAccessToken } from "@/lib/oauth";
 import { store, SyncedItem } from "@/lib/store";
 import {
   CATEGORY_META,
@@ -21,6 +22,20 @@ function tokenFrom(extra: unknown): string | null {
     | { authInfo?: { token?: string }; http?: { authInfo?: { token?: string } } }
     | undefined;
   return e?.authInfo?.token ?? e?.http?.authInfo?.token ?? null;
+}
+
+type AuthInfoLike = { token?: string; extra?: Record<string, unknown> };
+
+// The traveller's private storage namespace for this request. OAuth access
+// tokens carry it (set in verifyToken below); legacy pyb_ tokens hash to one.
+function namespaceFrom(extra: unknown): string | null {
+  const e = extra as { authInfo?: AuthInfoLike; http?: { authInfo?: AuthInfoLike } } | undefined;
+  const info = e?.authInfo ?? e?.http?.authInfo;
+  const namespace = info?.extra?.namespace;
+  if (typeof namespace === "string" && namespace) {
+    return namespace;
+  }
+  return info?.token ? namespaceFor(info.token) : null;
 }
 
 function newId() {
@@ -62,8 +77,8 @@ const baseHandler = createMcpHandler(
         }),
       },
       async (args, extra) => {
-        const token = tokenFrom(extra);
-        if (!token) return text("Not connected. Reconnect PackYourBags with a valid token.");
+        const namespace = namespaceFrom(extra);
+        if (!namespace) return text("Not connected. Reconnect PackYourBags from your assistant's connector settings.");
 
         const item: SyncedItem = {
           id: newId(),
@@ -79,7 +94,7 @@ const baseHandler = createMcpHandler(
           source: "assistant",
           createdAt: new Date().toISOString(),
         };
-        await store.push(namespaceFor(token), item);
+        await store.push(namespace, item);
         return text(`Saved trip brief for ${args.destination} to PackYourBags. Open the Connected inbox to import it.`);
       },
     );
@@ -106,8 +121,8 @@ const baseHandler = createMcpHandler(
         }),
       },
       async (args, extra) => {
-        const token = tokenFrom(extra);
-        if (!token) return text("Not connected. Reconnect PackYourBags with a valid token.");
+        const namespace = namespaceFrom(extra);
+        if (!namespace) return text("Not connected. Reconnect PackYourBags from your assistant's connector settings.");
 
         const item: SyncedItem = {
           id: newId(),
@@ -117,7 +132,7 @@ const baseHandler = createMcpHandler(
           source: "assistant",
           createdAt: new Date().toISOString(),
         };
-        await store.push(namespaceFor(token), item);
+        await store.push(namespace, item);
         return text(`Saved a ${args.days.length}-day itinerary for ${args.destination} to PackYourBags.`);
       },
     );
@@ -130,9 +145,9 @@ const baseHandler = createMcpHandler(
         inputSchema: z.object({}),
       },
       async (_args, extra) => {
-        const token = tokenFrom(extra);
-        if (!token) return text("Not connected.");
-        const items = await store.list(namespaceFor(token));
+        const namespace = namespaceFrom(extra);
+        if (!namespace) return text("Not connected.");
+        const items = await store.list(namespace);
         if (items.length === 0) return text("No saved trips or itineraries yet.");
         const lines = items.map((i) => {
           const when = new Date(i.createdAt).toISOString().slice(0, 10);
@@ -150,9 +165,9 @@ const baseHandler = createMcpHandler(
         inputSchema: z.object({}),
       },
       async (_args, extra) => {
-        const token = tokenFrom(extra);
-        if (!token) return text("Not connected.");
-        const items = await store.list(namespaceFor(token));
+        const namespace = namespaceFrom(extra);
+        if (!namespace) return text("Not connected.");
+        const items = await store.list(namespace);
         const latest = items.find((i) => i.type === "itinerary");
         if (!latest) return text("No itinerary saved yet.");
         const d = latest.data as {
@@ -252,10 +267,34 @@ const baseHandler = createMcpHandler(
 const handler = withMcpAuth(
   baseHandler,
   async (_req, bearerToken) => {
-    if (!isValidTokenShape(bearerToken)) {
+    if (!bearerToken) {
       return undefined;
     }
-    return { token: bearerToken, clientId: "packyourbags-web", scopes: [] };
+
+    // OAuth access token from the connector flow (Claude, ChatGPT): data goes
+    // to the signed-in traveller's namespace.
+    const oauth = readAccessToken(bearerToken);
+    if (oauth) {
+      return {
+        token: bearerToken,
+        clientId: oauth.cid,
+        scopes: [oauth.scope],
+        expiresAt: oauth.exp,
+        extra: { namespace: oauth.sub, email: oauth.email },
+      };
+    }
+
+    // Legacy manual token from /connect (pyb_...): still supported.
+    if (isValidTokenShape(bearerToken)) {
+      return {
+        token: bearerToken,
+        clientId: "packyourbags-web",
+        scopes: [],
+        extra: { namespace: namespaceFor(bearerToken) },
+      };
+    }
+
+    return undefined;
   },
   { required: true },
 );

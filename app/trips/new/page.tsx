@@ -3,10 +3,10 @@
 import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { ArrowLeft, ArrowRight, Check, Sparkles } from "lucide-react";
 import { Logo } from "@/components/logo";
 import {
-  getSignedInAccount,
   getLatestTripDraft,
   saveTripDraft,
   TripDraft,
@@ -14,23 +14,29 @@ import {
 
 export default function NewTrip() {
   const router = useRouter();
+  const { status } = useSession();
   const [ready, setReady] = useState(false);
   const [savedTrip, setSavedTrip] = useState<TripDraft | null>(null);
   const [draft, setDraft] = useState<TripDraft | null>(null);
 
   useEffect(() => {
-    const timeout = window.setTimeout(() => {
-      if (!getSignedInAccount()) {
-        router.replace("/signin");
-        return;
-      }
+    if (status === "loading") {
+      return;
+    }
 
+    if (status === "unauthenticated") {
+      router.replace("/signin");
+      return;
+    }
+
+    // Deferred so setState isn't called synchronously inside the effect body.
+    const timeout = window.setTimeout(() => {
       setDraft(getLatestTripDraft());
       setReady(true);
     }, 0);
 
     return () => window.clearTimeout(timeout);
-  }, [router]);
+  }, [status, router]);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

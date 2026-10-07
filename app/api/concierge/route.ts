@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { z } from "zod";
+import { auth } from "@/auth";
 import { FREE_GENERATION_LIMIT, toUsageInfo } from "@/lib/plan";
 import { readUsageState, writeUsageState } from "@/lib/usage";
 
@@ -34,6 +35,13 @@ const requestSchema = z.object({
 });
 
 export async function POST(request: Request) {
+  // The /concierge page is behind sign-in, but this endpoint spends Anthropic
+  // credits, so it must check the session itself rather than trust the page.
+  const session = await auth();
+  if (!session?.user) {
+    return Response.json({ error: "Sign in to use the concierge." }, { status: 401 });
+  }
+
   let body: unknown;
   try {
     body = await request.json();
