@@ -14,6 +14,7 @@ import {
   reviewDateLabel,
   searchDestinations,
   summarise,
+  type CountryNotice,
   type CredentialCode,
   type VisaCategory,
 } from "@/lib/visa";
@@ -23,6 +24,18 @@ import { VisaResultCard } from "@/components/visa-result-card";
 import { VISA_TONES } from "@/components/visa-tones";
 
 const STAT_CATEGORIES: VisaCategory[] = ["visa-free", "visa-on-arrival", "visa-required"];
+
+/** "2 verified matches, 1 not yet verified", or "Your passport country" when that's the match. */
+function matchSummary(verified: number, notices: readonly CountryNotice[]): string {
+  const home = notices.find((n) => n.kind !== "unverified");
+  const unverified = notices.filter((n) => n.kind === "unverified").length;
+  const parts: string[] = [];
+  if (verified > 0 || !home) parts.push(`${verified} verified ${verified === 1 ? "match" : "matches"}`);
+  if (home) parts.push(home.kind === "passport" ? "your passport country" : "where you live");
+  if (unverified > 0) parts.push(`${unverified} not yet verified`);
+  const text = parts.join(", ");
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
 
 export function VisaExplorer() {
   const [passport, setPassport] = useState("IN");
@@ -60,9 +73,7 @@ export function VisaExplorer() {
     ? `${resolved.length} verified destinations`
     : nothingFound
       ? `No country found for ${trimmed}`
-      : `${search.rules.length} verified ${search.rules.length === 1 ? "match" : "matches"}${
-          search.notices.length ? `, ${search.notices.length} not yet verified` : ""
-        }`;
+      : matchSummary(search.rules.length, search.notices);
 
   function toggleVisa(code: CredentialCode) {
     setVisas((prev) => (prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code]));
@@ -221,7 +232,7 @@ export function VisaExplorer() {
             {search.notices.length > 0 && (
               <section aria-labelledby="visa-notices-heading">
                 <h2 id="visa-notices-heading" className="sr-only">
-                  Matching countries without a verified rule
+                  Other matching countries
                 </h2>
                 <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
                   {search.notices.map((notice) => (
