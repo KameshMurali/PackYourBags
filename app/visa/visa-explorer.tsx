@@ -155,18 +155,18 @@ export function VisaExplorer() {
 
       {nationality.supported ? (
         <>
-          <dl className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="glass-panel rounded-[1.5rem] border border-black/10 p-5">
+          <dl className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <div className="glass-panel rounded-[1.5rem] border border-black/10 p-4 sm:p-5">
               <dt className="text-sm text-muted">Reachable without a prior visa</dt>
-              <dd className="mt-2 font-display text-4xl text-ink">
+              <dd className="mt-2 font-display text-3xl text-ink sm:text-4xl">
                 {stats.freedom}
                 <span className="ml-2 font-sans text-lg text-muted">/ {stats.total}</span>
               </dd>
             </div>
             {STAT_CATEGORIES.map((cat) => (
-              <div key={cat} className="glass-panel rounded-[1.5rem] border border-black/10 p-5">
+              <div key={cat} className="glass-panel rounded-[1.5rem] border border-black/10 p-4 sm:p-5">
                 <dt className="text-sm text-muted">{CATEGORY_META[cat].label}</dt>
-                <dd className="mt-2 font-display text-4xl text-ink">{stats.counts[cat]}</dd>
+                <dd className="mt-2 font-display text-3xl text-ink sm:text-4xl">{stats.counts[cat]}</dd>
               </div>
             ))}
           </dl>

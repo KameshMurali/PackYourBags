@@ -55,7 +55,7 @@ export function VisaNoticeCard({
           </span>,
         )}
         <p className="mt-3 text-sm leading-6 text-muted">
-          This is your passport country, so as a citizen of {passport.name} you don&apos;t need a
+          This is your passport country, so as a citizen of {passport.name} you don’t need a
           visa to enter.
         </p>
       </article>
@@ -102,8 +102,8 @@ export function VisaNoticeCard({
         Rule not yet verified for your passport
       </p>
       <p className="mt-1 text-sm leading-6 text-muted">
-        We haven&apos;t verified the {country.name} entry rule for {passport.demonym} passport
-        holders yet, so we won&apos;t guess. Check the official source before you book:
+        We haven’t verified the {country.name} entry rule for {passport.demonym} passport
+        holders yet, so we won’t guess. Check the official source before you book:
       </p>
       <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2">
         <VisaExternalLink href={source.url} label={source.label} className={linkClass}>
