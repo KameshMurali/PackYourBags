@@ -36,6 +36,19 @@ export const PAKISTAN_DESTINATIONS: DestinationRule[] = [
     sourceLabel: "Maldives Immigration",
     lastReviewed: R,
   },
+  {
+    code: "NP",
+    name: "Nepal",
+    flag: "🇳🇵",
+    region: "South Asia",
+    base: "visa-on-arrival",
+    days: 90,
+    fee: "Free for SAARC citizens (except Afghanistan) up to 30 days on the first visit of a visa year; otherwise USD 30 (15 days), USD 50 (30 days) or USD 125 (90 days)",
+    note: "Visa on arrival at Tribhuvan International Airport: fill in the arrival card and online tourist visa form first, then pay at the bank counter. You can also get a visa from a Nepali mission before travel. The free-visa group is SAARC citizens except Afghans, which includes Pakistanis.",
+    source: "https://immigration.gov.np/visa-information",
+    sourceLabel: "Department of Immigration, Nepal",
+    lastReviewed: R,
+  },
 
   // Southeast Asia
   {
@@ -173,6 +186,25 @@ export const PAKISTAN_DESTINATIONS: DestinationRule[] = [
       },
     ],
   },
+  {
+    code: "AM",
+    name: "Armenia",
+    flag: "🇦🇲",
+    region: "Caucasus",
+    base: "visa-required",
+    note: "Pakistan is on Armenia's list of nationalities that can apply for a visitor visa only at an Armenian embassy or consulate abroad and with an invitation. A temporary exemption (1 July 2026 to 1 July 2027) lets residents of the UAE, US, EU or Schengen countries and several Gulf states enter without a visa.",
+    source: "https://www.mfa.am/filemanager/consular/visa/2025/2025-12-30-LIST-OF-COUNTRIES-TEMPORARY-VISA-EXEMPTION.pdf",
+    sourceLabel: "Ministry of Foreign Affairs of Armenia — temporary visa exemption list",
+    lastReviewed: R,
+    overrides: [
+      {
+        residence: ["AE", "US", "SCHENGEN"],
+        category: "visa-free",
+        days: 180,
+        note: "Temporary, 1 July 2026 to 1 July 2027: a residence permit from the UAE, US, an EU or Schengen state (also Bahrain, Qatar, Saudi Arabia, Kuwait or Oman) valid 6+ months on entry. Up to 180 days in one year. The permit must be a physical card or passport sticker with Latin-script details.",
+      },
+    ],
+  },
 
   // East Africa
   {
@@ -185,6 +217,19 @@ export const PAKISTAN_DESTINATIONS: DestinationRule[] = [
     note: "Every visitor needs an approved Kenya eTA before the journey; Pakistan is not on the exempt-nationalities list. Have a passport valid for 6 months with a blank page, an itinerary, an accommodation booking and a payment card ready.",
     source: "https://etakenya.go.ke/how-to-apply",
     sourceLabel: "Directorate of Immigration Services, Kenya (eTA portal)",
+    lastReviewed: R,
+  },
+  {
+    code: "RW",
+    name: "Rwanda",
+    flag: "🇷🇼",
+    region: "East Africa",
+    base: "visa-on-arrival",
+    days: 30,
+    fee: "Waived for Commonwealth citizens (30-day visit)",
+    note: "Citizens of all countries can get a visa on arrival without prior application, or apply online or at a Rwandan mission beforehand. Commonwealth members, which includes Pakistan, are waived the visa fee for a visit of 30 days.",
+    source: "https://www.migration.gov.rw/visa-on-arrival",
+    sourceLabel: "Directorate General of Immigration and Emigration, Rwanda",
     lastReviewed: R,
   },
 
@@ -212,5 +257,42 @@ export const PAKISTAN_DESTINATIONS: DestinationRule[] = [
     sourceLabel: "GOV.UK — Immigration Rules Appendix Visitor: visa national list",
     lastReviewed: R,
     aliases: ["London"],
+  },
+
+  // North America
+  {
+    code: "US",
+    name: "United States",
+    flag: "🇺🇸",
+    region: "North America",
+    base: "visa-required",
+    note: "Pakistan is not on the Department of Homeland Security's list of Visa Waiver Program countries, so you need a US visa before you travel; ESTA is only for Visa Waiver Program travellers. Check travel.state.gov for the visa type and current entry rules.",
+    source: "https://www.dhs.gov/visa-waiver-program",
+    sourceLabel: "U.S. Department of Homeland Security — Visa Waiver Program",
+    lastReviewed: R,
+  },
+  {
+    code: "CA",
+    name: "Canada",
+    flag: "🇨🇦",
+    region: "North America",
+    base: "visa-required",
+    note: "Pakistan is on IRCC's list of countries whose citizens need a visitor visa to visit or transit through Canada, by any method of travel. Pakistan is not among the visa-required countries whose citizens may be eligible for an eTA instead.",
+    source: "https://www.canada.ca/en/immigration-refugees-citizenship/services/visit-canada/entry-requirements-country.html",
+    sourceLabel: "Immigration, Refugees and Citizenship Canada — entry requirements by country",
+    lastReviewed: R,
+  },
+
+  // Oceania
+  {
+    code: "AU",
+    name: "Australia",
+    flag: "🇦🇺",
+    region: "Oceania",
+    base: "visa-required",
+    note: "A visa is needed before you travel. Pakistani passports are not on the eligible-passport lists for the Electronic Travel Authority (601) or the eVisitor (651), so apply for a Visitor visa (subclass 600): for tourists, business visitors or family visits of 3, 6 or 12 months.",
+    source: "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/visitor-600",
+    sourceLabel: "Department of Home Affairs, Australia (Visitor visa 600; ETA 601; eVisitor 651)",
+    lastReviewed: R,
   },
 ];
