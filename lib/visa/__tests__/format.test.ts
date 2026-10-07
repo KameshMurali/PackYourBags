@@ -7,8 +7,10 @@ import {
   easyAccessAnswer,
   formatEasyAccess,
   formatVisaCheck,
+  latestReview,
   NATIONALITIES,
   resolveRules,
+  reviewDateLabel,
   ruleCodesFor,
   VISA_DISCLAIMER,
   visaCheckAnswer,
@@ -133,5 +135,18 @@ describe("MCP answers", () => {
 
   it("explains unsupported passports", () => {
     expect(easyAccessAnswer({ passport: "Narnia" })).toContain(`Passport "Narnia" isn't covered yet`);
+  });
+});
+
+describe("review dates", () => {
+  it("formats ISO dates without depending on the locale", () => {
+    expect(reviewDateLabel("2026-10-07")).toBe("7 Oct 2026");
+    expect(reviewDateLabel("2025-01-31")).toBe("31 Jan 2025");
+    expect(reviewDateLabel("not a date")).toBe("not a date");
+  });
+
+  it("finds the latest review date", () => {
+    expect(latestReview([])).toBeNull();
+    expect(latestReview([{ lastReviewed: "2026-10-01" }, { lastReviewed: "2026-10-07" }])).toBe("2026-10-07");
   });
 });

@@ -10,6 +10,24 @@ import type { CredentialCode, CredentialUnlock, Nationality, ResolvedDestination
 export const VISA_DISCLAIMER =
   "Indicative guidance — not legal advice. Visa rules change and depend on your exact situation; verify with the official source before you book.";
 
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+/** "2026-10-07" → "7 Oct 2026" (locale-independent, so server and client agree). */
+export function reviewDateLabel(iso: string): string {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+  if (!match) return iso;
+  const month = MONTHS[Number(match[2]) - 1];
+  return month ? `${Number(match[3])} ${month} ${match[1]}` : iso;
+}
+
+/** The most recent review date across rules, or null. */
+export function latestReview(rules: ReadonlyArray<{ lastReviewed: string }>): string | null {
+  return rules.reduce<string | null>(
+    (latest, r) => (latest === null || r.lastReviewed > latest ? r.lastReviewed : latest),
+    null,
+  );
+}
+
 /** "IN (India), PK (Pakistan), …" for the passports with verified data. */
 export function supportedPassportsLabel(): string {
   return NATIONALITIES.filter((n) => n.supported)
