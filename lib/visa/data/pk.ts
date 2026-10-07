@@ -88,6 +88,18 @@ export const PAKISTAN_DESTINATIONS: DestinationRule[] = [
     sourceLabel: "Immigration & Checkpoints Authority, Singapore",
     lastReviewed: R,
   },
+  {
+    code: "VN",
+    name: "Vietnam",
+    flag: "🇻🇳",
+    region: "Southeast Asia",
+    base: "evisa",
+    days: 90,
+    note: "Since 15 August 2023 Vietnam grants e-visas to citizens of all countries and territories, valid for 90 days, and Pakistan is not on its visa-exemption list. E-visa holders must enter and leave through the designated international airports and land and sea border gates.",
+    source: "https://vietnam.travel/plan-your-trip/visa-requirements",
+    sourceLabel: "Vietnam National Authority of Tourism (official tourism website)",
+    lastReviewed: R,
+  },
 
   // East Asia
   {
@@ -111,6 +123,20 @@ export const PAKISTAN_DESTINATIONS: DestinationRule[] = [
     note: "Pakistani nationals need a visa for any purpose, including airside transit. Apply at a Chinese diplomatic or consular mission (or its visa application service centre), or to the HKSAR Immigration Department by post or through a local sponsor, and get it before you travel.",
     source: "https://www.immd.gov.hk/eng/services/visas/visit-transit/visit-visa-entry-permit.html",
     sourceLabel: "Immigration Department, Hong Kong SAR",
+    lastReviewed: R,
+  },
+  {
+    code: "KR",
+    name: "South Korea",
+    flag: "🇰🇷",
+    region: "East Asia",
+    base: "visa-required",
+    days: 90,
+    fee: "PKR 12,000 (stays under 90 days)",
+    processingTime: "Minimum 8 weeks after the application is received",
+    note: "Ordinary-passport holders need a visa (only diplomatic and official passports are exempt). Apply in person at the Korean Embassy in Islamabad (the Karachi consulate serves Sindh). The tourist visa (C-3-9) allows up to 90 days and needs flight and hotel bookings, an itinerary, 6 months of bank statements and proof of employment.",
+    source: "https://overseas.mofa.go.kr/pk-en/brd/m_3158/view.do?seq=755072&page=1",
+    sourceLabel: "Embassy of the Republic of Korea in Pakistan — visa information for Pakistani nationals",
     lastReviewed: R,
   },
 
