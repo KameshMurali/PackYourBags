@@ -59,7 +59,12 @@ export type {
   VisaCheck,
   VisaCheckInput,
 } from "./engine";
-
-/** Shown with every answer, in the UI and in MCP output. */
-export const VISA_DISCLAIMER =
-  "Indicative guidance — not legal advice. Visa rules change and depend on your exact situation; verify with the official source before you book.";
+export {
+  credentialLabel,
+  describeUnlocks,
+  formatEasyAccess,
+  formatVisaCheck,
+  summaryLine,
+  supportedPassportsLabel,
+  VISA_DISCLAIMER,
+} from "./format";
