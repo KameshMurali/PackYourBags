@@ -58,7 +58,7 @@ export const PAKISTAN_DESTINATIONS: DestinationRule[] = [
     region: "Southeast Asia",
     base: "evisa",
     processingTime: "2 to 10 working days",
-    note: "Visa required: Pakistan is on the Immigration Department's list of nationalities that must have a visa. The High Commission of Malaysia in Islamabad says tourist visa applications are made online on Malaysia's eVISA portal.",
+    note: "Visa required: Pakistan is on the Immigration Department's list of nationalities that must have a visa. The High Commission of Malaysia in Islamabad says a tourist visa application can be made online on Malaysia's eVISA portal.",
     source: "https://www.kln.gov.my/web/pak_islamabad/requirement_foreigner",
     sourceLabel: "High Commission of Malaysia, Islamabad (Ministry of Foreign Affairs)",
     lastReviewed: R,
@@ -70,7 +70,7 @@ export const PAKISTAN_DESTINATIONS: DestinationRule[] = [
     region: "Southeast Asia",
     base: "evisa",
     processingTime: "About 14 working days after the fee is received",
-    note: "Visa required: apply for a Thai e-Visa at thaievisa.go.th. From Pakistan, applications go to the Royal Thai Embassy in Islamabad or the Consulate-General in Karachi, and you must be physically in Pakistan for the whole application. Visa fees are non-refundable.",
+    note: "Visa required: apply for a Thai e-Visa at thaievisa.go.th. If you are in Pakistan, apply to the Royal Thai Embassy in Islamabad or the Consulate-General in Karachi and stay in Pakistan for the whole application. Visa fees are non-refundable.",
     source: "https://image.mfa.go.th/mfa/0/eb9u2bRVs7/VISA/2025/FAQs_on_Thailand_s_e-visa/FAQs_on_Thailand.pdf",
     sourceLabel: "Royal Thai Embassy, Islamabad (Thai Ministry of Foreign Affairs)",
     lastReviewed: R,
@@ -230,6 +230,19 @@ export const PAKISTAN_DESTINATIONS: DestinationRule[] = [
         note: "Temporary, 1 July 2026 to 1 July 2027: a residence permit from the UAE, US, an EU or Schengen state (also Bahrain, Qatar, Saudi Arabia, Kuwait or Oman) valid 6+ months on entry. Up to 180 days in one year. The permit must be a physical card or passport sticker with Latin-script details.",
       },
     ],
+  },
+
+  // North Africa
+  {
+    code: "EG",
+    name: "Egypt",
+    flag: "🇪🇬",
+    region: "North Africa",
+    base: "visa-required",
+    note: "Pakistan is not on the Egypt e-Visa Portal's list of nationalities that can be issued an e-Visa, so you must get a visa from an Egyptian embassy or consulate before travelling. Confirm the process with the Egyptian mission in your country; entry can still be refused at the port.",
+    source: "https://visa2egypt.gov.eg/eVisa/FAQ",
+    sourceLabel: "Egypt e-Visa Portal (Ministry of Interior)",
+    lastReviewed: R,
   },
 
   // East Africa
