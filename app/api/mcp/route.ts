@@ -4,12 +4,10 @@ import { isValidTokenShape, namespaceFor } from "@/lib/connection";
 import { readAccessToken } from "@/lib/oauth";
 import { store, SyncedItem } from "@/lib/store";
 import {
-  CATEGORY_META,
   CredentialCode,
-  matchesQuery,
-  resolveDestinations,
-  summarise,
-  VISA_GUIDES,
+  easyAccessAnswer,
+  supportedPassportsLabel,
+  visaCheckAnswer,
 } from "@/lib/visa";
 
 export const runtime = "nodejs";
@@ -185,42 +183,35 @@ const baseHandler = createMcpHandler(
       {
         title: "Check the visa requirement for a destination",
         description:
-          "Check whether a traveller needs a visa for a destination, given their nationality, residence, and any visas they hold. Returns the requirement and, if a visa is required, a documentation checklist. Indicative only — always verify with official sources.",
+          "Check whether a traveller needs a visa for a destination, given their passport, residence, and any visas they hold. Recognises every country and major territory, including native names (Deutschland, Brasil), major cities (Dubai, Bali) and typos. Returns the requirement and conditions, a how-to-apply checklist when a visa is needed, the official source and the date the rule was last reviewed. If the rule isn't verified for that passport yet, it says so and links the official source instead of guessing. Indicative only — always verify with official sources.",
         inputSchema: z.object({
-          destination: z.string().describe("Destination country or region, e.g. 'Schengen', 'Japan', 'Mexico'"),
-          nationality: z.string().default("IN").describe("Passport country code (currently 'IN' supported)"),
-          residence: z.enum(RESIDENCE_VALUES).optional().describe("Residence: NONE, AE, US, UK, SCHENGEN, CA, AU"),
-          heldVisas: z.array(z.enum(VISA_VALUES)).optional().describe("Valid visas held: US, SCHENGEN, UK, CA"),
+          destination: z
+            .string()
+            .describe("Destination country, territory, city or 'Schengen', e.g. 'Germany', 'Japan', 'Dubai'"),
+          nationality: z
+            .string()
+            .default("IN")
+            .describe(`Passport as an ISO code or country name. Supported: ${supportedPassportsLabel()}`),
+          residence: z
+            .enum([...RESIDENCE_VALUES, "JP"] as const)
+            .optional()
+            .describe("Where the traveller lives: NONE, AE, US, UK, SCHENGEN, CA, AU, JP"),
+          heldVisas: z
+            .array(z.enum([...VISA_VALUES, "AU", "JP"] as const))
+            .optional()
+            .describe("Valid visas held: US, SCHENGEN, UK, CA, AU, JP"),
         }),
       },
       async (args, extra) => {
         if (!tokenFrom(extra)) return text("Not connected.");
-        const resolved = resolveDestinations(
-          args.nationality.toUpperCase(),
-          credentialsFrom(args.residence, args.heldVisas),
+        return text(
+          visaCheckAnswer({
+            passport: args.nationality,
+            destination: args.destination,
+            residence: args.residence,
+            credentials: credentialsFrom(args.residence, args.heldVisas),
+          }),
         );
-        if (resolved.length === 0) {
-          return text(`Nationality '${args.nationality}' isn't supported yet (currently: India / IN).`);
-        }
-        const q = args.destination.toLowerCase();
-        const match =
-          resolved.find((d) => d.name.toLowerCase() === q || d.code.toLowerCase() === q) ??
-          resolved.find((d) => matchesQuery(d, args.destination));
-        if (!match) {
-          return text(`No visa record for '${args.destination}'. It may not be in the dataset yet — check official sources.`);
-        }
-        const meta = CATEGORY_META[match.effective];
-        let out = `${match.name}: ${meta.label}`;
-        if (match.effectiveDays) out += ` (up to ${match.effectiveDays} days)`;
-        if (match.effectiveNote) out += `\n${match.effectiveNote}`;
-        if (match.unlockedBy?.length) out += `\nUnlocked by: ${match.unlockedBy.join(", ")}`;
-        if (match.guide && VISA_GUIDES[match.guide]) {
-          const g = VISA_GUIDES[match.guide];
-          out += `\n\n${g.title} — documents:\n${g.documents.map((x) => `• ${x}`).join("\n")}`;
-          out += `\n\nProcess:\n${g.steps.map((x, idx) => `${idx + 1}. ${x}`).join("\n")}`;
-        }
-        out += `\n\nSource: ${match.source}\n(Indicative — verify with official sources before booking.)`;
-        return text(out);
       },
     );
 
@@ -229,34 +220,30 @@ const baseHandler = createMcpHandler(
       {
         title: "List easy-access destinations",
         description:
-          "List destinations the traveller can enter without a prior visa (visa-free, visa on arrival, or travel authorisation), given nationality, residence, and held visas. Indicative only.",
+          "List the verified destinations a traveller can enter without a visa in advance (visa-free, visa on arrival, or a travel authorisation), given their passport, residence, and held visas, with each rule's source and review date. Destinations not yet verified for that passport are left out; check them with check_visa. Indicative only.",
         inputSchema: z.object({
-          nationality: z.string().default("IN").describe("Passport country code (currently 'IN' supported)"),
-          residence: z.enum(RESIDENCE_VALUES).optional().describe("Residence: NONE, AE, US, UK, SCHENGEN, CA, AU"),
-          heldVisas: z.array(z.enum(VISA_VALUES)).optional().describe("Valid visas held: US, SCHENGEN, UK, CA"),
+          nationality: z
+            .string()
+            .default("IN")
+            .describe(`Passport as an ISO code or country name. Supported: ${supportedPassportsLabel()}`),
+          residence: z
+            .enum([...RESIDENCE_VALUES, "JP"] as const)
+            .optional()
+            .describe("Where the traveller lives: NONE, AE, US, UK, SCHENGEN, CA, AU, JP"),
+          heldVisas: z
+            .array(z.enum([...VISA_VALUES, "AU", "JP"] as const))
+            .optional()
+            .describe("Valid visas held: US, SCHENGEN, UK, CA, AU, JP"),
         }),
       },
       async (args, extra) => {
         if (!tokenFrom(extra)) return text("Not connected.");
-        const resolved = resolveDestinations(
-          args.nationality.toUpperCase(),
-          credentialsFrom(args.residence, args.heldVisas),
-        );
-        if (resolved.length === 0) {
-          return text(`Nationality '${args.nationality}' isn't supported yet (currently: India / IN).`);
-        }
-        const easy = resolved.filter((d) =>
-          ["visa-free", "visa-on-arrival", "eta"].includes(d.effective),
-        );
-        const s = summarise(resolved);
-        const lines = easy.map((d) => {
-          const meta = CATEGORY_META[d.effective];
-          const days = d.effectiveDays ? ` · up to ${d.effectiveDays}d` : "";
-          const unlocked = d.unlockedBy?.length ? ` (via ${d.unlockedBy.join("/")})` : "";
-          return `• ${d.name} — ${meta.short}${days}${unlocked}`;
-        });
         return text(
-          `${s.freedom} easy-access destinations of ${s.total} in the dataset:\n${lines.join("\n")}\n\n(Indicative — verify before booking.)`,
+          easyAccessAnswer({
+            passport: args.nationality,
+            residence: args.residence,
+            credentials: credentialsFrom(args.residence, args.heldVisas),
+          }),
         );
       },
     );
