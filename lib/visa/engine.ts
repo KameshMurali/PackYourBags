@@ -292,7 +292,10 @@ export type VisaCheckInput = {
   /** Destination as a country, native name, city, ISO code, or "Schengen". */
   destination: string;
   residence?: CredentialCode | "NONE" | null;
+  /** Valid visas held. */
   visas?: CredentialCode[];
+  /** Every visa and residence held (the residence may be included); merged with `visas`. */
+  credentials?: CredentialCode[];
 };
 
 export type VisaCheck =
@@ -327,7 +330,11 @@ export function checkVisa(input: VisaCheckInput): VisaCheck {
 
   const residence = input.residence && input.residence !== "NONE" ? input.residence : null;
   const credentials = Array.from(
-    new Set<CredentialCode>([...(residence ? [residence] : []), ...(input.visas ?? [])]),
+    new Set<CredentialCode>([
+      ...(residence ? [residence] : []),
+      ...(input.visas ?? []),
+      ...(input.credentials ?? []),
+    ]),
   );
   const resolved = resolveDestinations(passport.code, credentials, { residence });
   const search = searchDestinations(passport.code, resolved, input.destination, { residence });

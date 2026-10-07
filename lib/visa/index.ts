@@ -62,9 +62,11 @@ export type {
 export {
   credentialLabel,
   describeUnlocks,
+  easyAccessAnswer,
   formatEasyAccess,
   formatVisaCheck,
   summaryLine,
   supportedPassportsLabel,
   VISA_DISCLAIMER,
+  visaCheckAnswer,
 } from "./format";

@@ -4,12 +4,14 @@ import {
   COUNTRIES,
   DATASETS,
   describeUnlocks,
+  easyAccessAnswer,
   formatEasyAccess,
   formatVisaCheck,
   NATIONALITIES,
   resolveRules,
   ruleCodesFor,
   VISA_DISCLAIMER,
+  visaCheckAnswer,
   type DestinationRule,
 } from "@/lib/visa";
 
@@ -106,5 +108,30 @@ describe("formatEasyAccess", () => {
     expect(text).toContain("• Georgia — No visa · up to 90 days (via your US visa) · reviewed 2026-10-01");
     expect(text).not.toContain("United Kingdom");
     expect(text.endsWith(VISA_DISCLAIMER)).toBe(true);
+  });
+});
+
+describe("MCP answers", () => {
+  it("treats the residence country as home and keeps the disclaimer", () => {
+    const text = visaCheckAnswer({
+      passport: "IN",
+      destination: "Dubai",
+      residence: "AE",
+      credentials: ["AE"],
+    });
+    expect(text).toContain("United Arab Emirates: Visa-free");
+    expect(text).toContain("You live here");
+    expect(text.endsWith(VISA_DISCLAIMER)).toBe(true);
+  });
+
+  it("lists easy-access destinations for a resident with held visas", () => {
+    const text = easyAccessAnswer({ passport: "india", residence: "AE", credentials: ["AE", "US"] });
+    expect(text).toContain("India passport (UAE resident, holding US visas)");
+    expect(text).toMatch(/reviewed \d{4}-\d{2}-\d{2} · https:\/\//);
+    expect(text.endsWith(VISA_DISCLAIMER)).toBe(true);
+  });
+
+  it("explains unsupported passports", () => {
+    expect(easyAccessAnswer({ passport: "Narnia" })).toContain(`Passport "Narnia" isn't covered yet`);
   });
 });

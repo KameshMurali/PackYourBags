@@ -1,7 +1,7 @@
 // Plain-text answers for assistants (the MCP check_visa / list_visa_free tools).
 
-import type { VisaCheck } from "./engine";
-import { summarise } from "./engine";
+import type { VisaCheck, VisaCheckInput } from "./engine";
+import { checkVisa, findPassport, resolveDestinations, summarise } from "./engine";
 import { IATA_TRAVEL_CENTRE, SCHENGEN_CODE } from "./lookup";
 import { CATEGORY_META, CREDENTIAL_LABELS, EASY_ACCESS, NATIONALITIES } from "./meta";
 import type { CredentialCode, CredentialUnlock, Nationality, ResolvedDestination } from "./types";
@@ -181,4 +181,32 @@ export function formatEasyAccess(
   ];
 
   return `${lines.join("\n")}\n\n${VISA_DISCLAIMER}`;
+}
+
+/** check_visa: the full answer for one destination. */
+export function visaCheckAnswer(input: VisaCheckInput): string {
+  return formatVisaCheck(checkVisa(input));
+}
+
+/** list_visa_free: every verified destination reachable without a visa in advance. */
+export function easyAccessAnswer(input: Omit<VisaCheckInput, "destination">): string {
+  const passport = findPassport(input.passport);
+  if (!passport || !passport.supported) {
+    return formatVisaCheck({
+      status: "unsupported-passport",
+      query: input.passport,
+      supported: NATIONALITIES.filter((n) => n.supported),
+    });
+  }
+  const residence = input.residence && input.residence !== "NONE" ? input.residence : null;
+  const credentials = Array.from(
+    new Set<CredentialCode>([
+      ...(residence ? [residence] : []),
+      ...(input.visas ?? []),
+      ...(input.credentials ?? []),
+    ]),
+  );
+  const visas = credentials.filter((c) => c !== residence);
+  const resolved = resolveDestinations(passport.code, credentials, { residence });
+  return formatEasyAccess(passport, resolved, { residence, visas });
 }
