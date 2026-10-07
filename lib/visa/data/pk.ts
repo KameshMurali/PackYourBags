@@ -62,8 +62,68 @@ export const PAKISTAN_DESTINATIONS: DestinationRule[] = [
     sourceLabel: "Royal Thai Embassy, Islamabad (Thai Ministry of Foreign Affairs)",
     lastReviewed: R,
   },
+  {
+    code: "SG",
+    name: "Singapore",
+    flag: "🇸🇬",
+    region: "Southeast Asia",
+    base: "evisa",
+    fee: "S$30 (non-refundable processing fee)",
+    processingTime: "3 working days (excluding the day of submission)",
+    note: "A Singapore entry visa is required for Pakistani travel documents. You can't apply directly: a Singapore citizen or PR local contact, or an authorised visa agent or strategic partner, submits it online and prints your e-Visa; you can also apply at a Singapore overseas mission. Business or social visits also need a Letter of Introduction (Form V39A).",
+    source: "https://www.ica.gov.sg/enter-transit-depart/entering-singapore/visa_requirements/visa-detail-page/pakistan",
+    sourceLabel: "Immigration & Checkpoints Authority, Singapore",
+    lastReviewed: R,
+  },
+
+  // East Asia
+  {
+    code: "CN",
+    name: "China",
+    flag: "🇨🇳",
+    region: "East Asia",
+    base: "visa-required",
+    processingTime: "About 4 working days after the embassy receives the passport",
+    note: "Visa required: Pakistani ordinary passports are not visa-exempt. Apply through Gerry's Chinese Visa Application Service Center in Islamabad, Karachi or Lahore. The embassy says tourist (L) visas are for tourists travelling in a group of at least 5 with an invitation letter for a tourist group. It waives its visa fee for Pakistani ordinary passports.",
+    source: "https://pk.china-embassy.gov.cn/eng/lsfw/va/202504/t20250428_11606290.htm",
+    sourceLabel: "Embassy of China in Pakistan — visa application instructions",
+    lastReviewed: R,
+  },
+  {
+    code: "HK",
+    name: "Hong Kong",
+    flag: "🇭🇰",
+    region: "East Asia",
+    base: "visa-required",
+    note: "Pakistani nationals need a visa for any purpose, including airside transit. Apply at a Chinese diplomatic or consular mission (or its visa application service centre), or to the HKSAR Immigration Department by post or through a local sponsor, and get it before you travel.",
+    source: "https://www.immd.gov.hk/eng/services/visas/visit-transit/visit-visa-entry-permit.html",
+    sourceLabel: "Immigration Department, Hong Kong SAR",
+    lastReviewed: R,
+  },
 
   // Middle East
+  {
+    code: "QA",
+    name: "Qatar",
+    flag: "🇶🇦",
+    region: "Middle East",
+    base: "visa-on-arrival",
+    note: "Visit Qatar's visa checker puts Pakistan in the group that gets an entry visa on arrival only after booking a visa-on-arrival hotel on the Discover Qatar website before you travel. Alternatively, apply in advance for a Hayya A1 Entry Visa at hayya.qa and skip the paperwork at the airport.",
+    source: "https://visitqatar.com/intl-en/plan-your-trip/visas",
+    sourceLabel: "Qatar Tourism — Visit Qatar visa checker",
+    lastReviewed: R,
+  },
+  {
+    code: "BH",
+    name: "Bahrain",
+    flag: "🇧🇭",
+    region: "Middle East",
+    base: "evisa",
+    note: "Pakistan is on Bahrain's list of nationalities that can apply online for a visit eVisa (evisa.gov.bh) and also on its visa-on-arrival list. Terms and conditions apply to both and are shown only in the portal's eligibility check, and entry is not guaranteed, so apply for the eVisa before you travel.",
+    source: "https://www.evisa.gov.bh/list-of-online-visa-country.html",
+    sourceLabel: "Nationality, Passports & Residence Affairs, Bahrain (eVisa portal)",
+    lastReviewed: R,
+  },
   {
     code: "TR",
     name: "Türkiye",
@@ -84,6 +144,48 @@ export const PAKISTAN_DESTINATIONS: DestinationRule[] = [
         note: "One-month single-entry e-Visa at evisa.gov.tr for holders of a valid Schengen, US, UK or Ireland visa or residence permit (Ireland is not selectable here, but it is accepted).",
       },
     ],
+  },
+
+  // Caucasus
+  {
+    code: "GE",
+    name: "Georgia",
+    flag: "🇬🇪",
+    region: "Caucasus",
+    base: "visa-required",
+    note: "Visa required. A Georgian e-Visa needs a supporting document: a Schengen visa, a visa from any OECD member, or a Schengen or OECD residence permit. UAE residents can enter visa-free for 90 days with a UAE residence permit or multiple-entry visa valid for at least 1 year.",
+    source: "https://www.evisa.gov.ge/geovisa/countries/index.html",
+    sourceLabel: "Georgia e-Visa portal (Ministry of Foreign Affairs of Georgia)",
+    lastReviewed: R,
+    overrides: [
+      {
+        visas: ["SCHENGEN", "US", "UK", "CA", "AU", "JP"],
+        residence: ["SCHENGEN", "US", "UK", "CA", "AU", "JP"],
+        category: "evisa",
+        note: "A Georgian e-Visa is open to Pakistani citizens holding a valid Schengen visa or a valid visa from any OECD member, or a valid Schengen or OECD residence permit (OECD members not selectable here also count).",
+      },
+      {
+        visas: ["AE"],
+        residence: ["AE"],
+        category: "visa-free",
+        days: 90,
+        note: "Visa-free for up to 90 days in any 180-day period, per the Embassy of Georgia in the UAE (uae.mfa.gov.ge). For Pakistani citizens the UAE visa must be multiple-entry and, like a residence permit (Emirates ID), valid for at least 1 year on the day you enter. Passport valid at least 90 days.",
+      },
+    ],
+  },
+
+  // East Africa
+  {
+    code: "KE",
+    name: "Kenya",
+    flag: "🇰🇪",
+    region: "East Africa",
+    base: "eta",
+    processingTime: "Typically 3 working days",
+    note: "Every visitor needs an approved Kenya eTA before the journey; Pakistan is not on the exempt-nationalities list. Have a passport valid for 6 months with a blank page, an itinerary, an accommodation booking and a payment card ready.",
+    source: "https://etakenya.go.ke/how-to-apply",
+    sourceLabel: "Directorate of Immigration Services, Kenya (eTA portal)",
+    lastReviewed: R,
   },
 
   // Europe
