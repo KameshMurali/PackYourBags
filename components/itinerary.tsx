@@ -21,10 +21,10 @@ export function ItineraryTimeline({ days }: { days: ItineraryDay[] }) {
       />
       {days.map((day, index) => (
         <li key={day.day} className="relative flex gap-4 sm:gap-5">
-          <span className="relative z-10 mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-ink font-display text-lg leading-none text-[#f2e6d6] shadow-[0_12px_26px_rgba(32,25,20,0.26)]">
+          <span className="relative z-10 mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-ink font-display text-lg leading-none text-[#fde8d3] shadow-[0_12px_26px_rgba(10,34,51,0.26)]">
             {day.day}
           </span>
-          <div className="flex-1 rounded-[1.4rem] border border-black/10 bg-white/75 p-5 transition duration-200 hover:-translate-y-0.5 hover:border-clay/40 hover:bg-white hover:shadow-[0_18px_44px_rgba(43,30,20,0.1)]">
+          <div className="flex-1 rounded-[1.4rem] border border-black/10 bg-white/75 p-5 transition duration-200 hover:-translate-y-0.5 hover:border-clay/40 hover:bg-white hover:shadow-[0_18px_44px_rgba(10,34,51,0.1)]">
             <p className="text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-clay">
               {dayLabel(index, days.length)}
             </p>

@@ -165,7 +165,7 @@ export default function Connect() {
         {/* Step 1 — connect (OAuth: just the URL) */}
         <div className="glass-panel hero-shadow mt-9 rounded-[2rem] border border-black/10 p-6 md:p-8">
           <div className="flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#f2e7d9] text-clay">
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#fde8d3] text-clay">
               <Plug className="h-5 w-5" />
             </span>
             <h2 className="font-display text-2xl text-ink">1. Add PackYourBags to your assistant</h2>
@@ -218,7 +218,7 @@ export default function Connect() {
         <div className="glass-panel hero-shadow mt-5 rounded-[2rem] border border-black/10 p-6 md:p-8">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#f2e7d9] text-clay">
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#fde8d3] text-clay">
                 <Inbox className="h-5 w-5" />
               </span>
               <h2 className="font-display text-2xl text-ink">2. From your assistant</h2>
@@ -244,7 +244,7 @@ export default function Connect() {
           </div>
 
           {!durable && isAdmin && (
-            <p className="mt-4 flex items-start gap-2 rounded-[1.1rem] border border-[#e7d3a9] bg-[#fbf3e3] p-3 text-xs leading-5 text-[#7a5a1e]">
+            <p className="mt-4 flex items-start gap-2 rounded-[1.1rem] border border-[#ffd9a0] bg-[#fdeedd] p-3 text-xs leading-5 text-[#7a5a1e]">
               <Sparkles className="mt-0.5 h-4 w-4 shrink-0" />
               <span>
                 Admin note: assistant storage is in-memory, so items can disappear between requests on
@@ -300,7 +300,7 @@ export default function Connect() {
         {/* Advanced — manual token for MCP clients without OAuth */}
         <details className="glass-panel mt-5 rounded-[2rem] border border-black/10 p-6 md:p-8">
           <summary className="flex cursor-pointer list-none items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#f2e7d9] text-clay">
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#fde8d3] text-clay">
               <KeyRound className="h-5 w-5" />
             </span>
             <span className="font-display text-2xl text-ink">Advanced: connect with a manual token</span>
@@ -328,7 +328,7 @@ export default function Connect() {
             type="button"
             onClick={generate}
             disabled={busy}
-            className="mt-4 inline-flex h-11 items-center justify-center gap-2 rounded-full bg-ink px-5 text-sm font-semibold text-white shadow-[0_18px_48px_rgba(32,25,20,0.22)] disabled:opacity-60"
+            className="mt-4 inline-flex h-11 items-center justify-center gap-2 rounded-full bg-ink px-5 text-sm font-semibold text-white shadow-[0_18px_48px_rgba(10,34,51,0.22)] disabled:opacity-60"
           >
             <RefreshCw className="h-4 w-4" />
             {token ? "Regenerate token" : "Generate token"}
@@ -354,7 +354,7 @@ function Field({
     <div>
       <p className="mb-1.5 text-sm font-semibold text-ink">{label}</p>
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-        <code className="flex-1 overflow-x-auto rounded-[1rem] border border-black/10 bg-[#fffcf7] px-4 py-3 font-mono text-sm text-ink">
+        <code className="flex-1 overflow-x-auto rounded-[1rem] border border-black/10 bg-[#fffaf3] px-4 py-3 font-mono text-sm text-ink">
           {value}
         </code>
         <button
@@ -362,7 +362,7 @@ function Field({
           onClick={onCopy}
           className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-full border border-black/10 bg-white/70 px-5 text-sm font-semibold text-ink transition hover:bg-white"
         >
-          {copied ? <Check className="h-4 w-4 text-[#305247]" /> : <Copy className="h-4 w-4" />}
+          {copied ? <Check className="h-4 w-4 text-[#0a4d5c]" /> : <Copy className="h-4 w-4" />}
           {copied ? "Copied" : "Copy"}
         </button>
       </div>

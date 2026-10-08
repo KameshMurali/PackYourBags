@@ -167,7 +167,7 @@ export default function Concierge() {
       <section
         className={`mx-auto px-5 pt-14 text-center lg:px-8 ${itinerary ? "max-w-4xl" : "max-w-3xl"}`}
       >
-        <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#f2e7d9] text-clay">
+        <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#fde8d3] text-clay">
           <Sparkles className="h-6 w-6" />
         </span>
         <p className="mt-7 text-xs font-semibold uppercase tracking-[0.28em] text-clay">
@@ -191,11 +191,11 @@ export default function Concierge() {
         )}
         {itinerary ? (
           <div className="glass-panel hero-shadow mt-9 overflow-hidden rounded-[2rem] border border-black/10 text-left">
-            <div className="relative overflow-hidden border-b border-black/10 bg-gradient-to-br from-[#f5ead9] via-[#fbf5ec] to-[#eaf2ed] p-6 md:p-9">
-              <div className="pointer-events-none absolute -right-10 -top-10 h-44 w-44 rounded-full bg-[#e7d4ba] opacity-50 blur-3xl" />
+            <div className="relative overflow-hidden border-b border-black/10 bg-gradient-to-br from-[#fde8d3] via-[#fff8ee] to-[#eaf2ed] p-6 md:p-9">
+              <div className="pointer-events-none absolute -right-10 -top-10 h-44 w-44 rounded-full bg-[#ffd9b8] opacity-50 blur-3xl" />
               <div className="relative">
-                <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-[#53786b]">
-                  <CheckCircle2 className="h-4 w-4 text-[#305247]" />
+                <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-[#2b7a85]">
+                  <CheckCircle2 className="h-4 w-4 text-[#0a4d5c]" />
                   Concierge itinerary
                 </p>
                 <h2 className="mt-3 font-display text-4xl leading-[0.96] tracking-tight text-ink md:text-5xl">
@@ -226,7 +226,7 @@ export default function Concierge() {
             <div className="border-t border-black/10 bg-white/40 p-6 md:px-9">
               <div className="flex flex-col gap-3 sm:flex-row">
                 <Link
-                  className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-full bg-ink px-6 text-sm font-semibold text-white shadow-[0_18px_48px_rgba(32,25,20,0.22)] transition hover:-translate-y-0.5 hover:bg-[#120f0c]"
+                  className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-full bg-ink px-6 text-sm font-semibold text-white shadow-[0_18px_48px_rgba(10,34,51,0.22)] transition hover:-translate-y-0.5 hover:bg-[#0a2233]"
                   href="/dashboard"
                 >
                   Save and return to dashboard <ArrowRight className="h-4 w-4" />
@@ -244,7 +244,7 @@ export default function Concierge() {
         ) : outOfFreeGenerations ? (
           <div className="glass-panel hero-shadow mt-9 rounded-[2rem] border border-black/10 p-6 text-left md:p-8">
             <div className="flex items-start gap-4">
-              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#f2e7d9] text-clay">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#fde8d3] text-clay">
                 <Lock className="h-5 w-5" />
               </span>
               <div>
@@ -258,7 +258,7 @@ export default function Concierge() {
               </div>
             </div>
             <button
-              className="mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ink px-6 text-sm font-semibold text-white shadow-[0_18px_48px_rgba(32,25,20,0.22)] disabled:cursor-wait disabled:opacity-60"
+              className="mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ink px-6 text-sm font-semibold text-white shadow-[0_18px_48px_rgba(10,34,51,0.22)] disabled:cursor-wait disabled:opacity-60"
               disabled={isUpgrading}
               onClick={handleUpgrade}
               type="button"
@@ -282,7 +282,7 @@ export default function Concierge() {
             value={prompt}
           />
           <button
-            className="mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ink px-6 text-sm font-semibold text-white shadow-[0_18px_48px_rgba(32,25,20,0.22)] disabled:cursor-wait disabled:opacity-60"
+            className="mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ink px-6 text-sm font-semibold text-white shadow-[0_18px_48px_rgba(10,34,51,0.22)] disabled:cursor-wait disabled:opacity-60"
             disabled={isGenerating}
             type="submit"
           >

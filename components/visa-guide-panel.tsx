@@ -2,11 +2,11 @@ import { reviewDateLabel, type VisaGuide } from "@/lib/visa";
 import { VisaExternalLink } from "@/components/visa-external-link";
 
 const sectionLabel =
-  "mt-4 text-xs font-semibold uppercase tracking-[0.18em] text-[#8a4a24] [font-family:var(--font-sans)]";
+  "mt-4 text-xs font-semibold uppercase tracking-[0.18em] text-[#b5391c] [font-family:var(--font-sans)]";
 
 export function VisaGuidePanel({ guide }: { guide: VisaGuide }) {
   return (
-    <div className="mt-4 rounded-[1.25rem] border border-black/10 bg-[#fffcf7] p-4 text-left">
+    <div className="mt-4 rounded-[1.25rem] border border-black/10 bg-[#fffaf3] p-4 text-left">
       <p className="font-display text-lg leading-6 text-ink">{guide.title}</p>
       <p className="mt-1 text-xs leading-5 text-muted">{guide.appliesTo}</p>
       <p className="mt-3 text-sm leading-6 text-muted">{guide.overview}</p>
@@ -25,7 +25,7 @@ export function VisaGuidePanel({ guide }: { guide: VisaGuide }) {
       <ol className="mt-2 space-y-1.5">
         {guide.steps.map((step, idx) => (
           <li key={step} className="flex gap-2 text-sm leading-6 text-ink/80">
-            <span className="font-semibold text-[#8a4a24]">{idx + 1}.</span>
+            <span className="font-semibold text-[#b5391c]">{idx + 1}.</span>
             <span>{step}</span>
           </li>
         ))}
@@ -67,7 +67,7 @@ export function VisaGuidePanel({ guide }: { guide: VisaGuide }) {
           <VisaExternalLink
             key={l.url}
             href={l.url}
-            className="text-xs font-semibold text-ink hover:text-[#8a4a24]"
+            className="text-xs font-semibold text-ink hover:text-[#b5391c]"
           >
             {l.label}
           </VisaExternalLink>

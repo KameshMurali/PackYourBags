@@ -4,12 +4,10 @@
 
 :root {
   color-scheme: light;
-  --font-sans: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
-  --font-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
   --page-bg:
-    radial-gradient(circle at top left, rgba(233, 211, 183, 0.55), transparent 28%),
-    radial-gradient(circle at 85% 14%, rgba(170, 196, 188, 0.24), transparent 22%),
-    linear-gradient(180deg, #f7f0e6 0%, #fbf7f1 40%, #fffdf9 100%);
+    radial-gradient(ellipse 80% 40% at 50% -10%, rgba(255, 185, 56, 0.28), transparent 70%),
+    radial-gradient(ellipse 60% 30% at 100% 0%, rgba(8, 122, 122, 0.12), transparent 70%),
+    linear-gradient(180deg, #fff3e1 0%, #fff8ee 38%, #fffcf7 100%);
 }
 
 html {
@@ -19,8 +17,9 @@ html {
 body {
   min-height: 100vh;
   background: var(--page-bg);
-  color: #201914;
-  font-family: var(--font-sans);
+  background-attachment: fixed;
+  color: #0e2a3b;
+  font-family: var(--font-sans), system-ui, sans-serif;
   text-rendering: optimizeLegibility;
 }
 
@@ -31,16 +30,17 @@ h4,
 h5,
 h6,
 .font-display {
-  font-family: var(--font-display);
+  font-family: var(--font-display), system-ui, sans-serif;
+  letter-spacing: -0.02em;
 }
 
 ::selection {
-  background: rgba(210, 145, 92, 0.28);
+  background: rgba(255, 107, 74, 0.3);
 }
 
 @layer base {
   * {
-    @apply border-black/10;
+    @apply border-ink/10;
   }
 
   a,
@@ -52,37 +52,39 @@ h6,
   button:focus-visible,
   input:focus-visible,
   select:focus-visible,
-  textarea:focus-visible {
-    outline: 2px solid rgba(201, 131, 79, 0.85);
-    outline-offset: 2px;
+  textarea:focus-visible,
+  summary:focus-visible {
+    outline: 3px solid rgba(8, 122, 122, 0.75);
+    outline-offset: 3px;
   }
 }
 
 @layer components {
   .field {
-    @apply w-full rounded-[1.15rem] border border-black/10 bg-white/80 px-4 py-3 text-sm text-ink outline-none transition placeholder:text-muted focus:border-clay focus:ring-2 focus:ring-clay/15;
+    @apply w-full rounded-[1.15rem] border border-ink/15 bg-white px-4 py-3 text-sm text-ink outline-none transition placeholder:text-muted focus:border-lagoon focus:ring-2 focus:ring-lagoon/20;
   }
 }
 
 @layer utilities {
   .page-grid {
     background-image:
-      linear-gradient(rgba(39, 29, 22, 0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(39, 29, 22, 0.05) 1px, transparent 1px);
-    background-size: 72px 72px;
+      linear-gradient(rgba(14, 42, 59, 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(14, 42, 59, 0.06) 1px, transparent 1px);
+    background-size: 56px 56px;
   }
 
+  /* Cards: solid and slightly warm, like a printed ticket, instead of frosted glass. */
   .glass-panel {
-    background: rgba(255, 252, 246, 0.72);
-    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.86);
+    backdrop-filter: blur(14px);
   }
 
   .hero-shadow {
-    box-shadow: 0 32px 100px rgba(55, 39, 27, 0.12);
+    box-shadow: 0 30px 90px rgba(10, 34, 51, 0.18);
   }
 
   .story-shadow {
-    box-shadow: 0 22px 70px rgba(43, 30, 20, 0.09);
+    box-shadow: 0 18px 56px rgba(10, 34, 51, 0.12);
   }
 
   .display-balance {
@@ -105,6 +107,62 @@ h6,
   .animate-drift {
     animation: drift 20s linear infinite alternate;
   }
+
+  /* Sunset gradient used for big fills (buttons, bands, accents). */
+  .bg-sunset {
+    background-image: linear-gradient(135deg, #ff6b4a 0%, #ff9a3c 55%, #ffb938 100%);
+  }
+
+  .text-sunset {
+    background-image: linear-gradient(100deg, #ff6b4a 0%, #ffb938 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Boarding-pass notches: round bites out of both sides at the dashed tear line. */
+  .ticket-notch {
+    --notch-y: 62%;
+    -webkit-mask:
+      radial-gradient(circle 14px at 0 var(--notch-y), transparent 98%, #000) left / 51% 100% no-repeat,
+      radial-gradient(circle 14px at 100% var(--notch-y), transparent 98%, #000) right / 51% 100% no-repeat;
+    mask:
+      radial-gradient(circle 14px at 0 var(--notch-y), transparent 98%, #000) left / 51% 100% no-repeat,
+      radial-gradient(circle 14px at 100% var(--notch-y), transparent 98%, #000) right / 51% 100% no-repeat;
+  }
+
+  /* Scroll reveal: content is visible by default (no-JS, SSR). Reveal marks only
+     below-the-fold elements data-visible="false" and flips them once they scroll in. */
+  .reveal {
+    transition:
+      opacity 0.8s cubic-bezier(0.2, 0.7, 0.2, 1),
+      transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+
+  .reveal[data-visible="false"] {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+
+  /* Gentle parallax on chapter photos where the browser supports scroll timelines. */
+  @supports (animation-timeline: view()) {
+    .parallax-img {
+      animation: parallax linear both;
+      animation-timeline: view();
+      animation-range: cover 0% cover 100%;
+    }
+  }
+}
+
+@keyframes parallax {
+  from {
+    transform: translateY(-5%) scale(1.12);
+  }
+
+  to {
+    transform: translateY(5%) scale(1.12);
+  }
 }
 
 @keyframes float-slow {
@@ -125,5 +183,27 @@ h6,
 
   100% {
     transform: translateX(12px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .animate-float-slow,
+  .animate-float-delayed,
+  .animate-drift,
+  .animate-marquee,
+  .animate-rise-in,
+  .animate-pulse-ring,
+  .parallax-img {
+    animation: none !important;
   }
 }

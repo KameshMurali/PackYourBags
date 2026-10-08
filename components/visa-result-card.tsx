@@ -96,7 +96,7 @@ export function VisaResultCard({ destination: d, via, guideOpen, onToggleGuide }
             onClick={onToggleGuide}
             aria-expanded={guideOpen}
             aria-controls={guideId}
-            className="inline-flex items-center gap-1.5 rounded-sm text-sm font-semibold text-ink transition hover:text-[#8a4a24]"
+            className="inline-flex items-center gap-1.5 rounded-sm text-sm font-semibold text-ink transition hover:text-[#b5391c]"
           >
             <ShieldCheck className="h-4 w-4 text-clay" aria-hidden />
             How to apply

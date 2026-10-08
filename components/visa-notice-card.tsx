@@ -8,7 +8,7 @@ import {
 } from "@/lib/visa";
 import { VisaExternalLink } from "@/components/visa-external-link";
 
-const linkClass = "text-sm font-semibold text-[#8a4a24] hover:text-ink";
+const linkClass = "text-sm font-semibold text-[#b5391c] hover:text-ink";
 
 // A recognised country without a verified rule for this passport: say so plainly and give
 // the official next step, instead of a dead end or a guess.
@@ -93,12 +93,12 @@ export function VisaNoticeCard({
       className="rounded-[1.5rem] border border-dashed border-[#d6bf98] bg-[#fffaf2] p-5"
     >
       {header(
-        <span className="shrink-0 rounded-full bg-[#efe5d3] px-3 py-1 text-xs font-semibold text-[#5f4a2c]">
+        <span className="shrink-0 rounded-full bg-[#fde8d3] px-3 py-1 text-xs font-semibold text-[#5f4a2c]">
           Not yet verified
         </span>,
       )}
       <p className="mt-3 flex items-start gap-2 text-sm font-semibold leading-6 text-ink">
-        <Info className="mt-1 h-4 w-4 shrink-0 text-[#8a4a24]" aria-hidden />
+        <Info className="mt-1 h-4 w-4 shrink-0 text-[#b5391c]" aria-hidden />
         Rule not yet verified for your passport
       </p>
       <p className="mt-1 text-sm leading-6 text-muted">

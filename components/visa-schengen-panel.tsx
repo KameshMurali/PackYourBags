@@ -25,7 +25,7 @@ export function VisaSchengenPanel({
 }) {
   if (destination.code !== SCHENGEN_CODE) {
     return (
-      <p className="mt-3 rounded-[1rem] bg-[#f6efe3] px-3 py-2 text-xs leading-5 text-[#5f4a2c]">
+      <p className="mt-3 rounded-[1rem] bg-[#fdeedd] px-3 py-2 text-xs leading-5 text-[#5f4a2c]">
         {listNames(countries)} {countries.length === 1 ? "follows" : "follow"} {destination.name}{" "}
         entry rules.
       </p>
@@ -37,7 +37,7 @@ export function VisaSchengenPanel({
 
   if (destination.residentHere) {
     return (
-      <p className="mt-3 rounded-[1rem] bg-[#f6efe3] px-3 py-2 text-xs leading-5 text-[#5f4a2c]">
+      <p className="mt-3 rounded-[1rem] bg-[#fdeedd] px-3 py-2 text-xs leading-5 text-[#5f4a2c]">
         {listNames(countries)} {countries.length === 1 ? "is" : "are"} covered by your Schengen
         residence permit.
       </p>
@@ -50,7 +50,7 @@ export function VisaSchengenPanel({
   return (
     <section
       aria-label="Schengen details"
-      className="mt-4 rounded-[1.25rem] border border-[#e7d3a9] bg-[#fbf6ec] p-4"
+      className="mt-4 rounded-[1.25rem] border border-[#ffd9a0] bg-[#fff8ee] p-4"
     >
       {members.length > 0 && (
         <p className="text-sm font-semibold leading-6 text-ink">
@@ -90,7 +90,7 @@ export function VisaSchengenPanel({
           <VisaExternalLink
             href={memberSource.source.url}
             label={memberSource.source.label}
-            className="text-xs font-semibold text-ink hover:text-[#8a4a24]"
+            className="text-xs font-semibold text-ink hover:text-[#b5391c]"
           >
             {single.name}: official visa information
           </VisaExternalLink>
@@ -99,7 +99,7 @@ export function VisaSchengenPanel({
           <VisaExternalLink
             key={s.url}
             href={s.url}
-            className="text-xs font-semibold text-ink hover:text-[#8a4a24]"
+            className="text-xs font-semibold text-ink hover:text-[#b5391c]"
           >
             {s.label.replace("European Commission — ", "EU: ")}
           </VisaExternalLink>

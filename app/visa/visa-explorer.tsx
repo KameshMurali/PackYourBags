@@ -139,7 +139,7 @@ export function VisaExplorer() {
                   onClick={() => toggleVisa(v.code)}
                   className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition ${
                     active
-                      ? "border-clay bg-[#f5ead9] text-[#8a4a24]"
+                      ? "border-clay bg-[#fde8d3] text-[#b5391c]"
                       : "border-black/10 bg-white/70 text-ink hover:bg-white"
                   }`}
                 >
@@ -154,7 +154,7 @@ export function VisaExplorer() {
 
       <div
         role="note"
-        className="mt-4 flex items-start gap-3 rounded-[1.4rem] border border-[#e7d3a9] bg-[#fbf3e3] p-4 text-sm leading-6 text-[#6b4f19]"
+        className="mt-4 flex items-start gap-3 rounded-[1.4rem] border border-[#ffd9a0] bg-[#fdeedd] p-4 text-sm leading-6 text-[#6b4f19]"
       >
         <Info className="mt-0.5 h-5 w-5 shrink-0" aria-hidden />
         <p>
@@ -284,7 +284,7 @@ export function VisaExplorer() {
                         <button
                           type="button"
                           onClick={() => setQuery(c.name)}
-                          className="rounded-sm font-semibold text-[#8a4a24] underline-offset-2 hover:underline"
+                          className="rounded-sm font-semibold text-[#b5391c] underline-offset-2 hover:underline"
                         >
                           {c.name}
                         </button>
@@ -298,7 +298,7 @@ export function VisaExplorer() {
                   any destination on the{" "}
                   <VisaExternalLink
                     href={IATA_TRAVEL_CENTRE.url}
-                    className="font-semibold text-[#8a4a24]"
+                    className="font-semibold text-[#b5391c]"
                   >
                     {IATA_TRAVEL_CENTRE.label}
                   </VisaExternalLink>
@@ -306,7 +306,7 @@ export function VisaExplorer() {
                   <button
                     type="button"
                     onClick={() => setQuery("Schengen")}
-                    className="rounded-sm font-semibold text-[#8a4a24] underline-offset-2 hover:underline"
+                    className="rounded-sm font-semibold text-[#b5391c] underline-offset-2 hover:underline"
                   >
                     Schengen
                   </button>
@@ -321,7 +321,7 @@ export function VisaExplorer() {
           <h2 className="font-display text-3xl text-ink">{nationality.name} is coming soon.</h2>
           <p className="mt-3 text-sm leading-7 text-muted">
             We only publish rules we&apos;ve verified against official sources. Until then, check the{" "}
-            <VisaExternalLink href={IATA_TRAVEL_CENTRE.url} className="font-semibold text-[#8a4a24]">
+            <VisaExternalLink href={IATA_TRAVEL_CENTRE.url} className="font-semibold text-[#b5391c]">
               {IATA_TRAVEL_CENTRE.label}
             </VisaExternalLink>
             .

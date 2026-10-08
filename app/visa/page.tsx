@@ -40,7 +40,7 @@ export default function VisaPage() {
       </header>
 
       <section className="mx-auto max-w-6xl px-5 pt-8 lg:px-8">
-        <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.28em] text-[#8a4a24]">
+        <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.28em] text-[#b5391c]">
           <Globe2 className="h-4 w-4" aria-hidden />
           Visa intelligence
         </p>

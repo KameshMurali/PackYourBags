@@ -135,7 +135,7 @@ export default async function AuthorizePage({ searchParams }: { searchParams: Pr
         <ul className="mt-5 space-y-3">
           {permissions.map(({ icon: Icon, text }) => (
             <li key={text} className="flex items-start gap-3 text-sm leading-6 text-ink/85">
-              <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#f2e7d9] text-clay">
+              <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#fde8d3] text-clay">
                 <Icon className="h-4 w-4" />
               </span>
               {text}
@@ -156,7 +156,7 @@ export default async function AuthorizePage({ searchParams }: { searchParams: Pr
           <input type="hidden" name="code_challenge" value={codeChallenge} />
           <input type="hidden" name="code_challenge_method" value={codeChallengeMethod ?? ""} />
           <button
-            className="inline-flex h-12 w-full items-center justify-center rounded-full bg-ink px-5 text-sm font-semibold text-white shadow-[0_18px_48px_rgba(32,25,20,0.22)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#120f0c]"
+            className="inline-flex h-12 w-full items-center justify-center rounded-full bg-ink px-5 text-sm font-semibold text-white shadow-[0_18px_48px_rgba(10,34,51,0.22)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#0a2233]"
             type="submit"
           >
             Allow access

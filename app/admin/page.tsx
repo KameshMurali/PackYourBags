@@ -39,7 +39,7 @@ export default async function AdminPage() {
             This area is for administrators only. Your account does not have admin access.
           </p>
           <Link
-            className="mt-7 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-ink px-6 text-sm font-semibold text-white shadow-[0_18px_48px_rgba(32,25,20,0.22)]"
+            className="mt-7 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-ink px-6 text-sm font-semibold text-white shadow-[0_18px_48px_rgba(10,34,51,0.22)]"
             href="/dashboard"
           >
             Back to dashboard
@@ -98,7 +98,7 @@ export default async function AdminPage() {
         {isDatabaseConfigured ? (
           <div className="glass-panel hero-shadow mt-9 overflow-hidden rounded-[2rem] border border-black/10">
             <div className="flex items-center gap-3 border-b border-black/10 p-6 md:px-8">
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#f2e7d9] text-clay">
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#fde8d3] text-clay">
                 <Database className="h-5 w-5" />
               </span>
               <div>
@@ -141,8 +141,8 @@ export default async function AdminPage() {
                           <span
                             className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
                               user.role === "admin"
-                                ? "bg-[#e2eee9] text-[#305247]"
-                                : "bg-[#f2e7d9] text-ink"
+                                ? "bg-[#e2eee9] text-[#0a4d5c]"
+                                : "bg-[#fde8d3] text-ink"
                             }`}
                           >
                             {user.role}
@@ -161,7 +161,7 @@ export default async function AdminPage() {
         ) : (
           <div className="glass-panel hero-shadow mt-9 rounded-[2rem] border border-black/10 p-6 md:p-8">
             <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#f2e7d9] text-clay">
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#fde8d3] text-clay">
                 <Database className="h-5 w-5" />
               </span>
               <h2 className="font-display text-2xl text-ink">User listing is off</h2>
@@ -172,7 +172,7 @@ export default async function AdminPage() {
               <code className="font-mono">DATABASE_URL</code> to a Postgres connection string and run{" "}
               <code className="font-mono">npm run db:push</code> to create the tables.
             </p>
-            <p className="mt-4 rounded-[1.1rem] border border-[#b7d4c8] bg-[#eff8f4]/90 p-4 text-sm leading-6 text-[#305247]">
+            <p className="mt-4 rounded-[1.1rem] border border-[#b7d4c8] bg-[#eff8f4]/90 p-4 text-sm leading-6 text-[#0a4d5c]">
               You still have full admin access. Admin status is driven by{" "}
               <code className="font-mono">ADMIN_EMAILS</code> and works with or without a database.
             </p>

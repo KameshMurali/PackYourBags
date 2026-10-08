@@ -21,7 +21,7 @@ export default async function Register({
       googleConfigured={isGoogleConfigured}
       callbackUrl={destination}
       title="Create your account."
-      subtitle="Start organising leave, long weekends, and premium trips from one calm workspace. Continuing with Google creates your account automatically."
+      subtitle="Check visas, sketch trips and plan with an AI concierge. Continuing with Google creates your account automatically."
     />
   );
 }

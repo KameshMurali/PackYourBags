@@ -73,7 +73,7 @@ export default function NewTrip() {
       <section className="mx-auto max-w-6xl px-5 pt-10 lg:px-8">
         {savedTrip ? (
           <div className="glass-panel hero-shadow mx-auto max-w-2xl rounded-[2.2rem] border border-black/10 p-8 text-center md:p-12">
-            <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#e2eee9] text-[#305247]">
+            <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#e2eee9] text-[#0a4d5c]">
               <Check className="h-6 w-6" />
             </span>
             <p className="mt-7 text-xs font-semibold uppercase tracking-[0.28em] text-clay">
@@ -113,8 +113,8 @@ export default function NewTrip() {
               <p className="mt-6 max-w-xl text-lg leading-8 text-muted">
                 Give the concierge a few signals. This is enough to shape a thoughtful first draft.
               </p>
-              <div className="mt-8 rounded-[1.8rem] border border-black/10 bg-[#201914] p-6 text-white">
-                <Sparkles className="h-5 w-5 text-[#e5c39a]" />
+              <div className="mt-8 rounded-[1.8rem] border border-black/10 bg-[#0e2a3b] p-6 text-white">
+                <Sparkles className="h-5 w-5 text-[#ffb938]" />
                 <p className="mt-4 font-display text-2xl">A good brief can be loose.</p>
                 <p className="mt-3 text-sm leading-7 text-white/65">
                   Try: “A quiet anniversary trip in late September with direct flights and a design hotel.”
@@ -157,7 +157,7 @@ export default function NewTrip() {
                 />
               </Field>
               <button
-                className="mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ink px-6 text-sm font-semibold text-white shadow-[0_18px_48px_rgba(32,25,20,0.22)]"
+                className="mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ink px-6 text-sm font-semibold text-white shadow-[0_18px_48px_rgba(10,34,51,0.22)]"
                 type="submit"
               >
                 Save trip brief <ArrowRight className="h-4 w-4" />
