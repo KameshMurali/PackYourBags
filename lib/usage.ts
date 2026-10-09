@@ -1,12 +1,28 @@
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
 import { Plan } from "@/lib/plan";
 
 const COOKIE_NAME = "pyb_usage";
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
-// Prototype fallback: per-user state lives in this browser cookie only. Set
-// USAGE_COOKIE_SECRET in production so signatures can't be forged offline.
-const SECRET = process.env.USAGE_COOKIE_SECRET ?? "packyourbags-dev-usage-secret";
+// The free-tier counter lives in a signed cookie. The signing key must never be a
+// value that's public in the source (anyone could then forge an "unlimited" cookie
+// and spend the Anthropic budget), so it comes from, in order:
+//   1. USAGE_COOKIE_SECRET, if set;
+//   2. a key derived from AUTH_SECRET (always present once sign-in works);
+//   3. a random per-process key: forgery-proof, but the counter resets on restart.
+export type UsageSecretSource = "dedicated" | "derived" | "ephemeral";
+
+export const usageSecretSource: UsageSecretSource = process.env.USAGE_COOKIE_SECRET
+  ? "dedicated"
+  : process.env.AUTH_SECRET
+    ? "derived"
+    : "ephemeral";
+
+const SECRET =
+  process.env.USAGE_COOKIE_SECRET ||
+  (process.env.AUTH_SECRET
+    ? createHmac("sha256", process.env.AUTH_SECRET).update("packyourbags:usage-cookie").digest("hex")
+    : randomBytes(32).toString("hex"));
 
 export type UsageState = {
   plan: Plan;

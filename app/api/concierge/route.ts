@@ -3,6 +3,7 @@ import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { z } from "zod";
 import { auth } from "@/auth";
 import { FREE_GENERATION_LIMIT, toUsageInfo } from "@/lib/plan";
+import { countItinerary } from "@/lib/store";
 import { readUsageState, writeUsageState } from "@/lib/usage";
 
 const MAX_PROMPT_LENGTH = 2000;
@@ -114,6 +115,9 @@ export async function POST(request: Request) {
     const nextState =
       usage.plan === "pro" ? usage : { plan: usage.plan, used: usage.used + 1 };
     await writeUsageState(nextState);
+    if (session.user.email) {
+      await countItinerary(session.user.email).catch(() => {});
+    }
 
     return Response.json({
       itinerary: response.parsed_output,

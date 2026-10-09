@@ -62,6 +62,8 @@ export default function Dashboard() {
     if (status !== "authenticated") {
       return;
     }
+    // Lets the admin user list show when each traveller was last active.
+    fetch("/api/seen", { method: "POST" }).catch(() => {});
     fetch("/api/usage")
       .then((res) => (res.ok ? (res.json() as Promise<UsageInfo>) : null))
       .then((info) => setUsage(info))

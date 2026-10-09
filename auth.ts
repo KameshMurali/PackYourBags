@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { authConfig } from "@/auth.config";
 import { roleForEmail } from "@/lib/admin";
 import { db, schema } from "@/lib/db";
+import { touchUser } from "@/lib/store";
 
 // Node-side Auth.js setup. This file is imported by the route handler and server
 // components only — never by the edge middleware — so it is free to use the
@@ -28,6 +29,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     // When a database is present, keep the persisted `role` column in sync with
     // ADMIN_EMAILS on every sign-in. No-op in JWT-only mode.
     async signIn({ user }) {
+      if (user?.email) {
+        // Feeds the admin user list. Best-effort: a storage hiccup must not block login.
+        try {
+          await touchUser({ email: user.email, name: user.name, image: user.image }, { signIn: true });
+        } catch {}
+      }
+
       if (!db || !user?.email) {
         return;
       }

@@ -126,3 +126,142 @@ const upstashStore: Store = {
 export const store: Store = UPSTASH_URL && UPSTASH_TOKEN ? upstashStore : memoryStore;
 
 export const usingDurableStore = Boolean(UPSTASH_URL && UPSTASH_TOKEN);
+
+
+// --- Traveller registry ------------------------------------------------------
+// Who has signed in, kept in the same store as assistant data so the admin page can
+// list people without needing a Postgres database. One hash per traveller plus a
+// sorted set (score = last seen) to list the most recent first.
+
+export type UserRecord = {
+  email: string;
+  name: string;
+  image: string;
+  firstSeen: string;
+  lastSeen: string;
+  signIns: number;
+  itineraries: number;
+};
+
+const USERS_INDEX = "pyb:users";
+
+function userKey(email: string) {
+  return `pyb:user:${email.trim().toLowerCase()}`;
+}
+
+function blankUser(email: string): UserRecord {
+  const now = new Date().toISOString();
+  return { email, name: "", image: "", firstSeen: now, lastSeen: now, signIns: 0, itineraries: 0 };
+}
+
+const memoryUsers = new Map<string, UserRecord>();
+
+async function upstashPipeline(commands: unknown[][]): Promise<unknown[]> {
+  const response = await fetch(`${UPSTASH_URL as string}/pipeline`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${UPSTASH_TOKEN}`, "Content-Type": "application/json" },
+    body: JSON.stringify(commands),
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    throw new Error(`Upstash error ${response.status}`);
+  }
+  const results = (await response.json()) as Array<{ result?: unknown; error?: string }>;
+  return results.map((entry) => {
+    if (entry.error) {
+      throw new Error(entry.error);
+    }
+    return entry.result;
+  });
+}
+
+function parseUser(email: string, flat: unknown): UserRecord | null {
+  if (!Array.isArray(flat) || flat.length === 0) {
+    return null;
+  }
+  const fields: Record<string, string> = {};
+  for (let i = 0; i < flat.length; i += 2) {
+    fields[String(flat[i])] = String(flat[i + 1] ?? "");
+  }
+  const base = blankUser(email);
+  return {
+    email: fields.email || email,
+    name: fields.name ?? "",
+    image: fields.image ?? "",
+    firstSeen: fields.firstSeen || base.firstSeen,
+    lastSeen: fields.lastSeen || base.lastSeen,
+    signIns: Number.parseInt(fields.signIns ?? "0", 10) || 0,
+    itineraries: Number.parseInt(fields.itineraries ?? "0", 10) || 0,
+  };
+}
+
+/**
+ * Records that a traveller was seen. `signIn: true` counts a fresh Google sign-in;
+ * otherwise it only refreshes "last seen" (and adds people who were already signed
+ * in before the registry existed).
+ */
+export async function touchUser(
+  input: { email: string; name?: string | null; image?: string | null },
+  options: { signIn?: boolean } = {},
+): Promise<void> {
+  const email = input.email.trim().toLowerCase();
+  const now = new Date();
+
+  if (!usingDurableStore) {
+    const user = memoryUsers.get(email) ?? blankUser(email);
+    user.lastSeen = now.toISOString();
+    user.name = input.name || user.name;
+    user.image = input.image || user.image;
+    if (options.signIn) user.signIns += 1;
+    memoryUsers.set(email, user);
+    return;
+  }
+
+  const key = userKey(email);
+  const set: unknown[] = ["HSET", key, "email", email, "lastSeen", now.toISOString()];
+  if (input.name) set.push("name", input.name);
+  if (input.image) set.push("image", input.image);
+
+  const commands: unknown[][] = [["HSETNX", key, "firstSeen", now.toISOString()], set];
+  if (options.signIn) commands.push(["HINCRBY", key, "signIns", 1]);
+  commands.push(["ZADD", USERS_INDEX, now.getTime(), email]);
+  await upstashPipeline(commands);
+}
+
+/** Counts one AI itinerary against a traveller (admin overview only). */
+export async function countItinerary(email: string): Promise<void> {
+  const normalized = email.trim().toLowerCase();
+  if (!usingDurableStore) {
+    const user = memoryUsers.get(normalized);
+    if (user) user.itineraries += 1;
+    return;
+  }
+  await upstashPipeline([["HINCRBY", userKey(normalized), "itineraries", 1]]);
+}
+
+/** Most recently seen travellers first. */
+export async function listUsers(limit = 200): Promise<UserRecord[]> {
+  if (!usingDurableStore) {
+    return Array.from(memoryUsers.values())
+      .sort((a, b) => b.lastSeen.localeCompare(a.lastSeen))
+      .slice(0, limit);
+  }
+
+  const emails = (await upstash(["ZREVRANGE", USERS_INDEX, 0, limit - 1])) as string[] | null;
+  if (!emails || emails.length === 0) {
+    return [];
+  }
+  const rows = await upstashPipeline(emails.map((email) => ["HGETALL", userKey(email)]));
+  return rows
+    .map((flat, i) => parseUser(emails[i] as string, flat))
+    .filter((user): user is UserRecord => user !== null);
+}
+
+export async function getUserRecord(email: string): Promise<UserRecord | null> {
+  const normalized = email.trim().toLowerCase();
+  if (!usingDurableStore) {
+    return memoryUsers.get(normalized) ?? null;
+  }
+  const [flat] = await upstashPipeline([["HGETALL", userKey(normalized)]]);
+  return parseUser(normalized, flat);
+}
