@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { Logo } from "@/components/logo";
+import type { SignInNotice } from "@/lib/auth-errors";
 
 function GoogleGlyph() {
   return (
@@ -33,11 +34,13 @@ export function SignInForm({
   callbackUrl,
   title,
   subtitle,
+  notice = null,
 }: {
   googleConfigured: boolean;
   callbackUrl: string;
   title: string;
   subtitle: string;
+  notice?: SignInNotice | null;
 }) {
   const [isSigningIn, setIsSigningIn] = useState(false);
 
@@ -79,6 +82,19 @@ export function SignInForm({
             {title}
           </h1>
           <p className="mt-4 text-base leading-7 text-muted">{subtitle}</p>
+
+          {notice && (
+            <p
+              role="status"
+              className={`mt-6 rounded-2xl border px-4 py-3 text-sm font-medium leading-6 ${
+                notice.tone === "error"
+                  ? "border-clay/30 bg-clay/10 text-clay"
+                  : "border-lagoon/30 bg-lagoon/10 text-lagoon-deep"
+              }`}
+            >
+              {notice.text}
+            </p>
+          )}
 
           {googleConfigured ? (
             <>

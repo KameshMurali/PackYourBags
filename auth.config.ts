@@ -21,6 +21,9 @@ export const authConfig = {
   session: { strategy: "jwt" },
   pages: {
     signIn: "/signin",
+    // Any Auth.js error lands on our sign-in page (?error=...) with a friendly
+    // message, never on the built-in "Server error" screen.
+    error: "/signin",
   },
   providers: googleConfigured
     ? [
