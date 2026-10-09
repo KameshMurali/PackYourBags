@@ -24,6 +24,8 @@ interface Store {
   push(namespace: string, item: SyncedItem): Promise<void>;
   list(namespace: string): Promise<SyncedItem[]>;
   clear(namespace: string): Promise<void>;
+  /** How many travellers have saved assistant data (admin overview only). */
+  summary(): Promise<{ travellers: number }>;
 }
 
 function key(namespace: string) {
@@ -44,6 +46,9 @@ const memoryStore: Store = {
   },
   async clear(namespace) {
     memory.delete(key(namespace));
+  },
+  async summary() {
+    return { travellers: memory.size };
   },
 };
 
@@ -99,6 +104,22 @@ const upstashStore: Store = {
   },
   async clear(namespace) {
     await upstash(["DEL", key(namespace)]);
+  },
+  async summary() {
+    // Each traveller's items live in one list key, so counting keys counts travellers.
+    // SCAN is paged and capped so a large keyspace can't make the admin page slow.
+    let cursor = "0";
+    let travellers = 0;
+    for (let page = 0; page < 20; page += 1) {
+      const [next, keys] = (await upstash(["SCAN", cursor, "MATCH", "pyb:items:*", "COUNT", 500])) as [
+        string,
+        string[],
+      ];
+      travellers += keys.length;
+      cursor = next;
+      if (cursor === "0") break;
+    }
+    return { travellers };
   },
 };
 

@@ -1,9 +1,14 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { desc } from "drizzle-orm";
-import { ArrowLeft, Database, Shield, ShieldAlert } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Database, Shield, ShieldAlert, XCircle } from "lucide-react";
 import { auth } from "@/auth";
+import { isGoogleConfigured } from "@/auth.config";
+import { adminEmails } from "@/lib/admin";
 import { db, isDatabaseConfigured, schema } from "@/lib/db";
+import { isOAuthConfigured } from "@/lib/oauth";
+import { store, usingDurableStore } from "@/lib/store";
+import { DATASETS, reviewDateLabel } from "@/lib/visa";
 import { Logo } from "@/components/logo";
 
 export const runtime = "nodejs";
@@ -17,6 +22,26 @@ type AdminUserRow = {
   role: string;
   createdAt: Date;
 };
+
+const STALE_AFTER_DAYS = 180;
+
+// Computed outside the component: it reads the clock, which render functions shouldn't.
+function getVisaHealth(staleAfterDays: number) {
+  const now = Date.now();
+  return Object.entries(DATASETS)
+    .filter(([, rules]) => rules.length > 0)
+    .map(([passport, rules]) => {
+      const dates = rules.map((r) => r.lastReviewed).sort();
+      const due = rules.filter((r) => (now - new Date(r.lastReviewed).getTime()) / 86_400_000 > staleAfterDays).length;
+      return {
+        passport,
+        count: rules.length,
+        oldest: dates[0] ?? "",
+        newest: dates[dates.length - 1] ?? "",
+        due,
+      };
+    });
+}
 
 export default async function AdminPage() {
   const session = await auth();
@@ -36,7 +61,9 @@ export default async function AdminPage() {
           </span>
           <h1 className="mt-6 font-display text-4xl text-ink">Not authorized</h1>
           <p className="mt-3 text-base leading-7 text-muted">
-            This area is for administrators only. Your account does not have admin access.
+            This area is for administrators only. You&apos;re signed in as{" "}
+            <span className="font-semibold text-ink">{session.user.email}</span>, which doesn&apos;t have
+            admin access. If you meant to use a different Google account, sign out and sign in again with it.
           </p>
           <Link
             className="mt-7 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-ink px-6 text-sm font-semibold text-white shadow-[0_18px_48px_rgba(10,34,51,0.22)]"
@@ -47,6 +74,56 @@ export default async function AdminPage() {
         </div>
       </main>
     );
+  }
+
+  // Booleans only: this page reports whether things are configured, never their values.
+  const checks: Array<{ label: string; ok: boolean; detail: string }> = [
+    {
+      label: "Google sign-in",
+      ok: isGoogleConfigured,
+      detail: isGoogleConfigured ? "Travellers can sign in." : "Add AUTH_GOOGLE_ID and AUTH_GOOGLE_SECRET.",
+    },
+    {
+      label: "AI concierge",
+      ok: Boolean(process.env.ANTHROPIC_API_KEY),
+      detail: process.env.ANTHROPIC_API_KEY
+        ? `Using ${process.env.ANTHROPIC_MODEL || "the default Claude model"}.`
+        : "Add ANTHROPIC_API_KEY or itineraries can't be generated.",
+    },
+    {
+      label: "Claude and ChatGPT connectors",
+      ok: isOAuthConfigured,
+      detail: isOAuthConfigured ? "OAuth sign-in for assistants is on." : "Add AUTH_SECRET (or MCP_OAUTH_SECRET).",
+    },
+    {
+      label: "Durable storage (Upstash)",
+      ok: usingDurableStore,
+      detail: usingDurableStore
+        ? "Assistant-saved plans persist."
+        : "Using in-memory storage: saved plans reset when the server restarts.",
+    },
+    {
+      label: "Free-tier counter",
+      ok: Boolean(process.env.USAGE_COOKIE_SECRET),
+      detail: process.env.USAGE_COOKIE_SECRET ? "Signed cookies protect the 3 free itineraries." : "Add USAGE_COOKIE_SECRET.",
+    },
+    {
+      label: "User database",
+      ok: isDatabaseConfigured,
+      detail: isDatabaseConfigured ? "Accounts are stored." : "Optional. Add DATABASE_URL to list users below.",
+    },
+  ];
+
+  const admins = adminEmails();
+  const usingDefaultAdmin = !process.env.ADMIN_EMAILS?.trim();
+
+  const visaHealth = getVisaHealth(STALE_AFTER_DAYS);
+
+  let travellersWithPlans: number | null = null;
+  try {
+    travellersWithPlans = (await store.summary()).travellers;
+  } catch {
+    travellersWithPlans = null;
   }
 
   let users: AdminUserRow[] = [];
@@ -95,8 +172,104 @@ export default async function AdminPage() {
           <span className="font-semibold text-ink">{session.user.email}</span> with admin access.
         </p>
 
+        <div className="mt-9 grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
+          <div className="glass-panel story-shadow rounded-[2rem] border border-ink/10 p-6 md:p-8">
+            <h2 className="font-display text-2xl font-bold text-ink">System status</h2>
+            <p className="mt-1 text-sm text-muted">Whether each part of the app is switched on. Values are never shown.</p>
+            <ul className="mt-5 divide-y divide-ink/10">
+              {checks.map((check) => (
+                <li key={check.label} className="flex items-start gap-3 py-3.5">
+                  {check.ok ? (
+                    <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-lagoon" />
+                  ) : (
+                    <XCircle className="mt-0.5 h-5 w-5 shrink-0 text-clay" />
+                  )}
+                  <div>
+                    <p className="font-semibold text-ink">{check.label}</p>
+                    <p className="text-sm leading-6 text-muted">{check.detail}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="space-y-5">
+            <div className="glass-panel story-shadow rounded-[2rem] border border-ink/10 p-6 md:p-8">
+              <h2 className="font-display text-2xl font-bold text-ink">Admins</h2>
+              <ul className="mt-4 space-y-2 text-sm">
+                {admins.map((email) => (
+                  <li key={email} className="flex items-center gap-2 font-medium text-ink">
+                    <Shield className="h-4 w-4 text-lagoon" />
+                    {email}
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-4 text-xs leading-5 text-muted">
+                {usingDefaultAdmin
+                  ? "Using the built-in default. Set ADMIN_EMAILS to a comma-separated list to change it."
+                  : "Set by the ADMIN_EMAILS setting."}
+              </p>
+            </div>
+
+            <div className="glass-panel story-shadow rounded-[2rem] border border-ink/10 p-6 md:p-8">
+              <h2 className="font-display text-2xl font-bold text-ink">Assistants</h2>
+              <p className="mt-4 font-display text-5xl font-extrabold leading-none text-ink">
+                {travellersWithPlans === null ? "—" : travellersWithPlans}
+              </p>
+              <p className="mt-2 text-sm leading-6 text-muted">
+                {travellersWithPlans === null
+                  ? "Couldn't read storage."
+                  : travellersWithPlans === 1
+                    ? "traveller has plans saved from Claude or ChatGPT."
+                    : "travellers have plans saved from Claude or ChatGPT."}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="glass-panel story-shadow mt-5 overflow-hidden rounded-[2rem] border border-ink/10">
+          <div className="p-6 md:px-8 md:pt-8">
+            <h2 className="font-display text-2xl font-bold text-ink">Visa data health</h2>
+            <p className="mt-1 text-sm text-muted">
+              Rules are re-checked against official sources. Anything not reviewed in {STALE_AFTER_DAYS} days is flagged.
+            </p>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-left text-sm">
+              <thead>
+                <tr className="border-y border-ink/10 text-xs uppercase tracking-[0.18em] text-muted">
+                  <th className="px-6 py-3 font-semibold md:px-8">Passport</th>
+                  <th className="px-6 py-3 font-semibold">Rules</th>
+                  <th className="px-6 py-3 font-semibold">Newest review</th>
+                  <th className="px-6 py-3 font-semibold">Oldest review</th>
+                  <th className="px-6 py-3 font-semibold">Review due</th>
+                </tr>
+              </thead>
+              <tbody>
+                {visaHealth.map((row) => (
+                  <tr key={row.passport} className="border-b border-ink/5 last:border-0">
+                    <td className="px-6 py-3 font-bold text-ink md:px-8">{row.passport}</td>
+                    <td className="px-6 py-3 text-ink">{row.count}</td>
+                    <td className="px-6 py-3 text-muted">{reviewDateLabel(row.newest)}</td>
+                    <td className="px-6 py-3 text-muted">{reviewDateLabel(row.oldest)}</td>
+                    <td className="px-6 py-3">
+                      <span
+                        className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${
+                          row.due > 0 ? "bg-sun text-night" : "bg-lagoon/10 text-lagoon"
+                        }`}
+                      >
+                        {row.due > 0 ? `${row.due} due` : "All current"}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         {isDatabaseConfigured ? (
-          <div className="glass-panel hero-shadow mt-9 overflow-hidden rounded-[2rem] border border-black/10">
+          <div className="glass-panel hero-shadow mt-5 overflow-hidden rounded-[2rem] border border-black/10">
             <div className="flex items-center gap-3 border-b border-black/10 p-6 md:px-8">
               <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#fde8d3] text-clay">
                 <Database className="h-5 w-5" />
@@ -159,7 +332,7 @@ export default async function AdminPage() {
             )}
           </div>
         ) : (
-          <div className="glass-panel hero-shadow mt-9 rounded-[2rem] border border-black/10 p-6 md:p-8">
+          <div className="glass-panel hero-shadow mt-5 rounded-[2rem] border border-black/10 p-6 md:p-8">
             <div className="flex items-center gap-3">
               <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#fde8d3] text-clay">
                 <Database className="h-5 w-5" />

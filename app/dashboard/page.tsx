@@ -133,7 +133,14 @@ export default function Dashboard() {
             )}
           </nav>
           <div className="hidden text-right sm:block">
-            <p className="text-sm font-semibold text-ink">{displayName}</p>
+            <p className="flex items-center justify-end gap-2 text-sm font-semibold text-ink">
+              {isAdmin && (
+                <span className="rounded-full bg-sunset px-2.5 py-0.5 text-[0.65rem] font-extrabold uppercase tracking-wider text-night">
+                  Admin
+                </span>
+              )}
+              {displayName}
+            </p>
             <p className="text-xs text-muted">{user.email}</p>
           </div>
           <button
@@ -146,6 +153,25 @@ export default function Dashboard() {
           </button>
         </div>
       </header>
+
+      <nav aria-label="Main" className="mx-auto -mt-2 flex max-w-7xl gap-2 overflow-x-auto px-5 pb-3 md:hidden">
+        {[
+          { href: "/visa", label: "Visas", icon: Globe2, show: true },
+          { href: "/connect", label: "Connect", icon: Plug, show: true },
+          { href: "/admin", label: "Admin", icon: Shield, show: isAdmin },
+        ]
+          .filter((item) => item.show)
+          .map(({ href, label, icon: Icon }) => (
+            <Link
+              key={href}
+              href={href}
+              className="inline-flex h-10 shrink-0 items-center gap-2 rounded-full border border-ink/10 bg-white px-4 text-sm font-bold text-ink transition active:scale-[0.97]"
+            >
+              <Icon className="h-4 w-4 text-clay" />
+              {label}
+            </Link>
+          ))}
+      </nav>
 
       <section className="mx-auto max-w-7xl px-5 pt-4 lg:px-8">
         <div className="relative isolate overflow-hidden rounded-[2.2rem] bg-night text-white shadow-[0_30px_80px_rgba(10,34,51,0.25)]">

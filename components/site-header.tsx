@@ -16,7 +16,7 @@ const links = [
 
 // Floats over the hero (white text), then settles into a solid paper bar once you scroll.
 export function SiteHeader() {
-  const { status } = useSession();
+  const { data: session, status } = useSession();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -61,7 +61,18 @@ export function SiteHeader() {
         </nav>
         <div className="flex items-center gap-2">
           {signedIn ? (
-            <ButtonLink href="/dashboard">My trips</ButtonLink>
+            <>
+              {session?.user?.role === "admin" && (
+                <ButtonLink
+                  href="/admin"
+                  variant="ghost"
+                  className={cn(!scrolled && "text-white hover:bg-white/15 hover:text-white")}
+                >
+                  Admin
+                </ButtonLink>
+              )}
+              <ButtonLink href="/dashboard">My trips</ButtonLink>
+            </>
           ) : (
             <>
               <ButtonLink
