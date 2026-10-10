@@ -50,7 +50,7 @@ export function VisaSchengenPanel({
   return (
     <section
       aria-label="Schengen details"
-      className="mt-4 rounded-[1.25rem] border border-[#ffd9a0] bg-[#fff8ee] p-4"
+      className="visa-pop mt-4 rounded-[1.25rem] border border-[#ffd9a0] bg-[#fff8ee] p-4"
     >
       {members.length > 0 && (
         <p className="text-sm font-semibold leading-6 text-ink">

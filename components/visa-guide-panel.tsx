@@ -6,7 +6,7 @@ const sectionLabel =
 
 export function VisaGuidePanel({ guide }: { guide: VisaGuide }) {
   return (
-    <div className="mt-4 rounded-[1.25rem] border border-black/10 bg-[#fffaf3] p-4 text-left">
+    <div className="visa-pop mt-4 rounded-[1.25rem] border border-black/10 bg-[#fffaf3] p-4 text-left">
       <p className="font-display text-lg leading-6 text-ink">{guide.title}</p>
       <p className="mt-1 text-xs leading-5 text-muted">{guide.appliesTo}</p>
       <p className="mt-3 text-sm leading-6 text-muted">{guide.overview}</p>

@@ -15,12 +15,16 @@ const linkClass = "text-sm font-semibold text-[#b5391c] hover:text-ink";
 export function VisaNoticeCard({
   notice,
   passport,
+  index = 0,
 }: {
   notice: CountryNotice;
   passport: Nationality;
+  /** Position in the list; drives the staggered entrance. */
+  index?: number;
 }) {
   const { country, source, isFallbackSource } = notice;
   const titleId = `visa-notice-${country.code}`;
+  const motion = (accent: string) => ({ "--visa-accent": accent, "--i": index }) as React.CSSProperties;
 
   const header = (badge: React.ReactNode) => (
     <div className="flex items-start justify-between gap-3">
@@ -46,7 +50,8 @@ export function VisaNoticeCard({
     return (
       <article
         aria-labelledby={titleId}
-        className="rounded-[1.5rem] border border-black/10 bg-white/75 p-5"
+        className="visa-card visa-rise h-full rounded-[1.5rem] border border-black/10 bg-white/90 p-5 shadow-[0_6px_20px_rgba(10,34,51,0.05)]"
+        style={motion("#639922")}
       >
         {header(
           <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[#eaf3de] px-3 py-1 text-xs font-semibold text-[#3b6d11]">
@@ -66,7 +71,8 @@ export function VisaNoticeCard({
     return (
       <article
         aria-labelledby={titleId}
-        className="rounded-[1.5rem] border border-black/10 bg-white/75 p-5"
+        className="visa-card visa-rise h-full rounded-[1.5rem] border border-black/10 bg-white/90 p-5 shadow-[0_6px_20px_rgba(10,34,51,0.05)]"
+        style={motion("#639922")}
       >
         {header(
           <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[#eaf3de] px-3 py-1 text-xs font-semibold text-[#3b6d11]">
@@ -90,7 +96,8 @@ export function VisaNoticeCard({
   return (
     <article
       aria-labelledby={titleId}
-      className="rounded-[1.5rem] border border-dashed border-[#d6bf98] bg-[#fffaf2] p-5"
+      className="visa-card visa-rise h-full rounded-[1.5rem] border border-dashed border-[#d6bf98] bg-[#fffaf2] p-5"
+      style={motion("#ba7517")}
     >
       {header(
         <span className="shrink-0 rounded-full bg-[#fde8d3] px-3 py-1 text-xs font-semibold text-[#5f4a2c]">

@@ -18,9 +18,11 @@ type Props = {
   via?: Country[];
   guideOpen: boolean;
   onToggleGuide: () => void;
+  /** Position in its group; drives the staggered entrance. */
+  index?: number;
 };
 
-export function VisaResultCard({ destination: d, via, guideOpen, onToggleGuide }: Props) {
+export function VisaResultCard({ destination: d, via, guideOpen, onToggleGuide, index = 0 }: Props) {
   const meta = CATEGORY_META[d.effective];
   const tone = VISA_TONES[meta.tone];
   const guide = d.guide ? VISA_GUIDES[d.guide] : null;
@@ -39,7 +41,8 @@ export function VisaResultCard({ destination: d, via, guideOpen, onToggleGuide }
   return (
     <article
       aria-labelledby={titleId}
-      className="flex min-w-0 flex-col rounded-[1.5rem] border border-black/10 bg-white/75 p-5"
+      className="visa-card visa-rise flex h-full min-w-0 flex-col rounded-[1.5rem] border border-black/10 bg-white/90 p-5 shadow-[0_6px_20px_rgba(10,34,51,0.05)]"
+      style={{ "--visa-accent": tone.accent, "--i": index } as React.CSSProperties}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3">
@@ -56,7 +59,17 @@ export function VisaResultCard({ destination: d, via, guideOpen, onToggleGuide }
             <p className="text-xs text-muted">{d.region}</p>
           </div>
         </div>
-        <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${tone.pill}`}>
+        <span
+          className={`inline-flex shrink-0 items-center gap-1.5 self-start rounded-full px-3 py-1 text-xs font-semibold ${tone.pill}`}
+        >
+          {d.effective === "visa-free" && (
+            <span className="relative flex h-2 w-2" aria-hidden>
+              <span
+                className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-70 motion-reduce:hidden ${tone.dot}`}
+              />
+              <span className={`relative inline-flex h-2 w-2 rounded-full ${tone.dot}`} />
+            </span>
+          )}
           {meta.short}
           {d.effectiveDays ? ` · ${d.effectiveDays}d` : ""}
         </span>
