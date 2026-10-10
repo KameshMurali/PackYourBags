@@ -35,7 +35,7 @@ export const UNITED_STATES_DESTINATIONS: DestinationRule[] = [
     region: "North America",
     base: "visa-free",
     days: 180,
-    note: "No visa for visits of up to 180 days without paid activities (tourism, business, study). You need a passport valid for your whole stay and a completed Multiple Migratory Form (FMM), which the airline or the border post gives you. Officers may ask for documents showing the purpose of your trip.",
+    note: "No visa for visits of up to 180 days as a visitor without permission to carry out paid activities. You need a passport valid for your whole stay and a completed Multiple Migratory Form (FMM), which the airline or the border post gives you. Officers may ask for documents showing the purpose of your trip.",
     source: "https://consulmex.sre.gob.mx/leamington/index.php/non-mexicans/visas/111-visitor-visa",
     sourceLabel: "Secretaría de Relaciones Exteriores of Mexico — Consulate of Mexico visa page (visitors who do not require a visa, up to 180 days)",
     lastReviewed: R,
