@@ -146,6 +146,17 @@ export const NIGERIA_DESTINATIONS: DestinationRule[] = [
     ],
   },
   {
+    code: "QA",
+    name: "Qatar",
+    flag: "🇶🇦",
+    region: "Middle East",
+    base: "evisa",
+    note: "Nigeria is not visa-free: apply for an A1 tourist entry visa on the Hayya portal before travel, with a hotel reservation, and pay the fee once approved. Nigerian passport holders with a valid Schengen, UK, US, Australian, New Zealand or Canadian visa apply for an A3 entry visa instead; GCC (including UAE) residents apply for an A2 entry visa.",
+    source: "https://visitqatar.com/intl-en/plan-your-trip/visas",
+    sourceLabel: "Qatar Tourism, Visit Qatar visa checker for Hayya (no readable immigration page found)",
+    lastReviewed: R,
+  },
+  {
     code: "TR",
     name: "Türkiye",
     flag: "🇹🇷",
