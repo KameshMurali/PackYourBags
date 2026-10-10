@@ -206,7 +206,7 @@ export const EGYPT_DESTINATIONS: DestinationRule[] = [
     flag: "🇦🇪",
     region: "Middle East",
     base: "visa-required",
-    note: "Visa required: the UAE Ministry of Foreign Affairs lists Egypt as 'Visa Required' on its visa-exemptions page, and visa on arrival is not offered. Arrange the entry permit before you travel.",
+    note: "Visa required: the UAE Ministry of Foreign Affairs lists Egypt as 'Visa Required' on its visa-exemptions page, not as visa-free. Arrange your entry permit before you travel, and check the current conditions with your airline or the UAE embassy in Cairo.",
     source: "https://www.mofa.gov.ae/en/visa-exemptions-for-non-citizen",
     sourceLabel: "Ministry of Foreign Affairs, UAE — visa exemptions page",
     lastReviewed: R,
