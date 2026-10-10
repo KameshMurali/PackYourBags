@@ -25,6 +25,17 @@ export const PHILIPPINES_DESTINATIONS: DestinationRule[] = [
     sourceLabel: "Maldives Immigration",
     lastReviewed: R,
   },
+  {
+    code: "IN",
+    name: "India",
+    flag: "🇮🇳",
+    region: "South Asia",
+    base: "evisa",
+    note: "The Philippines is on India's list of e-Visa-eligible countries. Apply online at least 4 days before you arrive; the e-Tourist visa comes in 30-day, 1-year and 5-year versions. Fees depend on nationality, so check the portal's fee table before paying.",
+    source: "https://indianvisaonline.gov.in/evisa/tvoa.html",
+    sourceLabel: "Government of India — official e-Visa portal (Ministry of Home Affairs / Bureau of Immigration)",
+    lastReviewed: R,
+  },
 
   // Southeast Asia
   {
@@ -223,6 +234,28 @@ export const PHILIPPINES_DESTINATIONS: DestinationRule[] = [
     lastReviewed: R,
   },
   {
+    code: "BH",
+    name: "Bahrain",
+    flag: "🇧🇭",
+    region: "Middle East",
+    base: "evisa",
+    note: "The Philippines is on Bahrain's list of nationalities that can apply online for a visit eVisa at evisa.gov.bh. Terms and conditions apply and are shown in the portal's eligibility check, and entry is not guaranteed, so apply for the eVisa before you travel.",
+    source: "https://www.evisa.gov.bh/list-of-online-visa-country.html",
+    sourceLabel: "Nationality, Passports & Residence Affairs, Bahrain (eVisa portal)",
+    lastReviewed: R,
+  },
+  {
+    code: "OM",
+    name: "Oman",
+    flag: "🇴🇲",
+    region: "Middle East",
+    base: "visa-required",
+    note: "The Philippines is on neither of the Royal Oman Police's visa-exemption lists (list 1: visa-free nationalities; list 2: nationals of 24 countries who hold a valid US, Canada, Australia, UK, Japan or Schengen visa), so get a tourist visa before you travel, normally through the Royal Oman Police e-visa portal (evisa.rop.gov.om).",
+    source: "https://www.rop.gov.om/english/VisaExempt.aspx",
+    sourceLabel: "Royal Oman Police — visa exemption lists",
+    lastReviewed: R,
+  },
+  {
     code: "SA",
     name: "Saudi Arabia",
     flag: "🇸🇦",
@@ -350,8 +383,8 @@ export const PHILIPPINES_DESTINATIONS: DestinationRule[] = [
     region: "North America",
     base: "visa-required",
     note: "Filipino citizens need a visitor visa to visit or transit through Canada, unless they qualify for an eTA (see below).",
-    source: "https://www.canada.ca/en/immigration-refugees-citizenship/services/visit-canada/entry-requirements-country.html",
-    sourceLabel: "Immigration, Refugees and Citizenship Canada — entry requirements by country (eTA rules: IRCC eTA eligibility page)",
+    source: "https://www.canada.ca/en/immigration-refugees-citizenship/services/visit-canada/eta/eligibility/eta-x.html",
+    sourceLabel: "Immigration, Refugees and Citizenship Canada — eTA for citizens of some visa-required countries (also: entry requirements by country; Check if you need a visa or eTA)",
     lastReviewed: R,
     overrides: [
       {
