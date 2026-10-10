@@ -207,3 +207,305 @@ h6,
     animation: none !important;
   }
 }
+
+/* ==========================================================================
+   Visa explorer (visa-*): golden-hour backdrop, ticket card and motion.
+   Motion is transform/opacity only and is switched off for reduced motion.
+   ========================================================================== */
+
+:root {
+  --visa-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* Backdrop: sunrise washes, a fading dot grid and a few slow-drifting glows. */
+.visa-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 90% 560px at 50% 0%, rgba(255, 185, 56, 0.32), transparent 72%),
+    radial-gradient(ellipse 55% 460px at 100% 640px, rgba(255, 107, 74, 0.1), transparent 72%),
+    radial-gradient(ellipse 55% 520px at 0% 1250px, rgba(8, 122, 122, 0.1), transparent 72%);
+}
+
+.visa-dots {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(14, 42, 59, 0.14) 1px, transparent 1.5px);
+  background-size: 26px 26px;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 520px, #000 62%, transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0, #000 520px, #000 62%, transparent 100%);
+}
+
+.visa-orb {
+  position: absolute;
+  width: min(70vw, 640px);
+  aspect-ratio: 1;
+  border-radius: 9999px;
+  animation: visa-drift 26s ease-in-out infinite alternate;
+}
+
+.visa-orb--sun {
+  top: 600px;
+  right: -16%;
+  background: radial-gradient(circle, rgba(255, 185, 56, 0.34), rgba(255, 185, 56, 0) 68%);
+}
+
+.visa-orb--lagoon {
+  top: 1350px;
+  left: -20%;
+  background: radial-gradient(circle, rgba(8, 122, 122, 0.18), rgba(8, 122, 122, 0) 68%);
+  animation-duration: 32s;
+  animation-delay: -9s;
+}
+
+.visa-orb--coral {
+  top: 2300px;
+  right: -14%;
+  background: radial-gradient(circle, rgba(255, 107, 74, 0.16), rgba(255, 107, 74, 0) 68%);
+  animation-duration: 29s;
+  animation-delay: -15s;
+}
+
+/* Entrances: staggered by --i (capped, so long lists never feel slow). "backwards"
+   rather than "both" so the final frame doesn't pin transform and block hover lifts. */
+.visa-rise {
+  animation: visa-rise 0.75s var(--visa-ease) backwards;
+  animation-delay: calc(min(var(--i, 0), 10) * 70ms);
+}
+
+.visa-pop {
+  transform-origin: top center;
+  animation: visa-pop 0.38s var(--visa-ease) backwards;
+}
+
+/* Boarding-pass controls: two stacked halves, each bitten by a notch at the tear line. */
+.visa-ticket {
+  filter: drop-shadow(0 26px 34px rgba(10, 34, 51, 0.2)) drop-shadow(0 2px 4px rgba(10, 34, 51, 0.08));
+}
+
+.visa-ticket-top {
+  -webkit-mask:
+    radial-gradient(circle at 0 100%, transparent 13px, #000 13.5px) left / 51% 100% no-repeat,
+    radial-gradient(circle at 100% 100%, transparent 13px, #000 13.5px) right / 51% 100% no-repeat;
+  mask:
+    radial-gradient(circle at 0 100%, transparent 13px, #000 13.5px) left / 51% 100% no-repeat,
+    radial-gradient(circle at 100% 100%, transparent 13px, #000 13.5px) right / 51% 100% no-repeat;
+}
+
+.visa-ticket-bottom {
+  position: relative;
+  -webkit-mask:
+    radial-gradient(circle at 0 0, transparent 13px, #000 13.5px) left / 51% 100% no-repeat,
+    radial-gradient(circle at 100% 0, transparent 13px, #000 13.5px) right / 51% 100% no-repeat;
+  mask:
+    radial-gradient(circle at 0 0, transparent 13px, #000 13.5px) left / 51% 100% no-repeat,
+    radial-gradient(circle at 100% 0, transparent 13px, #000 13.5px) right / 51% 100% no-repeat;
+}
+
+.visa-ticket-bottom::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 28px;
+  right: 28px;
+  border-top: 2px dashed rgba(14, 42, 59, 0.2);
+}
+
+.visa-barcode {
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(14, 42, 59, 0.6) 0 2px,
+    transparent 2px 4px,
+    rgba(14, 42, 59, 0.6) 4px 5px,
+    transparent 5px 8px,
+    rgba(14, 42, 59, 0.6) 8px 11px,
+    transparent 11px 13px
+  );
+}
+
+/* Native selects keep their behaviour; only the arrow is restyled to match the fields. */
+.visa-select {
+  -webkit-appearance: none;
+  appearance: none;
+  padding-right: 2.75rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%230e2a3b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1rem;
+}
+
+/* Cards and tiles lift on hover (pointer devices only) and glow in their own tone. */
+.visa-card,
+.visa-tile {
+  position: relative;
+  transition:
+    transform 0.35s var(--visa-ease),
+    box-shadow 0.35s var(--visa-ease),
+    border-color 0.25s ease;
+}
+
+.visa-card::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 1.5rem;
+  width: 2.25rem;
+  height: 3px;
+  border-radius: 0 0 4px 4px;
+  background: var(--visa-accent, #0a2233);
+  transition: width 0.5s var(--visa-ease);
+}
+
+.visa-card:focus-within {
+  box-shadow: 0 14px 36px rgba(10, 34, 51, 0.12);
+}
+
+@media (hover: hover) {
+  .visa-card:hover,
+  .visa-tile:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 44px rgba(10, 34, 51, 0.14);
+    box-shadow: 0 20px 44px color-mix(in srgb, var(--visa-accent, #0a2233) 24%, transparent);
+  }
+
+  .visa-card:hover {
+    border-color: rgba(14, 42, 59, 0.2);
+  }
+
+  .visa-card:hover::before {
+    width: calc(100% - 3rem);
+  }
+}
+
+/* Summary tiles: a soft corner glow and a progress bar that eases when counts change. */
+.visa-tile {
+  overflow: hidden;
+}
+
+.visa-tile::after {
+  content: "";
+  position: absolute;
+  top: -42px;
+  right: -42px;
+  width: 130px;
+  height: 130px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, var(--visa-accent, #ffb938), transparent 68%);
+  opacity: 0.12;
+  pointer-events: none;
+}
+
+.visa-bar {
+  transform-origin: left center;
+  transition: transform 0.9s var(--visa-ease);
+  animation: visa-grow 1.2s var(--visa-ease) 0.4s backwards;
+}
+
+/* Held-visa toggles: the check badge scales in without changing the pill's width. */
+.visa-check {
+  transform: scale(0);
+  transition: transform 0.25s var(--visa-ease);
+}
+
+[aria-pressed="true"] > .visa-check {
+  transform: scale(1);
+}
+
+/* The "departure" stamp thumps down once, then rests. */
+.visa-stamp {
+  transform: rotate(-12deg);
+  animation: visa-stamp 1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.9s backwards;
+}
+
+/* Verified-destination ticker, a calm strip that fades at both edges. */
+.visa-ticker-track {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+
+@keyframes visa-drift {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  to {
+    transform: translate3d(-36px, 30px, 0) scale(1.08);
+  }
+}
+
+@keyframes visa-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes visa-pop {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -8px, 0) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes visa-grow {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes visa-stamp {
+  0% {
+    opacity: 0;
+    transform: rotate(-30deg) scale(1.8);
+  }
+
+  55% {
+    opacity: 0.95;
+    transform: rotate(-10deg) scale(0.94);
+  }
+
+  100% {
+    opacity: 0.9;
+    transform: rotate(-12deg) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .visa-orb,
+  .visa-rise,
+  .visa-pop,
+  .visa-bar,
+  .visa-stamp {
+    animation: none !important;
+  }
+
+  .visa-card,
+  .visa-tile,
+  .visa-card::before,
+  .visa-bar,
+  .visa-check {
+    transition: none;
+  }
+
+  .visa-card:hover,
+  .visa-tile:hover {
+    transform: none;
+  }
+
+  .visa-card:hover::before {
+    width: 2.25rem;
+  }
+}
