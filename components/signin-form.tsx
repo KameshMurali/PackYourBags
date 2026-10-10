@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { Logo } from "@/components/logo";
@@ -110,7 +111,19 @@ export function SignInForm({
                 {isSigningIn ? "Opening Google…" : "Continue with Google"}
               </button>
               <p className="mt-6 text-sm leading-6 text-muted">
-                We use Google to sign you in securely and only see your name and email.
+                We use Google to sign you in securely. We keep your name, email and profile photo, and
+                nothing else from your Google account.
+              </p>
+              <p className="mt-3 text-xs leading-5 text-muted">
+                By continuing you agree to the{" "}
+                <Link href="/terms" className="font-semibold text-clay underline-offset-4 hover:underline">
+                  terms
+                </Link>{" "}
+                and the{" "}
+                <Link href="/privacy" className="font-semibold text-clay underline-offset-4 hover:underline">
+                  privacy policy
+                </Link>
+                .
               </p>
             </>
           ) : (

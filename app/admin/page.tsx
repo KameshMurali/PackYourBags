@@ -17,7 +17,9 @@ import { adminEmails, roleForEmail } from "@/lib/admin";
 import { isDatabaseConfigured } from "@/lib/db";
 import { namespaceForUser, isOAuthConfigured } from "@/lib/oauth";
 import { getUserRecord, listUsers, store, touchUser, usingDurableStore, type UserRecord } from "@/lib/store";
-import { usageSecretSource } from "@/lib/usage";
+import { conciergeEnabled, dailyCap, generationsToday, readQuota, readQuotas, type Quota } from "@/lib/quota";
+import { FREE_GENERATION_LIMIT } from "@/lib/plan";
+import { setConciergeAction, setUserPlanAction } from "@/app/admin/actions";
 import { DATASETS, reviewDateLabel } from "@/lib/visa";
 import { Logo } from "@/components/logo";
 
@@ -183,14 +185,11 @@ export default async function AdminPage({
         : "Using in-memory storage: plans and the user list reset when the server restarts.",
     },
     {
-      label: "Free-tier counter",
-      state: usageSecretSource === "ephemeral" ? "bad" : "ok",
-      detail:
-        usageSecretSource === "dedicated"
-          ? "Signed with USAGE_COOKIE_SECRET."
-          : usageSecretSource === "derived"
-            ? "Signed with a key derived from AUTH_SECRET, so it can't be forged."
-            : "No signing key available, so the counter resets on restart. Set AUTH_SECRET.",
+      label: "Free-tier allowance",
+      state: usingDurableStore ? "ok" : "bad",
+      detail: usingDurableStore
+        ? `${FREE_GENERATION_LIMIT} free itineraries per person, counted on the server so clearing cookies doesn't reset it.`
+        : "Without Upstash the allowance lives in server memory and resets on restart.",
     },
     {
       label: "Postgres database",
@@ -205,6 +204,12 @@ export default async function AdminPage({
   const usingDefaultAdmin = !process.env.ADMIN_EMAILS?.trim();
   const visaHealth = getVisaHealth(STALE_AFTER_DAYS);
 
+  const [conciergeOn, todayCount] = await Promise.all([
+    conciergeEnabled().catch(() => true),
+    generationsToday().catch(() => 0),
+  ]);
+  const quotas = await readQuotas(users.map((u) => u.email)).catch(() => new Map<string, Quota>());
+
   let travellersWithPlans: number | null = null;
   try {
     travellersWithPlans = (await store.summary()).travellers;
@@ -215,11 +220,13 @@ export default async function AdminPage({
   // Details panel for one traveller.
   const selectedEmail = params.user?.trim().toLowerCase();
   let selected: UserRecord | null = null;
+  let selectedQuota: Quota | null = null;
   let savedPlans: Awaited<ReturnType<typeof store.list>> = [];
   if (tab === "users" && selectedEmail) {
     selected = users.find((u) => u.email === selectedEmail) ?? (await getUserRecord(selectedEmail).catch(() => null));
     if (selected) {
       savedPlans = await store.list(namespaceForUser(selected.email)).catch(() => []);
+      selectedQuota = await readQuota(selected.email).catch(() => null);
     }
   }
 
@@ -299,6 +306,30 @@ export default async function AdminPage({
               </div>
 
               <div className="space-y-5">
+                <div className="glass-panel story-shadow rounded-[2rem] border border-ink/10 p-6 md:p-8">
+                  <h2 className="font-display text-2xl font-bold text-ink">AI concierge</h2>
+                  <p className="mt-3 font-display text-4xl font-extrabold leading-none text-ink">
+                    {todayCount}
+                    <span className="ml-2 font-sans text-base font-semibold text-muted">of {dailyCap()} today</span>
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-muted">
+                    {conciergeOn
+                      ? "On. Everyone is capped at the daily total above."
+                      : "Paused. Nobody can generate itineraries until you turn it back on."}
+                  </p>
+                  <form action={setConciergeAction} className="mt-4">
+                    <input type="hidden" name="enabled" value={conciergeOn ? "0" : "1"} />
+                    <button
+                      type="submit"
+                      className={`inline-flex h-11 items-center rounded-full px-5 text-sm font-bold transition active:scale-[0.98] ${
+                        conciergeOn ? "bg-night text-white hover:bg-lagoon-deep" : "bg-coral text-night hover:bg-[#ff7d5f]"
+                      }`}
+                    >
+                      {conciergeOn ? "Pause the concierge" : "Turn the concierge back on"}
+                    </button>
+                  </form>
+                </div>
+
                 <div className="glass-panel story-shadow rounded-[2rem] border border-ink/10 p-6 md:p-8">
                   <h2 className="font-display text-2xl font-bold text-ink">Admins</h2>
                   <ul className="mt-4 space-y-2 text-sm">
@@ -408,6 +439,15 @@ export default async function AdminPage({
                             <p className="flex flex-wrap items-center gap-2 font-bold text-ink">
                               <span className="truncate">{user.name || user.email}</span>
                               <RoleBadge email={user.email} />
+                              {quotas.get(user.email)?.plan === "pro" ? (
+                                <span className="rounded-full bg-lagoon px-2.5 py-0.5 text-[0.65rem] font-extrabold uppercase tracking-wider text-white">
+                                  Pro
+                                </span>
+                              ) : quotas.get(user.email)?.requested ? (
+                                <span className="rounded-full bg-sun px-2.5 py-0.5 text-[0.65rem] font-extrabold uppercase tracking-wider text-night">
+                                  Pro requested
+                                </span>
+                              ) : null}
                             </p>
                             <p className="truncate text-sm text-muted">{user.name ? user.email : "No name shared"}</p>
                           </div>
@@ -454,6 +494,34 @@ export default async function AdminPage({
                       </div>
                     ))}
                   </dl>
+
+                  {selectedQuota && (
+                    <div className="mt-5 rounded-[1.25rem] border border-ink/10 bg-white p-4">
+                      <p className="text-xs font-bold uppercase tracking-[0.14em] text-muted">Plan</p>
+                      <p className="mt-1.5 font-display text-lg font-bold text-ink">
+                        {selectedQuota.plan === "pro"
+                          ? "Pro · unlimited itineraries"
+                          : `Starter · ${selectedQuota.used} of ${FREE_GENERATION_LIMIT} free itineraries used`}
+                      </p>
+                      {selectedQuota.plan !== "pro" && selectedQuota.requested && (
+                        <p className="mt-1 text-sm font-semibold text-clay">They’ve asked for Pro access.</p>
+                      )}
+                      <form action={setUserPlanAction} className="mt-3">
+                        <input type="hidden" name="email" value={selected.email} />
+                        <input type="hidden" name="plan" value={selectedQuota.plan === "pro" ? "starter" : "pro"} />
+                        <button
+                          type="submit"
+                          className={`inline-flex h-10 items-center rounded-full px-5 text-sm font-bold transition active:scale-[0.98] ${
+                            selectedQuota.plan === "pro"
+                              ? "border-2 border-ink/15 bg-white text-ink hover:border-ink/40"
+                              : "bg-coral text-night hover:bg-[#ff7d5f]"
+                          }`}
+                        >
+                          {selectedQuota.plan === "pro" ? "Move back to Starter" : "Grant Pro"}
+                        </button>
+                      </form>
+                    </div>
+                  )}
 
                   <h3 className="mt-8 flex items-center gap-2 font-display text-lg font-bold text-ink">
                     <Sparkles className="h-4 w-4 text-clay" />

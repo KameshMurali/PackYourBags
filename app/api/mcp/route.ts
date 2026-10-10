@@ -67,11 +67,11 @@ const baseHandler = createMcpHandler(
         description:
           "Save a traveller's trip brief (destination, timing, who's going, mood, notes) into their PackYourBags workspace so it appears in their dashboard inbox.",
         inputSchema: z.object({
-          destination: z.string().describe("Destination or region, e.g. 'Kyoto, Japan'"),
-          dates: z.string().optional().describe("Timing, e.g. 'Late October, 6 nights'"),
-          travellers: z.string().optional().describe("Who is travelling, e.g. '2 adults'"),
-          mood: z.string().optional().describe("Trip mood, e.g. 'Food and culture'"),
-          notes: z.string().optional().describe("Anything else the concierge should know"),
+          destination: z.string().trim().min(1).max(120).describe("Destination or region, e.g. 'Kyoto, Japan'"),
+          dates: z.string().max(200).optional().describe("Timing, e.g. 'Late October, 6 nights'"),
+          travellers: z.string().max(200).optional().describe("Who is travelling, e.g. '2 adults'"),
+          mood: z.string().max(200).optional().describe("Trip mood, e.g. 'Food and culture'"),
+          notes: z.string().max(2000).optional().describe("Anything else the concierge should know"),
         }),
       },
       async (args, extra) => {
@@ -104,14 +104,14 @@ const baseHandler = createMcpHandler(
         description:
           "Save a generated day-by-day itinerary into the traveller's PackYourBags workspace. Use 1–14 meaningfully different days.",
         inputSchema: z.object({
-          destination: z.string().describe("Primary destination or region"),
-          summary: z.string().describe("A concise overview of the trip's shape and pacing"),
+          destination: z.string().trim().min(1).max(120).describe("Primary destination or region"),
+          summary: z.string().max(1500).describe("A concise overview of the trip's shape and pacing"),
           days: z
             .array(
               z.object({
                 day: z.number().int().positive(),
-                title: z.string(),
-                plan: z.string(),
+                title: z.string().max(200),
+                plan: z.string().max(3000),
               }),
             )
             .min(1)

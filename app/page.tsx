@@ -441,6 +441,8 @@ export default function Home() {
             <Link href="/connect" className="transition hover:text-white">Connect Claude or ChatGPT</Link>
             <Link href="/signin" className="transition hover:text-white">Sign in</Link>
             <Link href="/register" className="transition hover:text-white">Register</Link>
+            <Link href="/privacy" className="transition hover:text-white">Privacy</Link>
+            <Link href="/terms" className="transition hover:text-white">Terms</Link>
           </nav>
           <p className="flex items-center gap-2">
             <Luggage className="h-4 w-4 text-coral" />

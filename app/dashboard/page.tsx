@@ -454,6 +454,15 @@ export default function Dashboard() {
             Open visa explorer <ArrowRight className="h-4 w-4" />
           </Link>
         </section>
+
+        <footer className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 border-t border-ink/10 pt-6 text-sm font-semibold text-muted">
+          <Link href="/privacy" className="transition hover:text-ink">
+            Privacy
+          </Link>
+          <Link href="/terms" className="transition hover:text-ink">
+            Terms
+          </Link>
+        </footer>
       </section>
     </main>
   );

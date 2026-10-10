@@ -34,8 +34,12 @@ ANTHROPIC_API_KEY=your_anthropic_api_key
 Restart the dev server after adding the key. The concierge uses `claude-sonnet-4-6`
 by default; set `ANTHROPIC_MODEL` to another Claude model ID to override it.
 
-Set `USAGE_COOKIE_SECRET` to a long random string in production so the free-tier
-quota cookie cannot be forged.
+**Cost controls.** The concierge is the only feature that spends money, so it is limited
+on the server (not in the browser): 3 free itineraries per signed-in person, counted in
+Upstash; one request at a time per person; a daily ceiling across everyone
+(`CONCIERGE_DAILY_CAP`, default 200); and an off switch on the admin page. Pro is never
+self-served: a person can request it and an admin grants it from `/admin`. Also set a
+monthly spend limit on the Anthropic workspace that owns the API key.
 
 ## Authentication
 
@@ -187,7 +191,7 @@ Environment variables in Vercel project settings:
 | `DATABASE_URL` | Optional Postgres connection string for user persistence; run `npm run db:push` after setting it |
 | `ANTHROPIC_API_KEY` | Required for concierge itinerary generation |
 | `ANTHROPIC_MODEL` | Optional — override the default `claude-sonnet-4-6` |
-| `USAGE_COOKIE_SECRET` | Sign the free-tier quota cookie so it can't be forged |
+| `CONCIERGE_DAILY_CAP` | Optional: max AI itineraries per day across all users (default 200) |
 | `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | Durable MCP sync storage (recommended). The Vercel Marketplace "Upstash for Redis" integration sets `KV_REST_API_URL` / `KV_REST_API_TOKEN` instead; both are accepted. |
 
 > After adding `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET`, make sure the production

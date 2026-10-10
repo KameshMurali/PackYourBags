@@ -91,12 +91,12 @@ export default function Concierge() {
       const response = await fetch("/api/subscribe", { method: "POST" });
 
       if (!response.ok) {
-        throw new Error("subscribe failed");
+        throw new Error("request failed");
       }
 
       setUsage((await response.json()) as UsageInfo);
     } catch {
-      setError("Could not activate the Pro plan. Please try again.");
+      setError("Could not send your request. Please try again.");
     } finally {
       setIsUpgrading(false);
     }
@@ -252,22 +252,29 @@ export default function Concierge() {
                   You have used all {usage?.limit} free itineraries.
                 </h2>
                 <p className="mt-3 text-sm leading-7 text-muted">
-                  Upgrade to Pro for unlimited concierge itineraries, generated with Claude Sonnet.
+                  Pro gives you unlimited concierge itineraries, generated with Claude Sonnet.
                   Your saved trips and briefs stay exactly where they are.
                 </p>
               </div>
             </div>
             <button
               className="mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ink px-6 text-sm font-semibold text-white shadow-[0_18px_48px_rgba(10,34,51,0.22)] disabled:cursor-wait disabled:opacity-60"
-              disabled={isUpgrading}
+              disabled={isUpgrading || Boolean(usage?.proRequested)}
               onClick={handleUpgrade}
               type="button"
             >
-              {isUpgrading ? "Activating Pro..." : "Upgrade to Pro"} <Sparkles className="h-4 w-4" />
+              {usage?.proRequested
+                ? "Request sent"
+                : isUpgrading
+                  ? "Sending your request..."
+                  : "Request Pro access"}{" "}
+              <Sparkles className="h-4 w-4" />
             </button>
             {error && <p className="mt-4 text-sm leading-6 text-red-700">{error}</p>}
             <p className="mt-4 text-xs leading-5 text-muted">
-              Demo checkout: no payment is taken. Pro unlocks instantly in this browser.
+              {usage?.proRequested
+                ? "Thanks. Pro is approved by hand for now, and your request is waiting in the admin's queue. Check back soon."
+                : "Pro is approved by hand for now. Send a request and it goes straight to the admin."}
             </p>
           </div>
         ) : (

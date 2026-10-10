@@ -265,3 +265,25 @@ export async function getUserRecord(email: string): Promise<UserRecord | null> {
   const [flat] = await upstashPipeline([["HGETALL", userKey(normalized)]]);
   return parseUser(normalized, flat);
 }
+
+/** Removes a traveller's profile record and index entry (account deletion). */
+export async function deleteUserRecord(email: string): Promise<void> {
+  const normalized = email.trim().toLowerCase();
+  if (!usingDurableStore) {
+    memoryUsers.delete(normalized);
+    return;
+  }
+  await upstashPipeline([
+    ["DEL", userKey(normalized)],
+    ["ZREM", USERS_INDEX, normalized],
+  ]);
+}
+
+/**
+ * Raw access for small counters, flags and locks (see lib/quota.ts). Only meaningful
+ * when `usingDurableStore` is true; callers keep their own in-memory fallback.
+ */
+export const kv = {
+  command: upstash,
+  pipeline: upstashPipeline,
+};

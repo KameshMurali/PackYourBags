@@ -1,19 +1,27 @@
 import { auth } from "@/auth";
-import { toUsageInfo } from "@/lib/plan";
-import { readUsageState, writeUsageState } from "@/lib/usage";
+import { requestPro, usageFor } from "@/lib/quota";
 
-// Prototype checkout: flips the plan cookie to Pro without payment. Replace
-// with a real billing provider (Stripe, Paddle, ...) before launch.
+export const runtime = "nodejs";
+
+// There is no self-serve upgrade: this only records that the traveller would like Pro.
+// An admin reviews requests on /admin and grants the plan, which is the only way a
+// person's allowance becomes unlimited.
 export async function POST() {
   const session = await auth();
-  if (!session?.user) {
-    return Response.json({ error: "Sign in to change your plan." }, { status: 401 });
+  const email = session?.user?.email;
+  if (!email) {
+    return Response.json({ error: "Sign in to request Pro access." }, { status: 401 });
   }
 
-  const usage = await readUsageState();
-  const nextState = { plan: "pro" as const, used: usage.used };
+  try {
+    const current = await usageFor(email);
+    if (current.plan === "pro") {
+      return Response.json(current);
+    }
 
-  await writeUsageState(nextState);
-
-  return Response.json(toUsageInfo(nextState.plan, nextState.used));
+    await requestPro(email);
+    return Response.json(await usageFor(email), { status: 202 });
+  } catch {
+    return Response.json({ error: "Couldn't record your request. Please try again." }, { status: 503 });
+  }
 }

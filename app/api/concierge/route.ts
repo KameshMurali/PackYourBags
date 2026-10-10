@@ -2,9 +2,8 @@ import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { z } from "zod";
 import { auth } from "@/auth";
-import { FREE_GENERATION_LIMIT, toUsageInfo } from "@/lib/plan";
+import { releaseGeneration, reserveGeneration, usageFor } from "@/lib/quota";
 import { countItinerary } from "@/lib/store";
-import { readUsageState, writeUsageState } from "@/lib/usage";
 
 const MAX_PROMPT_LENGTH = 2000;
 const MODEL = process.env.ANTHROPIC_MODEL ?? "claude-sonnet-4-6";
@@ -39,7 +38,8 @@ export async function POST(request: Request) {
   // The /concierge page is behind sign-in, but this endpoint spends Anthropic
   // credits, so it must check the session itself rather than trust the page.
   const session = await auth();
-  if (!session?.user) {
+  const email = session?.user?.email;
+  if (!email) {
     return Response.json({ error: "Sign in to use the concierge." }, { status: 401 });
   }
 
@@ -64,26 +64,37 @@ export async function POST(request: Request) {
     );
   }
 
-  const usage = await readUsageState();
-
-  if (usage.plan !== "pro" && usage.used >= FREE_GENERATION_LIMIT) {
+  // Check configuration before reserving anything, so a misconfigured server never
+  // costs anyone an itinerary.
+  if (!process.env.ANTHROPIC_API_KEY) {
     return Response.json(
-      {
-        error: `You have used all ${FREE_GENERATION_LIMIT} free itineraries. Upgrade to Pro for unlimited concierge planning.`,
-        upgradeRequired: true,
-        usage: toUsageInfo(usage.plan, usage.used),
-      },
-      { status: 402 },
+      { error: "The concierge is resting. Please try again later." },
+      { status: 503 },
     );
   }
 
-  if (!process.env.ANTHROPIC_API_KEY) {
+  // Take one itinerary from this person's allowance (and from today's global cap) up
+  // front, so parallel requests can't race past the limit. Fail closed: if storage is
+  // unreachable we'd rather decline than spend money without counting it.
+  let reservation;
+  try {
+    reservation = await reserveGeneration(email);
+  } catch (error) {
+    console.error("Concierge quota check failed", error);
+    return Response.json(
+      { error: "The concierge is resting. Please try again later." },
+      { status: 503 },
+    );
+  }
+
+  if (!reservation.ok) {
     return Response.json(
       {
-        error:
-          "The concierge is not configured. Add ANTHROPIC_API_KEY to .env.local and restart the dev server.",
+        error: reservation.error,
+        upgradeRequired: reservation.upgradeRequired,
+        usage: await usageFor(email).catch(() => undefined),
       },
-      { status: 503 },
+      { status: reservation.status },
     );
   }
 
@@ -106,27 +117,26 @@ export async function POST(request: Request) {
     });
 
     if (!response.parsed_output) {
+      await releaseGeneration(email).catch(() => {});
       return Response.json(
         { error: "The concierge could not shape that into an itinerary. Please try again." },
         { status: 502 },
       );
     }
 
-    const nextState =
-      usage.plan === "pro" ? usage : { plan: usage.plan, used: usage.used + 1 };
-    await writeUsageState(nextState);
-    if (session.user.email) {
-      await countItinerary(session.user.email).catch(() => {});
-    }
+    await countItinerary(email).catch(() => {});
 
     return Response.json({
       itinerary: response.parsed_output,
-      usage: toUsageInfo(nextState.plan, nextState.used),
+      usage: await usageFor(email).catch(() => undefined),
     });
   } catch (error) {
+    await releaseGeneration(email).catch(() => {});
+
     if (error instanceof Anthropic.AuthenticationError) {
+      console.error("Concierge: Anthropic rejected the API key");
       return Response.json(
-        { error: "The concierge API key is invalid. Check ANTHROPIC_API_KEY and try again." },
+        { error: "The concierge is resting. Please try again later." },
         { status: 503 },
       );
     }
