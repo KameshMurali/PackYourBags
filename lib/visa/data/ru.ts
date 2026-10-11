@@ -9,7 +9,10 @@
 // then shows an honest "not yet verified" card instead of a guess.
 // Fees, processing times and stay lengths are included only where the cited page states them.
 // Where the Russian MFA table and the destination's own authority disagree, the destination's
-// authority wins (Mexico, Indonesia), and the rule is described conservatively.
+// authority wins (Mexico, Indonesia, Montenegro), and the rule is described conservatively.
+// Deliberately absent: Kazakhstan (see the note in the Central Asia block) and Tunisia (the Russian
+// MFA lists 90 days visa-free, but Tunisia's own foreign ministry page, which could not be re-read
+// today, appears to limit the exemption for ex-USSR nationals to organised tours).
 
 import type { DestinationRule } from "../types";
 
@@ -35,7 +38,7 @@ export const RUSSIA_DESTINATIONS: DestinationRule[] = [
     flag: "🇬🇧",
     region: "Europe",
     base: "visa-required",
-    note: "Russian nationals are on the UK visa national list: you need a visa (entry clearance) before you travel to the UK as a visitor, or for any other purpose for less than six months. Apply for a Standard Visitor visa before you travel.",
+    note: "Russian nationals are on the UK visa national list: you need a visa (entry clearance) before you travel to the UK as a visitor, or for any other purpose for less than six months.",
     source: "https://www.gov.uk/guidance/immigration-rules/immigration-rules-appendix-visitor-visa-national-list",
     sourceLabel: "UK Home Office — Immigration Rules Appendix Visitor: Visa national list (GOV.UK, updated 8 October 2026)",
     lastReviewed: R,
@@ -266,7 +269,7 @@ export const RUSSIA_DESTINATIONS: DestinationRule[] = [
     days: 60,
     note: "Ordinary passport holders are exempt from the visa for tourism and business trips of up to 60 days. The Russian MFA adds that people entering to study or work, professional drivers and journalists on assignment do not get the exemption.",
     source: "https://www.mfa.gov.tr/visa-information-for-foreigners.en.mfa",
-    sourceLabel: "Ministry of Foreign Affairs of Türkiye — visa information for foreigners",
+    sourceLabel: `Ministry of Foreign Affairs of Türkiye — visa information for foreigners; study, work, driver and journalist exclusions from the ${MFA_RU}`,
     lastReviewed: R,
   },
   {
@@ -467,9 +470,9 @@ export const RUSSIA_DESTINATIONS: DestinationRule[] = [
     base: "visa-on-arrival",
     days: 30,
     fee: "IDR 500,000",
-    note: "Russia is on the list of countries eligible for Indonesia's Visitor Visa: get it online in advance (e-VOA) or on arrival at the port of entry. It allows a 30-day stay (the visa itself is valid 90 days). Passport must be valid at least 6 months from arrival.",
+    note: "Russia is on Indonesia's list of visa-on-arrival subjects and is not on its visa-free (BVK) list. Get the Visitor Visa online in advance (e-VOA) or on arrival at the port of entry. It allows a 30-day stay (the visa itself is valid 90 days). Passport must be valid at least 6 months from arrival.",
     source: "https://evisa.imigrasi.go.id/front/info/evoa",
-    sourceLabel: "Directorate General of Immigration, Indonesia — official eVisa website (Visitor Visa / e-VOA)",
+    sourceLabel: "Directorate General of Immigration, Indonesia — official eVisa website (Visitor Visa / e-VOA); visa-on-arrival and visa-free (BVK) subject lists at imigrasi.go.id",
     lastReviewed: R,
   },
   {
