@@ -79,6 +79,9 @@ const PASSPORTS: Array<Omit<Nationality, "supported">> = [
   { code: "GB", name: "United Kingdom", flag: "🇬🇧", demonym: "British", aliases: ["UK", "England", "Scottish", "Welsh"] },
   { code: "US", name: "United States", flag: "🇺🇸", demonym: "American", aliases: ["USA", "US"] },
   { code: "IT", name: "Italy", flag: "🇮🇹", demonym: "Italian", aliases: ["Italia"] },
+  { code: "RU", name: "Russia", flag: "🇷🇺", demonym: "Russian", aliases: ["Russian Federation"] },
+  { code: "CN", name: "China", flag: "🇨🇳", demonym: "Chinese", aliases: ["PRC", "Mainland China"] },
+  { code: "ZA", name: "South Africa", flag: "🇿🇦", demonym: "South African", aliases: ["RSA"] },
 ];
 
 export const NATIONALITIES: Nationality[] = PASSPORTS.map((p) => ({
