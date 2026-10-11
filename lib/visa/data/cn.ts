@@ -24,7 +24,7 @@ export const CHINA_DESTINATIONS: DestinationRule[] = [
     flag: "🇭🇰",
     region: "East Asia",
     base: "visa-required",
-    note: "No visa, but Mainland residents need an Exit-Entry Permit for Travelling to and from Hong Kong and Macao (往来港澳通行证) with a valid exit endorsement: group tour (L) or, where offered, individual visit (G). The stay follows the endorsement; Mainland tourism endorsements allow up to 7 days per visit.",
+    note: "A travel permit, not a visa, is needed before you go: Mainland residents need an Exit-Entry Permit for Travelling to and from Hong Kong and Macao (往来港澳通行证) with a valid exit endorsement: group tour (L) or, where offered, individual visit (G). The stay follows the endorsement; Mainland tourism endorsements allow up to 7 days per visit.",
     source: "https://www.immd.gov.hk/eng/services/visas/overseas-chinese-entry-arrangement.html",
     sourceLabel:
       "Immigration Department, Hong Kong SAR (entry arrangements for Mainland residents); endorsement types and 7-day tourism stay from China's National Immigration Administration (nia.gov.cn)",
@@ -36,7 +36,7 @@ export const CHINA_DESTINATIONS: DestinationRule[] = [
     flag: "🇲🇴",
     region: "East Asia",
     base: "visa-required",
-    note: "No visa, but Mainland residents need a Two-way Exit Permit (往来港澳通行证) with a valid exit endorsement for Macao. The permitted stay is the period shown on the endorsement, up to 90 days; Mainland tourism endorsements allow up to 7 days per visit.",
+    note: "A travel permit, not a visa, is needed before you go: Mainland residents need a Two-way Exit Permit (往来港澳通行证) with a valid exit endorsement for Macao. The permitted stay is the period shown on the endorsement, up to 90 days; Mainland tourism endorsements allow up to 7 days per visit.",
     source: "https://www.gov.mo/en/services/ps-1474/ps-1474b/",
     sourceLabel:
       "Macao SAR Government Portal — immigration clearance of non-residents (Public Security Police); 7-day tourism stay from China's National Immigration Administration (nia.gov.cn)",
@@ -48,7 +48,7 @@ export const CHINA_DESTINATIONS: DestinationRule[] = [
     flag: "🇹🇼",
     region: "East Asia",
     base: "visa-required",
-    note: "Mainland residents don't use a visa. Individual tourism is open to residents of designated areas who meet financial or student criteria: an Exit-Entry Permit for Travelling to and from Taiwan (valid 6+ months, with a G endorsement) plus a Taiwan entry/exit permit applied for by an approved Taiwan travel agency. Stay: 15 days from the day after entry, 120 days a year at most.",
+    note: "A travel permit, not a visa, is needed before you go. Individual tourism is open to residents of designated areas who meet financial or student criteria: an Exit-Entry Permit for Travelling to and from Taiwan (valid 6+ months, with a G endorsement) plus a Taiwan entry/exit permit applied for by an approved Taiwan travel agency. Stay: 15 days from the day after entry, 120 days a year at most.",
     source: "https://www.immigration.gov.tw/5385/7244/7250/7257/7266/36078/",
     sourceLabel:
       "National Immigration Agency, Taiwan (R.O.C.) — online application notice for Mainland Area people visiting as individual tourists (published 17 May 2022); permit checklist also in its Q&A for Mainland Area people",
