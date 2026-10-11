@@ -2,6 +2,7 @@
 // A passport with an empty dataset is listed but shown as "coming soon".
 
 import type { DestinationRule } from "../types";
+import { CHINA_DESTINATIONS } from "./cn";
 import { EGYPT_DESTINATIONS } from "./eg";
 import { UNITED_KINGDOM_DESTINATIONS } from "./gb";
 import { INDIA_DESTINATIONS } from "./in";
@@ -10,6 +11,8 @@ import { ITALY_DESTINATIONS } from "./it";
 import { NIGERIA_DESTINATIONS } from "./ng";
 import { PHILIPPINES_DESTINATIONS } from "./ph";
 import { PAKISTAN_DESTINATIONS } from "./pk";
+import { RUSSIA_DESTINATIONS } from "./ru";
+import { SOUTH_AFRICA_DESTINATIONS } from "./za";
 import { UNITED_STATES_DESTINATIONS } from "./us";
 
 export const DATASETS: Readonly<Record<string, readonly DestinationRule[]>> = {
@@ -21,4 +24,7 @@ export const DATASETS: Readonly<Record<string, readonly DestinationRule[]>> = {
   GB: UNITED_KINGDOM_DESTINATIONS,
   US: UNITED_STATES_DESTINATIONS,
   IT: ITALY_DESTINATIONS,
+  RU: RUSSIA_DESTINATIONS,
+  CN: CHINA_DESTINATIONS,
+  ZA: SOUTH_AFRICA_DESTINATIONS,
 };
