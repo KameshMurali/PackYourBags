@@ -2,11 +2,16 @@
 //
 // Every record below was checked on 2026-10-11 against an official government page (the
 // destination's immigration authority, foreign ministry, embassy or consulate, or its official
-// e-visa/ETA portal). DIRCO's published visa-requirements list covers diplomatic and official
-// passports only, so it is not used for ordinary passports. A destination that could not be
-// confirmed from an official page is deliberately absent: the app then shows an honest "not yet
-// verified" card with the country's official link instead of a guess.
+// e-visa/ETA portal; the sourceLabel names the publisher, and says so where it is a national
+// tourism authority's official site: Eswatini, Qatar and Vietnam). DIRCO's published
+// visa-requirements list covers diplomatic and official passports only, so it is not used for
+// ordinary passports. A destination that could not be confirmed from an official page is
+// deliberately absent: the app then shows an honest "not yet verified" card with the country's
+// official link instead of a guess.
 // Fees, processing times and stay lengths are included only where the cited page states them.
+// Overrides list only the credentials an official page accepts: the UAE rule also accepts
+// residence in an EU member state (not the whole Schengen area), Singapore, South Korea and New
+// Zealand, which the app can't represent, so it is described in the note instead.
 
 import type { DestinationRule } from "../types";
 
@@ -471,6 +476,18 @@ export const SOUTH_AFRICA_DESTINATIONS: DestinationRule[] = [
     note: "No visa for a visit of up to 90 days: Brazil's Ministry of External Relations table 'Entry Visas to Brazil' (updated 7 October 2026) lists South Africa as visa exempt for visit visas for a period not exceeding 90 days.",
     source: "https://www.gov.br/mre/pt-br/assuntos/portal-consular/vistos/quadro-geral-de-regime-de-vistos-para-entrada-de-estrangeiros-no-brasil",
     sourceLabel: "Ministry of External Relations of Brazil (Itamaraty) — general visa regime table (QGRV), updated 7 Oct 2026",
+    lastReviewed: R,
+  },
+  {
+    code: "CL",
+    name: "Chile",
+    flag: "🇨🇱",
+    region: "South America",
+    base: "visa-free",
+    days: 90,
+    note: "No visa: Chile's online consulate shows 'Requires visa? NO' for South Africa, with a maximum stay of 90 days on a transitory stay permit (tourism, business, family, study and similar purposes, without intending to settle). To live or work in Chile you need a residence permit.",
+    source: "https://www.consulado.gob.cl/informacion-sobre-visas-para-ingresar-a-chile",
+    sourceLabel: "Ministry of Foreign Affairs of Chile — Consulado.gob.cl, visa information (nationality selector)",
     lastReviewed: R,
   },
 
