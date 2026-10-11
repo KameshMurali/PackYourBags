@@ -36,7 +36,7 @@ export const SOUTH_AFRICA_DESTINATIONS: DestinationRule[] = [
     flag: "🇳🇦",
     region: "Southern Africa",
     base: "visa-free",
-    note: "No visa: South Africa is on Namibia's list of countries whose nationals are exempt from visa requirements on all passports. You get a Visitor's Entry Permit stamp at the border. Passport valid 6+ months with 3 blank pages; carry proof of funds and, if asked, a return ticket. Any work needs a work visa.",
+    note: "No visa: South Africa is on Namibia's list of countries whose nationals are exempt from visa requirements on all passports. You get a Visitor's Entry Permit stamp at the border and fill in an arrival form. Passport valid 6+ months with 3 blank pages; carry proof of funds and, if asked, a return ticket. Any work needs a work visa.",
     source: "https://namibiaembassyusa.org/foreign-nationals/",
     sourceLabel: "Embassy of Namibia, Washington DC — visa exemption list; entry conditions from the Ministry of Home Affairs, Immigration, Safety and Security fact sheet",
     lastReviewed: R,
