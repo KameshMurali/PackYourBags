@@ -1,26 +1,14 @@
 import { auth } from "@/auth";
-import { namespaceFor, readConnectionCookie } from "@/lib/connection";
 import { namespaceForUser } from "@/lib/oauth";
 import { store, SyncedItem, usingDurableStore } from "@/lib/store";
 
 export const runtime = "nodejs";
 
-// The private spaces this browser can read: the signed-in traveller's (where
-// OAuth-connected assistants write) plus a legacy manual token's, if present.
+// The signed-in traveller's private space. OAuth connections and manual tokens both write
+// here, because both resolve to the same account namespace.
 async function readableNamespaces() {
-  const namespaces: string[] = [];
-
   const session = await auth();
-  if (session?.user?.email) {
-    namespaces.push(namespaceForUser(session.user.email));
-  }
-
-  const token = await readConnectionCookie();
-  if (token) {
-    namespaces.push(namespaceFor(token));
-  }
-
-  return namespaces;
+  return session?.user?.email ? [namespaceForUser(session.user.email)] : [];
 }
 
 // Items assistants pushed via the MCP server, newest first.

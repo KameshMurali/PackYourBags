@@ -26,13 +26,14 @@ const CODE_TTL_SECONDS = 5 * 60;
 const ACCESS_TTL_SECONDS = 60 * 60;
 const REFRESH_TTL_SECONDS = 60 * 60 * 24 * 30;
 
-type Kind = "client" | "code" | "access" | "refresh";
+type Kind = "client" | "code" | "access" | "refresh" | "manual";
 
 const PREFIX: Record<Kind, string> = {
   client: "pyc_",
   code: "pyo_",
   access: "pya_",
   refresh: "pyr_",
+  manual: "pyb_",
 };
 
 function nowSeconds() {
@@ -330,4 +331,41 @@ export function exchangeRefreshToken(input: { refreshToken: string | null; clien
 export function readAccessToken(token: string | null | undefined) {
   const claims = verify<TokenClaims>("access", token);
   return claims && claims.aud === AUDIENCE ? claims : null;
+}
+
+// --- Manual connection tokens ---------------------------------------------------
+//
+// For assistants that can't do the OAuth sign-in (e.g. the mcp-remote bridge), a
+// signed-in traveller can create a token on /connect and paste it in. It's signed with
+// the same server secret, so a made-up "pyb_..." string is worthless: only tokens this
+// server issued to a verified account verify. It carries a version number; bumping the
+// stored version (see lib/manual-token.ts) revokes every earlier token at once.
+
+const MANUAL_TTL_SECONDS = 60 * 60 * 24 * 90;
+
+export type ManualTokenClaims = {
+  sub: string; // traveller namespace, same as OAuth tokens, so both write to one inbox
+  email: string;
+  ver: number;
+  aud: string;
+  exp: number;
+  jti: string;
+};
+
+export function issueManualToken(input: { email: string; version: number }) {
+  const exp = nowSeconds() + MANUAL_TTL_SECONDS;
+  const claims: ManualTokenClaims = {
+    sub: namespaceForUser(input.email),
+    email: input.email.trim().toLowerCase(),
+    ver: input.version,
+    aud: AUDIENCE,
+    exp,
+    jti: randomBytes(9).toString("base64url"),
+  };
+  return { token: sign("manual", claims), expiresAt: exp };
+}
+
+export function readManualToken(token: string | null | undefined) {
+  const claims = verify<ManualTokenClaims>("manual", token);
+  return claims && claims.aud === AUDIENCE && Number.isInteger(claims.ver) ? claims : null;
 }

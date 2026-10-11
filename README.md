@@ -35,11 +35,24 @@ Restart the dev server after adding the key. The concierge uses `claude-sonnet-4
 by default; set `ANTHROPIC_MODEL` to another Claude model ID to override it.
 
 **Cost controls.** The concierge is the only feature that spends money, so it is limited
-on the server (not in the browser): 3 free itineraries per signed-in person, counted in
-Upstash; one request at a time per person; a daily ceiling across everyone
-(`CONCIERGE_DAILY_CAP`, default 200); and an off switch on the admin page. Pro is never
-self-served: a person can request it and an admin grants it from `/admin`. Also set a
-monthly spend limit on the Anthropic workspace that owns the API key.
+on the server (not in the browser):
+
+- **Trips only.** The model is told that the traveller's text is data and must refuse
+  anything that isn't trip planning; it answers in a fixed shape with an `onTopic` flag, and
+  the server returns only a well-formed 3-7 day itinerary. Refusals don't use up a free
+  itinerary, and five in a day stops that person until tomorrow.
+- **Per person.** 3 free itineraries per signed-in person, counted in Upstash by verified
+  email; one request at a time. Pro is never self-served: a person can request it and an
+  admin grants it from `/admin`.
+- **Monthly budget.** Each call's real token usage is priced and added to the month's total;
+  at the budget (`CONCIERGE_MONTHLY_BUDGET_USD`, default $25, editable on `/admin`) the
+  concierge pauses itself until next month. Prices default to Claude Sonnet 4.6
+  (`CONCIERGE_PRICE_IN_PER_MTOK` / `CONCIERGE_PRICE_OUT_PER_MTOK`).
+- **Daily ceiling and off switch.** `CONCIERGE_DAILY_CAP` (default 200) across everyone, and a
+  pause button on `/admin`.
+
+Also set a monthly spend limit on the Anthropic workspace that owns the API key, as an
+independent backstop.
 
 ## Authentication
 
@@ -146,8 +159,11 @@ derived from the traveller's verified Google email, so every connector they auth
 writes to the same inbox their signed-in `/connect` page reads. The core logic is in
 `lib/oauth.ts`.
 
-Manual bearer tokens (`pyb_...`, generated under **Advanced** on `/connect`) still work for
-clients without OAuth, such as the `mcp-remote` bridge.
+Manual bearer tokens (`pyb_...`, created under **Advanced** on `/connect`) work for clients
+without OAuth, such as the `mcp-remote` bridge. Only a signed-in traveller can create one,
+it is signed by the server (a made-up `pyb_...` string is rejected), it is shown once, lasts
+90 days, works for that account only, and creating a new one or pressing **Revoke all
+tokens** invalidates every earlier token (`lib/manual-token.ts`).
 
 **Storage** is pluggable (`lib/store.ts`): in-memory for local dev, or **Upstash Redis**
 in production when `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` are set (via the

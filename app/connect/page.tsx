@@ -39,6 +39,8 @@ export default function Connect() {
   const isAdmin = session?.user?.role === "admin";
   const [ready, setReady] = useState(false);
   const [token, setToken] = useState<string | null>(null);
+  const [tokenExpires, setTokenExpires] = useState<string | null>(null);
+  const [tokenNote, setTokenNote] = useState<string | null>(null);
   const [origin, setOrigin] = useState("");
   const [items, setItems] = useState<SyncedItem[]>([]);
   const [durable, setDurable] = useState(true);
@@ -60,15 +62,6 @@ export default function Connect() {
 
     (async () => {
       setOrigin(window.location.origin);
-      try {
-        const res = await fetch("/api/connect");
-        const data = (await res.json()) as { token: string | null };
-        if (!cancelled) {
-          setToken(data.token);
-        }
-      } catch {
-        /* ignore */
-      }
       await refreshInbox();
       if (!cancelled) {
         setReady(true);
@@ -93,10 +86,34 @@ export default function Connect() {
 
   async function generate() {
     setBusy(true);
+    setTokenNote(null);
     try {
       const res = await fetch("/api/connect", { method: "POST" });
-      const data = (await res.json()) as { token: string };
+      const data = (await res.json()) as { token?: string; expiresAt?: string; error?: string };
+      if (!res.ok || !data.token) {
+        setTokenNote(data.error ?? "Couldn’t create a token. Please try again.");
+        return;
+      }
       setToken(data.token);
+      setTokenExpires(data.expiresAt ?? null);
+    } catch {
+      setTokenNote("Couldn’t create a token. Please try again.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function revoke() {
+    setBusy(true);
+    setTokenNote(null);
+    try {
+      const res = await fetch("/api/connect", { method: "DELETE" });
+      if (!res.ok) throw new Error("revoke failed");
+      setToken(null);
+      setTokenExpires(null);
+      setTokenNote("All manual tokens have been revoked. Anything still using one will stop working.");
+    } catch {
+      setTokenNote("Couldn’t revoke tokens right now. Please try again.");
     } finally {
       setBusy(false);
     }
@@ -306,13 +323,18 @@ export default function Connect() {
             <span className="font-display text-2xl text-ink">Advanced: connect with a manual token</span>
           </summary>
           <p className="mt-4 text-sm leading-7 text-muted">
-            Only for MCP clients that can&apos;t sign in with OAuth (for example the{" "}
+            Only for MCP clients that can’t sign in with OAuth (for example the{" "}
             <code className="font-mono">mcp-remote</code> bridge with{" "}
-            <code className="font-mono">--header &quot;Authorization: Bearer &lt;token&gt;&quot;</code>). The token is a
-            secret, like a password. Generating a new one replaces the old.
+            <code className="font-mono">--header &quot;Authorization: Bearer &lt;token&gt;&quot;</code>). A token only
+            works for your account, lasts 90 days, and is a secret, like a password. Creating a new one stops every
+            earlier token from working.
           </p>
           {token ? (
             <div className="mt-4 space-y-3">
+              <p className="rounded-2xl border border-sun/60 bg-sun/15 px-4 py-3 text-sm font-medium leading-6 text-ink">
+                Copy it now: for your security it isn’t shown again.
+                {tokenExpires ? ` Valid until ${new Date(tokenExpires).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}.` : ""}
+              </p>
               <Field label="Connection token" value={token} copied={copied === "token"} onCopy={() => copy("token", token)} />
               <Field
                 label="Authorization header"
@@ -322,17 +344,32 @@ export default function Connect() {
               />
             </div>
           ) : (
-            <p className="mt-4 text-sm text-muted">No token yet.</p>
+            <p className="mt-4 text-sm text-muted">No token on screen. Create one when you need it.</p>
           )}
-          <button
-            type="button"
-            onClick={generate}
-            disabled={busy}
-            className="mt-4 inline-flex h-11 items-center justify-center gap-2 rounded-full bg-ink px-5 text-sm font-semibold text-white shadow-[0_18px_48px_rgba(10,34,51,0.22)] disabled:opacity-60"
-          >
-            <RefreshCw className="h-4 w-4" />
-            {token ? "Regenerate token" : "Generate token"}
-          </button>
+          {tokenNote && (
+            <p role="status" className="mt-3 text-sm font-medium text-clay">
+              {tokenNote}
+            </p>
+          )}
+          <div className="mt-4 flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={generate}
+              disabled={busy}
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-coral px-5 text-sm font-bold text-night disabled:opacity-60"
+            >
+              <RefreshCw className="h-4 w-4" />
+              {token ? "Create a new token" : "Create a token"}
+            </button>
+            <button
+              type="button"
+              onClick={revoke}
+              disabled={busy}
+              className="inline-flex h-11 items-center justify-center rounded-full border-2 border-ink/15 px-5 text-sm font-bold text-ink transition hover:border-ink/40 disabled:opacity-60"
+            >
+              Revoke all tokens
+            </button>
+          </div>
         </details>
       </section>
     </main>

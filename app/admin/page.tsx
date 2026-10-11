@@ -19,7 +19,8 @@ import { namespaceForUser, isOAuthConfigured } from "@/lib/oauth";
 import { getUserRecord, listUsers, store, touchUser, usingDurableStore, type UserRecord } from "@/lib/store";
 import { conciergeEnabled, dailyCap, generationsToday, readQuota, readQuotas, type Quota } from "@/lib/quota";
 import { FREE_GENERATION_LIMIT } from "@/lib/plan";
-import { setConciergeAction, setUserPlanAction } from "@/app/admin/actions";
+import { setBudgetAction, setConciergeAction, setUserPlanAction } from "@/app/admin/actions";
+import { budgetUsd, spentThisMonthUsd } from "@/lib/budget";
 import { DATASETS, reviewDateLabel } from "@/lib/visa";
 import { Logo } from "@/components/logo";
 
@@ -158,6 +159,12 @@ export default async function AdminPage({
     usersError = true;
   }
 
+  const [budget, spent] = await Promise.all([
+    budgetUsd().catch(() => 25),
+    spentThisMonthUsd().catch(() => 0),
+  ]);
+  const budgetUsedPct = Math.min(100, Math.round((spent / budget) * 100));
+
   // Booleans only: this page reports whether things are configured, never their values.
   const checks: Array<{ label: string; state: CheckState; detail: string }> = [
     {
@@ -183,6 +190,14 @@ export default async function AdminPage({
       detail: usingDurableStore
         ? "Holds assistant-saved plans and the user list."
         : "Using in-memory storage: plans and the user list reset when the server restarts.",
+    },
+    {
+      label: "Monthly AI budget",
+      state: spent < budget ? "ok" : "bad",
+      detail:
+        spent < budget
+          ? `$${spent.toFixed(2)} of $${budget.toFixed(budget % 1 === 0 ? 0 : 2)} used this month.`
+          : "This month’s budget is used up, so the concierge is paused until next month.",
     },
     {
       label: "Free-tier allowance",
@@ -317,7 +332,51 @@ export default async function AdminPage({
                       ? "On. Everyone is capped at the daily total above."
                       : "Paused. Nobody can generate itineraries until you turn it back on."}
                   </p>
-                  <form action={setConciergeAction} className="mt-4">
+                  <div className="mt-5">
+                    <p className="text-sm font-semibold text-ink">
+                      This month: ${spent.toFixed(2)} of ${budget.toFixed(budget % 1 === 0 ? 0 : 2)}
+                    </p>
+                    <div
+                      role="progressbar"
+                      aria-valuemin={0}
+                      aria-valuemax={100}
+                      aria-valuenow={budgetUsedPct}
+                      aria-label="Share of this month’s concierge budget used"
+                      className="mt-2 h-2.5 overflow-hidden rounded-full bg-ink/10"
+                    >
+                      <div
+                        className={`h-full rounded-full ${budgetUsedPct >= 90 ? "bg-clay" : "bg-sunset"}`}
+                        style={{ width: `${budgetUsedPct}%` }}
+                      />
+                    </div>
+                    <p className="mt-1.5 text-xs leading-5 text-muted">
+                      Estimated from real token usage at Claude Sonnet’s list price. At 100% the concierge pauses itself
+                      until next month.
+                    </p>
+                    <form action={setBudgetAction} className="mt-3 flex items-center gap-2">
+                      <label htmlFor="budget" className="sr-only">
+                        Monthly budget in US dollars
+                      </label>
+                      <span className="text-sm font-bold text-ink">$</span>
+                      <input
+                        id="budget"
+                        name="budget"
+                        type="number"
+                        min={1}
+                        max={1000}
+                        step={1}
+                        defaultValue={budget}
+                        className="field !w-24 !py-2"
+                      />
+                      <button
+                        type="submit"
+                        className="inline-flex h-10 items-center rounded-full border-2 border-ink/15 px-4 text-sm font-bold text-ink transition hover:border-ink/40"
+                      >
+                        Set budget
+                      </button>
+                    </form>
+                  </div>
+                  <form action={setConciergeAction} className="mt-5">
                     <input type="hidden" name="enabled" value={conciergeOn ? "0" : "1"} />
                     <button
                       type="submit"

@@ -50,8 +50,7 @@ export default function PrivacyPage() {
         <h2>Cookies</h2>
         <p>
           Only the cookies the site needs to work: Google sign-in and your session (set by the Auth.js
-          library), and a connection token if you use the Connect page. There are no advertising or
-          tracking cookies and no analytics.
+          library). There are no advertising or tracking cookies and no analytics.
         </p>
       </section>
 

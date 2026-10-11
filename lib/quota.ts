@@ -16,6 +16,9 @@ import { kv, usingDurableStore } from "@/lib/store";
 // Without Upstash (local dev, tests) the same logic runs against in-memory maps.
 
 const LOCK_SECONDS = 20;
+// After this many requests in a day that weren't about trips, the concierge stops
+// answering that person until tomorrow (each refused request still costs a little).
+export const OFF_TOPIC_LIMIT_PER_DAY = 5;
 const FLAG_KEY = "pyb:flag:concierge-off";
 
 export function dailyCap() {
@@ -30,12 +33,14 @@ function who(email: string) {
 const quotaKey = (email: string) => `pyb:quota:${who(email)}`;
 const lockKey = (email: string) => `pyb:lock:${who(email)}`;
 const dayKey = () => `pyb:day:${new Date().toISOString().slice(0, 10)}`;
+const strikeKey = (email: string) => `pyb:strike:${who(email)}:${new Date().toISOString().slice(0, 10)}`;
 
 // --- In-memory fallback -------------------------------------------------------
 type MemoryQuota = { used: number; plan: Plan; requested: boolean };
 const memoryQuota = new Map<string, MemoryQuota>();
 const memoryDays = new Map<string, number>();
 const memoryLocks = new Map<string, number>();
+const memoryStrikes = new Map<string, number>();
 let memoryOff = false;
 
 function memoryEntry(email: string): MemoryQuota {
@@ -52,6 +57,7 @@ export function resetQuotaMemory() {
   memoryQuota.clear();
   memoryDays.clear();
   memoryLocks.clear();
+  memoryStrikes.clear();
   memoryOff = false;
 }
 
@@ -134,6 +140,24 @@ async function dropLock(email: string): Promise<void> {
   await kv.command(["DEL", lockKey(email)]);
 }
 
+// --- Off-topic strikes -----------------------------------------------------------
+async function strikesToday(email: string): Promise<number> {
+  if (!usingDurableStore) return memoryStrikes.get(strikeKey(email)) ?? 0;
+  return Number.parseInt(String((await kv.command(["GET", strikeKey(email)])) ?? "0"), 10) || 0;
+}
+
+/** Counts a request that wasn't about trips against this person's day. */
+export async function recordOffTopic(email: string): Promise<void> {
+  if (!usingDurableStore) {
+    memoryStrikes.set(strikeKey(email), (memoryStrikes.get(strikeKey(email)) ?? 0) + 1);
+    return;
+  }
+  await kv.pipeline([
+    ["INCR", strikeKey(email)],
+    ["EXPIRE", strikeKey(email), 172_800],
+  ]);
+}
+
 // --- Reserve / release -----------------------------------------------------------
 export type Reservation =
   | { ok: true }
@@ -147,6 +171,14 @@ export type Reservation =
 export async function reserveGeneration(email: string): Promise<Reservation> {
   if (!(await conciergeEnabled())) {
     return { ok: false, status: 503, error: "The concierge is taking a short break. Please check back soon." };
+  }
+
+  if ((await strikesToday(email)) >= OFF_TOPIC_LIMIT_PER_DAY) {
+    return {
+      ok: false,
+      status: 429,
+      error: "The concierge only plans trips, and several of today’s requests were about something else. Please try again tomorrow.",
+    };
   }
 
   if (!(await takeLock(email))) {

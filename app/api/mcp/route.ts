@@ -1,6 +1,6 @@
 import { createMcpHandler, withMcpAuth } from "mcp-handler";
 import { z } from "zod";
-import { isValidTokenShape, namespaceFor } from "@/lib/connection";
+import { resolveManualToken } from "@/lib/manual-token";
 import { readAccessToken } from "@/lib/oauth";
 import { store, SyncedItem } from "@/lib/store";
 import {
@@ -24,16 +24,14 @@ function tokenFrom(extra: unknown): string | null {
 
 type AuthInfoLike = { token?: string; extra?: Record<string, unknown> };
 
-// The traveller's private storage namespace for this request. OAuth access
-// tokens carry it (set in verifyToken below); legacy pyb_ tokens hash to one.
+// The traveller's private storage namespace for this request. Both OAuth access
+// tokens and signed manual tokens carry it (set in verifyToken below); there is no
+// other way to get one, so an unauthenticated caller never reaches storage.
 function namespaceFrom(extra: unknown): string | null {
   const e = extra as { authInfo?: AuthInfoLike; http?: { authInfo?: AuthInfoLike } } | undefined;
   const info = e?.authInfo ?? e?.http?.authInfo;
   const namespace = info?.extra?.namespace;
-  if (typeof namespace === "string" && namespace) {
-    return namespace;
-  }
-  return info?.token ? namespaceFor(info.token) : null;
+  return typeof namespace === "string" && namespace ? namespace : null;
 }
 
 function newId() {
@@ -271,13 +269,16 @@ const handler = withMcpAuth(
       };
     }
 
-    // Legacy manual token from /connect (pyb_...): still supported.
-    if (isValidTokenShape(bearerToken)) {
+    // Manual token created on /connect by a signed-in traveller. It must be signed by
+    // this server, unexpired and not revoked; a made-up "pyb_..." string is rejected.
+    const manual = await resolveManualToken(bearerToken).catch(() => null);
+    if (manual) {
       return {
         token: bearerToken,
-        clientId: "packyourbags-web",
+        clientId: "packyourbags-manual",
         scopes: [],
-        extra: { namespace: namespaceFor(bearerToken) },
+        expiresAt: manual.expiresAt,
+        extra: { namespace: manual.namespace, email: manual.email },
       };
     }
 

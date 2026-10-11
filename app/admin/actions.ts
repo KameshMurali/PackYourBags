@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
+import { setBudgetUsd } from "@/lib/budget";
 import { setConciergeEnabled, setPlan } from "@/lib/quota";
 
 // Server actions are public POST endpoints, so every one re-checks the admin role
@@ -28,5 +29,17 @@ export async function setUserPlanAction(formData: FormData) {
 export async function setConciergeAction(formData: FormData) {
   await requireAdmin();
   await setConciergeEnabled(formData.get("enabled") === "1");
+  revalidatePath("/admin");
+}
+
+export async function setBudgetAction(formData: FormData) {
+  await requireAdmin();
+
+  const amount = Number.parseFloat(String(formData.get("budget") ?? ""));
+  if (!Number.isFinite(amount) || amount < 1 || amount > 1000) {
+    return;
+  }
+
+  await setBudgetUsd(Math.round(amount * 100) / 100);
   revalidatePath("/admin");
 }
