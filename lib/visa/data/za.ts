@@ -1,7 +1,222 @@
 // South African passport (ordinary). Indicative only — every record links to its source.
 //
-// Empty until verified: a passport with no rules shows as "coming soon".
+// Every record below was checked on 2026-10-11 against an official government page (the
+// destination's immigration authority, foreign ministry, embassy or consulate, or its official
+// e-visa/ETA portal). DIRCO's published visa-requirements list covers diplomatic and official
+// passports only, so it is not used for ordinary passports. A destination that could not be
+// confirmed from an official page is deliberately absent: the app then shows an honest "not yet
+// verified" card with the country's official link instead of a guess.
+// Fees, processing times and stay lengths are included only where the cited page states them.
 
 import type { DestinationRule } from "../types";
 
-export const SOUTH_AFRICA_DESTINATIONS: DestinationRule[] = [];
+const R = "2026-10-11";
+
+export const SOUTH_AFRICA_DESTINATIONS: DestinationRule[] = [
+  // Southern Africa
+  {
+    code: "BW",
+    name: "Botswana",
+    flag: "🇧🇼",
+    region: "Southern Africa",
+    base: "visa-free",
+    note: "No visa: South Africa is on the Embassy of Botswana's list of countries whose citizens do not require a visa to enter Botswana. That list states no maximum stay, so check the length of stay you are given at the border.",
+    source: "https://www.botswanaembassy.org/page/guidelines-for-completing-a-visa-application",
+    sourceLabel: "Embassy of the Republic of Botswana, Washington DC — countries whose citizens do not require a visa",
+    lastReviewed: R,
+  },
+  {
+    code: "NA",
+    name: "Namibia",
+    flag: "🇳🇦",
+    region: "Southern Africa",
+    base: "visa-free",
+    note: "No visa: South Africa is on Namibia's list of countries whose nationals are exempt from visa requirements on all passports. You get a Visitor's Entry Permit stamp at the border. Passport valid 6+ months with 3 blank pages; carry proof of funds and, if asked, a return ticket. Any work needs a work visa.",
+    source: "https://namibiaembassyusa.org/foreign-nationals/",
+    sourceLabel: "Embassy of Namibia, Washington DC — visa exemption list; entry conditions from the Ministry of Home Affairs, Immigration, Safety and Security fact sheet",
+    lastReviewed: R,
+  },
+  {
+    code: "ZW",
+    name: "Zimbabwe",
+    flag: "🇿🇼",
+    region: "Southern Africa",
+    base: "visa-free",
+    note: "No visa: South Africa is in Category A, the list of countries whose nationals do not require a visa to enter Zimbabwe. The Department encourages all travellers to complete the Zimbabwe Entry Declaration Form before travelling. The page states no maximum stay.",
+    source: "https://www.zimimmigration.gov.zw/?p=7176",
+    sourceLabel: "Department of Immigration, Zimbabwe — Category A",
+    lastReviewed: R,
+  },
+  {
+    code: "MZ",
+    name: "Mozambique",
+    flag: "🇲🇿",
+    region: "Southern Africa",
+    base: "visa-free",
+    days: 30,
+    note: "Visa-exempt for 30 days for tourism or business on an ordinary passport. Exempt travellers may still be asked for a valid passport, proof of accommodation, return or onward travel and proof of funds.",
+    source: "https://evisa.gov.mz/",
+    sourceLabel: "Mozambique National Immigration Service (SENAMI) — official e-visa portal, visa-exempt countries table",
+    lastReviewed: R,
+  },
+  {
+    code: "LS",
+    name: "Lesotho",
+    flag: "🇱🇸",
+    region: "Southern Africa",
+    base: "visa-free",
+    note: "No visa: the Lesotho Embassy's table of visa requirements shows South Africa as 'NO' (citizens do not require a visa to enter Lesotho). The table states no maximum stay.",
+    source: "https://www.lesothoemb-usa.gov.ls/visa/",
+    sourceLabel: "Embassy of the Kingdom of Lesotho, Washington DC — visa requirements by country",
+    lastReviewed: R,
+  },
+  {
+    code: "SZ",
+    name: "Eswatini",
+    flag: "🇸🇿",
+    region: "Southern Africa",
+    base: "visa-free",
+    days: 30,
+    note: "No visa: South Africa is on the list of nationalities that do not require a visa. Tourists and business visitors may stay up to 30 days, with a further 30-day extension from the Ministry of Home Affairs; longer stays need a Temporary Residence Permit. Passport valid at least 3 months after your travel dates.",
+    source: "https://www.thekingdomofeswatini.com/visa-guide/",
+    sourceLabel: "Eswatini Tourism Authority (official tourism website) — visa guide; the Ministry of Home Affairs says countries not on its visa-required list need no visa",
+    lastReviewed: R,
+  },
+  {
+    code: "ZM",
+    name: "Zambia",
+    flag: "🇿🇲",
+    region: "Southern Africa",
+    base: "visa-free",
+    note: "No visa: South Africa is on the Department of Immigration's list of nationals who do not require a visa to enter Zambia. If you arrive by air you must hold a valid return air ticket; if you arrive by land or water you must have enough funds for your stay and departure. The page states no maximum stay.",
+    source: "https://www.zambiaimmigration.gov.zm/nationals-who-dont-require-visa/",
+    sourceLabel: "Department of Immigration, Zambia — nationals who do not require a visa",
+    lastReviewed: R,
+  },
+  {
+    code: "MW",
+    name: "Malawi",
+    flag: "🇲🇼",
+    region: "Southern Africa",
+    base: "visa-free",
+    note: "No visa: Malawi's official e-visa portal (Visa Eligibility Wizard) says South Africa nationals do not require a visa. The portal states no maximum stay.",
+    source: "https://evisa.gov.mw/VisaAssistance",
+    sourceLabel: "Malawi Department of Immigration and Citizenship Services — official e-visa portal",
+    lastReviewed: R,
+  },
+
+  // East Africa
+  {
+    code: "TZ",
+    name: "Tanzania",
+    flag: "🇹🇿",
+    region: "East Africa",
+    base: "visa-free",
+    days: 90,
+    note: "No visa: 'South African Republic' is on Tanzania Immigration's list of countries whose nationals do not require a visa. Visitors get a Visitor's Pass valid for up to three months (per the Tanzanian High Commission in Pretoria). Passport valid at least 6 months.",
+    source: "https://visa.immigration.go.tz/visafreecountry",
+    sourceLabel: "Tanzania Immigration Services Department (eVisa portal); pass length and passport validity from the High Commission of Tanzania, Pretoria",
+    lastReviewed: R,
+  },
+  {
+    code: "KE",
+    name: "Kenya",
+    flag: "🇰🇪",
+    region: "East Africa",
+    base: "visa-free",
+    days: 90,
+    note: "No visa and no eTA: South Africa is on Kenya's list of nationals exempt from the Electronic Travel Authorisation for a period not exceeding 90 days, under the Kenya Citizenship and Immigration (Amendment) Rules, 2025.",
+    source: "https://www.etakenya.go.ke/general-information",
+    sourceLabel: "Directorate of Immigration Services, Kenya (official eTA website)",
+    lastReviewed: R,
+  },
+
+  // Europe
+  {
+    code: "SCHENGEN",
+    name: "Schengen Area (29 countries)",
+    flag: "🇪🇺",
+    region: "Europe",
+    base: "visa-required",
+    days: 90,
+    fee: "EUR 90 (adults); EUR 45 for children aged 6 to under 12",
+    processingTime: "Normally 15 days, up to 45 days",
+    note: "A short-stay Schengen visa is required: South Africa is on the EU's list of countries whose nationals need a visa (Annex I, Regulation (EU) 2018/1806). It allows up to 90 days in any 180-day period. Apply at the consulate of the country you will visit, no earlier than 6 months and at least 15 days before you travel.",
+    source: "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32018R1806",
+    sourceLabel: "EU Regulation 2018/1806, Annex I (EUR-Lex); fee, timings and 90/180 rule from the European Commission's 'Applying for a Schengen visa' page (home-affairs.ec.europa.eu)",
+    lastReviewed: R,
+  },
+  {
+    code: "GB",
+    name: "United Kingdom",
+    flag: "🇬🇧",
+    region: "Europe",
+    base: "visa-required",
+    days: 180,
+    fee: "GBP 135",
+    processingTime: "Usually within 3 weeks",
+    note: "A visit visa is required before you travel: South Africa is on the UK's visa national list (Immigration Rules, Appendix Visitor). A Standard Visitor visa allows stays of up to 6 months and costs GBP 135. You can apply no earlier than 3 months before you travel.",
+    source: "https://www.gov.uk/guidance/immigration-rules/immigration-rules-appendix-visitor-visa-national-list",
+    sourceLabel: "UK Home Office — Immigration Rules Appendix Visitor: Visa national list (updated 8 Oct 2026); fee and timings from GOV.UK Standard Visitor visa pages",
+    lastReviewed: R,
+  },
+
+  // North America
+  {
+    code: "US",
+    name: "United States",
+    flag: "🇺🇸",
+    region: "North America",
+    base: "visa-required",
+    note: "A US visa is required: the US Embassy says South African citizens must have a visa before they can visit the United States. Complete the DS-160 form, then book and pay for an appointment on the official scheduling site (ais.usvisa-info.com) for the US consulates in Johannesburg, Cape Town or Durban.",
+    source: "https://za.usembassy.gov/visas-2/",
+    sourceLabel: "U.S. Embassy & Consulates in South Africa",
+    lastReviewed: R,
+  },
+  {
+    code: "CA",
+    name: "Canada",
+    flag: "🇨🇦",
+    region: "North America",
+    base: "visa-required",
+    fee: "CAD 100 (plus CAD 85 biometrics)",
+    note: "A visitor visa is required: South Africa is on IRCC's list of travellers who need a visa, and is not among the countries whose citizens may qualify for an eTA instead. Apply online and give biometrics before you travel.",
+    source: "https://www.canada.ca/en/immigration-refugees-citizenship/services/visit-canada/entry-requirements-country.html",
+    sourceLabel: "Immigration, Refugees and Citizenship Canada (IRCC); fees from the IRCC fee list (ircc.canada.ca)",
+    lastReviewed: R,
+  },
+
+  // Oceania
+  {
+    code: "AU",
+    name: "Australia",
+    flag: "🇦🇺",
+    region: "Oceania",
+    base: "visa-required",
+    fee: "From AUD 250",
+    note: "A visa is required before you travel. South Africa is not among the passports eligible for the Electronic Travel Authority (subclass 601), so apply for a Visitor visa (subclass 600, tourist stream, apply from outside Australia). The Department says it might grant a stay of 3, 6 or 12 months.",
+    source: "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/visitor-600",
+    sourceLabel: "Australian Department of Home Affairs — Visitor visa (subclass 600); ETA-eligible passport list from the Subclass 601 page",
+    lastReviewed: R,
+  },
+  {
+    code: "NZ",
+    name: "New Zealand",
+    flag: "🇳🇿",
+    region: "Oceania",
+    base: "visa-required",
+    fee: "From NZD 441",
+    processingTime: "80% within 2 weeks",
+    note: "A Visitor Visa is required: South Africa is not on Immigration New Zealand's visa waiver list. A Visitor Visa lets you stay up to 6 or 9 months and you cannot work. Apply online before you travel.",
+    source: "https://www.immigration.govt.nz/visit/what-you-need-to-visit-new-zealand/visa-waiver-countries-and-territories/",
+    sourceLabel: "Immigration New Zealand — visa waiver list (South Africa is not on it); fee and timings from the Visitor Visa page",
+    lastReviewed: R,
+    overrides: [
+      {
+        residence: ["AU"],
+        category: "eta",
+        note: "Australian permanent residents can visit on an NZeTA (from NZD 17, allow 72 hours) and are normally given an Australian Resident Visa on arrival. You need a current Australian Permanent Resident Visa or Resident Return Visa linked to your passport, and must meet New Zealand's character requirements.",
+      },
+    ],
+  },
+];
