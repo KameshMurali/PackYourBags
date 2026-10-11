@@ -307,7 +307,7 @@ export const CHINA_DESTINATIONS: DestinationRule[] = [
     region: "Middle East",
     base: "visa-free",
     days: 90,
-    note: "Chinese ordinary passports valid 6+ months can enter visa-free, with a total stay of up to 90 days in any 180-day period (UAE policy change relayed by the Chinese Embassy in the UAE in April 2025). The 180 days count from your first entry, and each day over 90 costs a fine of AED 50.",
+    note: "Chinese ordinary passports valid 6+ months can enter visa-free, with a total stay of up to 90 days in any 180-day period (UAE policy change relayed by the Chinese Embassy in the UAE in April 2025). The 180 days count from your first entry. Overstaying is fined by the day.",
     source: "https://wb.beijing.gov.cn/home/wswm/crjxx/qzxx/qztz/202504/t20250414_4063864.html",
     sourceLabel:
       "Beijing Municipal Foreign Affairs Office, republishing the notice of the Chinese Embassy in the UAE and Consulate-General in Dubai (11 Apr 2025); mutual exemption in force since 16 Jan 2018 per China's Foreign Ministry",
