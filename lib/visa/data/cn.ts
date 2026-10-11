@@ -41,7 +41,6 @@ export const CHINA_DESTINATIONS: DestinationRule[] = [
     sourceLabel:
       "Macao SAR Government Portal — immigration clearance of non-residents (Public Security Police); 7-day tourism stay from China's National Immigration Administration (nia.gov.cn)",
     lastReviewed: R,
-    aliases: ["Macao"],
   },
   {
     code: "TW",
@@ -49,10 +48,10 @@ export const CHINA_DESTINATIONS: DestinationRule[] = [
     flag: "🇹🇼",
     region: "East Asia",
     base: "visa-required",
-    note: "Mainland residents don't use a visa. For individual tourism they need an Exit-Entry Permit for Travelling to and from Taiwan (valid 6+ months, with an individual-tourism endorsement), a Taiwan entry/exit permit applied for through an approved Taiwan travel agency, and a return ticket. Stay: 15 days from the day after entry, 120 days a year at most.",
+    note: "Mainland residents don't use a visa. Individual tourism is open to residents of designated areas who meet financial or student criteria: an Exit-Entry Permit for Travelling to and from Taiwan (valid 6+ months, with a G endorsement) plus a Taiwan entry/exit permit applied for by an approved Taiwan travel agency. Stay: 15 days from the day after entry, 120 days a year at most.",
     source: "https://www.immigration.gov.tw/5385/7244/7250/7257/7266/36078/",
     sourceLabel:
-      "National Immigration Agency, Taiwan (R.O.C.) — online application notice for Mainland Area people visiting as individual tourists; document checklist and stay limits also from its Q&A for Mainland Area people",
+      "National Immigration Agency, Taiwan (R.O.C.) — online application notice for Mainland Area people visiting as individual tourists (published 17 May 2022); permit checklist also in its Q&A for Mainland Area people",
     lastReviewed: R,
   },
   {
@@ -81,12 +80,12 @@ export const CHINA_DESTINATIONS: DestinationRule[] = [
     flag: "🇰🇷",
     region: "East Asia",
     base: "visa-required",
-    note: "Chinese ordinary passports need a visa to visit Korea. Visa-free options are narrow and conditional: the Jeju Island policy, transit programmes for people continuing to a third country, and designated group-tour schemes run through approved agencies. Confirm the current terms with the Korean Embassy or an approved agency.",
+    note: "Chinese ordinary passports need a visa to visit Korea. Narrow visa-free options exist: Jeju Island, transit programmes for people continuing to a third country, and a temporary 15-day scheme for Chinese tour groups via designated agencies (Justice Ministry plan: 29 Sep 2025 to 30 Jun 2026; media report an extension to 31 Dec 2026). Confirm with the Korean Embassy or an approved agency.",
     source: "https://overseas.mofa.go.kr/cn-guangzhou-zh/wpge/m_96/contents.do",
     sourceLabel:
-      "Ministry of Foreign Affairs of the Republic of Korea — Consulate General in Guangzhou, guide to visa-free entry to Korea",
+      "Ministry of Foreign Affairs of the Republic of Korea — Consulate General in Guangzhou, guide to visa-free entry to Korea; group-tour scheme period from the Ministry of Justice (moj.go.kr)",
     lastReviewed: R,
-    aliases: ["Korea", "Seoul", "Jeju"],
+    aliases: ["Seoul", "Jeju"],
   },
   {
     code: "MN",
@@ -157,7 +156,6 @@ export const CHINA_DESTINATIONS: DestinationRule[] = [
     sourceLabel:
       "Directorate General of Immigration, Indonesia (visa on arrival guide, China listed; fee and extension); e-VOA and arrival card rules from its official e-Visa portal (evisa.imigrasi.go.id)",
     lastReviewed: R,
-    aliases: ["Bali"],
   },
   {
     code: "VN",
@@ -200,7 +198,6 @@ export const CHINA_DESTINATIONS: DestinationRule[] = [
     sourceLabel:
       "Consulate-General of China in Luang Prabang (entry guidance of 7 Jan 2026); e-visa fee and processing time from the Lao Ministry of Foreign Affairs eVisa portal (laoevisa.gov.la)",
     lastReviewed: R,
-    aliases: ["Lao PDR"],
   },
   {
     code: "PH",
@@ -282,7 +279,7 @@ export const CHINA_DESTINATIONS: DestinationRule[] = [
     region: "Caucasus",
     base: "visa-free",
     days: 30,
-    note: "Citizens of the People's Republic of China may enter and stay in Georgia without a visa for 30 days for tourism only (Georgian Foreign Ministry, since 11 Sep 2023). A bilateral visa-exemption agreement for ordinary passports has also been in force since 28 May 2024 (China's Foreign Ministry).",
+    note: "By a Georgian government ordinance (since 11 Sep 2023), citizens of the People's Republic of China may enter and stay in Georgia without a visa for 30 days for tourism only. A bilateral visa-exemption agreement for ordinary passports has also been in force since 28 May 2024 (China's Foreign Ministry).",
     source: "https://china.mfa.gov.ge/en/important-information",
     sourceLabel:
       "Embassy of Georgia in China (Ministry of Foreign Affairs of Georgia); agreement date from the Ministry of Foreign Affairs of China",
@@ -315,7 +312,6 @@ export const CHINA_DESTINATIONS: DestinationRule[] = [
     sourceLabel:
       "Beijing Municipal Foreign Affairs Office, republishing the notice of the Chinese Embassy in the UAE and Consulate-General in Dubai (11 Apr 2025); mutual exemption in force since 16 Jan 2018 per China's Foreign Ministry",
     lastReviewed: R,
-    aliases: ["Dubai", "Abu Dhabi"],
   },
   {
     code: "QA",
@@ -461,10 +457,11 @@ export const CHINA_DESTINATIONS: DestinationRule[] = [
     base: "eta",
     days: 90,
     processingTime: "Typically within 24 hours",
-    note: "China is one of the visa-required markets served by South Africa's new online ETA (launched 12 Aug 2026), for tourism of up to 90 days. It works only for arrivals at OR Tambo, Cape Town, Lanseria and King Shaka airports; other ports need a visa from a South African mission. Without a valid visa or ETA you may be denied boarding.",
-    source: "https://eta.dha.gov.za/faq",
+    note: "China was one of the first four visa-required markets given South Africa's online ETA (launched 12 Aug 2026), for tourism of up to 90 days; it is meant to become compulsory for such visitors. It works only for arrivals at OR Tambo, Cape Town, Lanseria and King Shaka airports; other ports need a visa from a South African mission.",
+    source:
+      "https://www.gov.za/news/speeches/minister-leon-schreiber-launch-south-africa%E2%80%99s-electronic-travel-authorisation-12-aug",
     sourceLabel:
-      "Department of Home Affairs, South Africa — official ETA portal (eta.dha.gov.za); China as an initial ETA market from SAnews (12 Aug 2026)",
+      "Minister of Home Affairs, South Africa — launch of the Electronic Travel Authorisation (12 Aug 2026); 90-day stay and 24-hour processing from the Department of Home Affairs ETA portal (eta.dha.gov.za)",
     lastReviewed: R,
   },
 
@@ -479,7 +476,6 @@ export const CHINA_DESTINATIONS: DestinationRule[] = [
     source: "https://www.dhs.gov/visa-waiver-program",
     sourceLabel: "U.S. Department of Homeland Security — Visa Waiver Program",
     lastReviewed: R,
-    aliases: ["USA", "America"],
   },
   {
     code: "CA",
@@ -523,13 +519,12 @@ export const CHINA_DESTINATIONS: DestinationRule[] = [
     region: "South America",
     base: "visa-free",
     days: 30,
-    note: "Temporary visa waiver for Chinese ordinary passports from 11 May 2026 to 31 Dec 2026: up to 30 days, non-extendable, multiple entries allowed but no more than 30 days in total per migration year. Covers tourism, business, transit and artistic or sports activities, not work. Longer stays need a visa via e-Consular. Check the end date before booking.",
+    note: "Temporary visa waiver for Chinese ordinary passports from 11 May 2026, in effect until 31 Dec 2026 for now: up to 30 days, non-extendable; multiple entries allowed, but no more than 30 days in total within a year counted from first entry. Covers tourism, business, transit and artistic or sports activities, not work. Longer stays need a visa via e-Consular.",
     source:
       "https://www.gov.br/mre/pt-br/consulado-toquio/english/news/new-visa-rules-for-chinese-citizens",
     sourceLabel:
       "Ministry of Foreign Affairs of Brazil (Itamaraty) — consular notice on visa rules for Chinese citizens, 12 May 2026",
     lastReviewed: R,
-    aliases: ["Brasil", "Rio de Janeiro", "São Paulo"],
   },
   {
     code: "AR",
