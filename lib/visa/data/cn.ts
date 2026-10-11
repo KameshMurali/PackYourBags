@@ -154,7 +154,7 @@ export const CHINA_DESTINATIONS: DestinationRule[] = [
     note: "Chinese citizens can get a 30-day tourist visa on arrival (B1), extendable once for 30 more days; the e-VOA can also be bought online (evisa.imigrasi.go.id). Passport valid 6+ months and a return or onward ticket are required. Submit the arrival card (allindonesia.imigrasi.go.id) within 3 days before arrival.",
     source: "https://www.imigrasi.go.id/berita/2022/07/20/how-to-get-visa-on-arrival-in-indonesia?lang=en-US",
     sourceLabel:
-      "Directorate General of Immigration, Indonesia (visa on arrival guide, China listed; fee and extension); e-VOA and arrival card rules from its official e-Visa portal (evisa.imigrasi.go.id)",
+      "Directorate General of Immigration, Indonesia (visa on arrival guide of 2022, China listed; fee and extension); its official e-Visa portal (evisa.imigrasi.go.id) offers the B1 visa on arrival for Chinese passports and requires the arrival card",
     lastReviewed: R,
   },
   {
@@ -320,10 +320,10 @@ export const CHINA_DESTINATIONS: DestinationRule[] = [
     region: "Middle East",
     base: "visa-free",
     days: 30,
-    note: "Mutual visa exemption for Chinese ordinary passports in force since 21 Dec 2018; stays under these agreements are generally limited to 30 days. Visit Qatar lists China as visa-free: passport valid 3+ months and a confirmed hotel booking on arrival.",
-    source: MFA_TABLE,
+    note: "Visit Qatar's visa checker shows Chinese passport holders enter visa-free: passport valid 3+ months, plus a confirmed hotel booking on arrival if you hold a Schengen, UK, US, Australian, NZ or Canadian visa. China's mutual visa exemption has applied since 21 Dec 2018; stays under such agreements are generally limited to 30 days.",
+    source: "https://visitqatar.com/intl-en/plan-your-trip/visas",
     sourceLabel:
-      "Ministry of Foreign Affairs of China — table of mutual visa exemption agreements (updated 29 May 2026); entry conditions from Qatar Tourism (visitqatar.com)",
+      "Qatar Tourism — Visit Qatar visa checker (China: enter visa-free); exemption date and general 30-day limit from the Ministry of Foreign Affairs of China's table of mutual visa exemption agreements (updated 29 May 2026)",
     lastReviewed: R,
   },
   {
@@ -472,7 +472,7 @@ export const CHINA_DESTINATIONS: DestinationRule[] = [
     flag: "🇺🇸",
     region: "North America",
     base: "visa-required",
-    note: "China is not on the Visa Waiver Program list, so ESTA is not available: you need a US visa (for tourism, normally a B-2) before you travel.",
+    note: "China is not on the Visa Waiver Program list, so ESTA is not available: you need a US visa before you travel.",
     source: "https://www.dhs.gov/visa-waiver-program",
     sourceLabel: "U.S. Department of Homeland Security — Visa Waiver Program",
     lastReviewed: R,
