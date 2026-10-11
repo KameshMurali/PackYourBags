@@ -167,18 +167,10 @@ export const RUSSIA_DESTINATIONS: DestinationRule[] = [
   },
 
   // Central Asia
-  {
-    code: "KZ",
-    name: "Kazakhstan",
-    flag: "🇰🇿",
-    region: "Central Asia",
-    base: "visa-free",
-    days: 90,
-    note: "No visa. The Russian MFA says Russian citizens may stay up to 90 days: 30 days without registration, extendable by a further 60 days through the migration service. A longer stay needs a residence permit or a temporary registration based on an employment contract.",
-    source: "https://www.kdmid.ru/docs/kazakhstan/information-about-the-country/",
-    sourceLabel: `${MFA_RU} — Kazakhstan entry rules`,
-    lastReviewed: R,
-  },
+  // Kazakhstan is deliberately absent: the Russian MFA still lists visa-free entry, but Kazakhstan's
+  // official QazETA platform (qazeta.kz) now issues an electronic travel authorisation for visa-free
+  // nationals (Russian internal and foreign passports accepted) and its start of compulsory use could
+  // not be confirmed from an official page, so no category is asserted.
   {
     code: "KG",
     name: "Kyrgyzstan",
