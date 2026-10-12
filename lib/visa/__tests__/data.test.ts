@@ -262,6 +262,33 @@ describe("visa guides", () => {
     }
   });
 
+  it("only attach by destination guides that suit every passport", () => {
+    const demonyms = NATIONALITIES.map((n) => n.demonym);
+    const problems: string[] = [];
+    for (const [destination, key] of Object.entries(GUIDE_BY_DESTINATION)) {
+      const appliesTo = VISA_GUIDES[key].appliesTo;
+      const narrowedTo = demonyms.find((d) => appliesTo.includes(d));
+      if (narrowedTo) problems.push(`${destination} → ${key} is written for ${narrowedTo} passports`);
+    }
+    expect(problems).toEqual([]);
+  });
+
+  it("never show a guide written for one passport to holders of another", () => {
+    const problems: string[] = [];
+    for (const [passport, rules] of Object.entries(DATASETS)) {
+      const own = NATIONALITIES.find((n) => n.code === passport)?.demonym;
+      for (const rule of rules) {
+        if (!rule.guide) continue;
+        const appliesTo = VISA_GUIDES[rule.guide]?.appliesTo ?? "";
+        const narrowedTo = NATIONALITIES.map((n) => n.demonym).find((d) => appliesTo.includes(d));
+        if (narrowedTo && narrowedTo !== own) {
+          problems.push(`${passport} → ${rule.code} uses the ${rule.guide} guide, written for ${narrowedTo} passports`);
+        }
+      }
+    }
+    expect(problems).toEqual([]);
+  });
+
   it.each(Object.entries(VISA_GUIDES))("%s is complete and sourced", (key, guide) => {
     const problems: string[] = [];
     for (const field of ["title", "appliesTo", "processingTime", "overview"] as const) {

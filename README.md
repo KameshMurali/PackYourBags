@@ -4,14 +4,14 @@ PackYourBags is a premium minimal travel planning app built with Next.js App Rou
 
 ## Features
 
-- **Landing page** — product story for leave tracking, visa discovery, trip planning, and the AI concierge.
+- **Landing page** — product story for visa discovery, trip planning, and the AI concierge.
 - **Accounts** — real authentication with [Auth.js](https://authjs.dev) (NextAuth v5) and Google sign-in. JWT sessions mean login works with or without a database; an optional Postgres database persists users. See [Authentication](#authentication).
 - **Trip briefs** — capture destination, timing, travellers, mood, and notes at `/trips/new`, then hand the brief to the concierge.
 - **AI concierge** — `/concierge` turns a free-text brief into a 3–7 day itinerary using Claude Sonnet (`claude-sonnet-4-6`). Supports `?from=brief` (prefill from the saved trip brief) and `?view=latest` (reopen the last generated itinerary).
-- **Free tier + Pro** — Starter accounts get 3 free itineraries, enforced server-side via a signed HTTP-only cookie. After that the API returns 402 and the concierge shows an upgrade card. `/api/subscribe` is a demo checkout that unlocks unlimited Pro in the current browser — swap it for a real billing provider before launch.
-- **Visa intelligence** — `/visa` resolves destinations by passport + residence + held visas (e.g. Indian passport + UAE residence, or a US visa unlocking Mexico/Georgia), grouped into visa-free / on-arrival / ETA / eVisa / visa-required, with documentation checklists and step-by-step guides for Schengen, US, and UK. Indicative only — every record links to an official source.
+- **Free tier + Pro** — Starter accounts get 3 free itineraries per signed-in person, counted on the server in Upstash under a hash of the verified email (see [AI concierge](#ai-concierge) below). After that the API returns 402 and the concierge shows an upgrade card. There is no payment flow: `/api/subscribe` only records a request for Pro, and an admin grants it from `/admin`.
+- **Visa intelligence** — `/visa` resolves destinations by passport + residence + held visas (e.g. Indian passport + UAE residence, or a US visa unlocking Mexico/Georgia), grouped into visa-free / on-arrival / ETA / eVisa / visa-required, with documentation checklists and step-by-step how-to-apply guides (Schengen for any passport; US and UK for Indian passports only, because those two guides are written for them). Indicative only — every record links to the page it was checked against (mostly government and embassy pages, plus some national tourism-authority pages).
 - **Connect to ChatGPT / Claude (MCP)** — `/connect` + an MCP server at `/api/mcp` let an AI assistant read and write your trips, itineraries, and run visa checks from a chat.
-- **Dashboard** — greeting, saved brief, premium itinerary timeline, feature entry points, and visa-aware inspiration.
+- **Dashboard** — greeting, saved brief, premium itinerary timeline, feature entry points, and an example list of visa-free picks (for an Indian passport with UAE residence).
 
 ## Local development
 
@@ -84,7 +84,7 @@ Trips and itineraries intentionally remain in browser `localStorage`
 | `AUTH_GOOGLE_ID` | For sign-in | Google OAuth client ID. |
 | `AUTH_GOOGLE_SECRET` | For sign-in | Google OAuth client secret. |
 | `ADMIN_EMAILS` | Optional | Comma-separated admin emails. Defaults to `kameshwar.murali@gmail.com` when unset. |
-| `DATABASE_URL` | Optional | Postgres connection string. Enables user persistence + the admin user list. |
+| `DATABASE_URL` | Optional | Postgres connection string. Enables the Auth.js database adapter. Sign-in, the admin user list and the concierge allowance do not need it (they use JWT sessions and Upstash). Note: the adapter stores Google's access and refresh tokens in the `account` table, which would make the sign-in page's "nothing else from your Google account" sentence untrue. Change one or the other before setting it. |
 
 Sign-in is only enabled when **both** `AUTH_GOOGLE_ID` and `AUTH_GOOGLE_SECRET`
 are present. Without them the app still builds and runs — `/signin` shows a
@@ -120,9 +120,12 @@ database; when a database is present, a `role` column on `user` is also kept in
 sync on each sign-in. Admins see an **Admin** link in the dashboard header and
 can open `/admin`:
 
-- **With a database** — lists users (email, name, role, created).
-- **Without a database** — shows the signed-in admin's status plus a note that
-  user listing requires `DATABASE_URL`.
+- **Overview** — system status, concierge spend and the pause switch, the admin list, and
+  visa data health (rules not reviewed in 180 days are flagged).
+- **Users** — everyone who has signed in, read from Upstash (`lib/store.ts`): email, name,
+  plan, first and last seen, sign-in count, itineraries generated, whether they asked for
+  Pro, and the titles of plans saved from assistants, with a Grant Pro action. This works
+  with or without `DATABASE_URL`.
 
 Non-admins are redirected away from `/admin` by the middleware and also shown a
 "not authorized" panel by the in-page guard.

@@ -36,11 +36,11 @@ export const metadata: Metadata = {
     template: "%s · PackYourBags",
   },
   description:
-    "Check which countries your passport opens up, turn an idea into a day-by-day itinerary with an AI concierge, and keep every plan in one place.",
+    "Check which countries your passport opens up, turn an idea into a day-by-day itinerary with an AI concierge, and bring in plans from Claude or ChatGPT.",
   openGraph: {
     title: "PackYourBags",
     description:
-      "Go somewhere. We'll handle the paperwork: visa rules for your passport, AI itineraries, and every plan in one place.",
+      "Go somewhere. We'll handle the paperwork: visa rules for your passport, AI itineraries, and plans from Claude or ChatGPT.",
     url: siteUrl,
     siteName: "PackYourBags",
     locale: "en_US",
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "PackYourBags",
     description:
-      "Visa rules for your passport, AI-built itineraries, and every plan in one place.",
+      "Visa rules for your passport, AI-built itineraries, and plans from Claude or ChatGPT.",
   },
 };
 

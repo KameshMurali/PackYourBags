@@ -9,6 +9,7 @@ import { ChatCard, ConnectCard, VisaCard } from "@/components/mockups";
 import { Reveal } from "@/components/reveal";
 import { SiteHeader } from "@/components/site-header";
 import { DayPlanCard } from "@/components/today-card";
+import { FREE_GENERATION_LIMIT } from "@/lib/plan";
 import { COUNTRIES, DATASETS, resolveDestinations } from "@/lib/visa";
 
 // Real numbers from the visa engine, so the page can't drift from the product.
@@ -26,7 +27,7 @@ const visaFreeTicker = resolveDestinations("IN", ["AE"], { residence: "AE" })
 
 const steps = [
   {
-    title: "Tell us who's travelling",
+    title: "Pick who's travelling",
     text: "Pick your passport, where you live and the visas you hold. The visa answers update instantly.",
   },
   {
@@ -35,11 +36,11 @@ const steps = [
   },
   {
     title: "Make it yours",
-    text: "Tweak the brief, regenerate, or bring in a plan you already made in Claude or ChatGPT.",
+    text: "Tweak the brief and generate again, or bring in a plan you already made in Claude or ChatGPT.",
   },
   {
     title: "Take it with you",
-    text: "A clean morning-to-evening timeline that reads well on your phone, at the gate or in the taxi.",
+    text: "A clean day-by-day timeline that reads well on your phone. Planned somewhere else? Save it from Claude or ChatGPT, then import it on the phone.",
   },
 ];
 
@@ -143,7 +144,7 @@ export default function Home() {
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sun opacity-75 motion-reduce:hidden" />
               <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-sun" />
             </span>
-            {verifiedRules} visa rules checked against official sources
+            {verifiedRules} visa rules checked against government and national tourism-authority pages
           </div>
 
           <h1
@@ -161,7 +162,7 @@ export default function Home() {
             style={{ animationDelay: "260ms" }}
           >
             Check which countries your passport opens up, turn a one-line idea into a day-by-day itinerary,
-            and keep every plan in one place.
+            and send plans from Claude or ChatGPT straight to your account.
           </p>
 
           <div className="animate-rise-in mt-9 flex flex-col gap-3 sm:flex-row" style={{ animationDelay: "380ms" }}>
@@ -179,7 +180,7 @@ export default function Home() {
       <MarqueeStrip
         label={
           <>
-            <span className="sm:hidden">Visa-free</span>
+            <span className="sm:hidden">Indian passport · visa-free</span>
             <span className="hidden sm:inline">Visa-free for an Indian passport · UAE resident</span>
           </>
         }
@@ -192,8 +193,8 @@ export default function Home() {
           <dl className="grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-4">
             {[
               [`${COUNTRIES.length}`, "countries and territories recognised, even by native name or a typo"],
-              [`${verifiedRules}`, `visa rules for ${passports} passports, each linked to its official source`],
-              ["3", "free AI itineraries, no card needed"],
+              [`${verifiedRules}`, `visa rules for ${passports} passports, each linked to the page we checked it against`],
+              [`${FREE_GENERATION_LIMIT}`, "free AI itineraries, no card needed"],
               ["2", "assistants, Claude and ChatGPT, can save trips straight to you"],
             ].map(([figure, copy]) => (
               <div key={copy} className="border-t-4 border-coral pt-4">
@@ -216,11 +217,11 @@ export default function Home() {
               Start with where your passport <span className="font-serif font-normal italic text-clay">actually</span> goes.
             </>
           }
-          text="Pick your passport, where you live and any visas you hold. See what's visa-free, what's an e-visa and what needs an embassy, each with the official source and the date we last checked it."
+          text="Pick your passport, where you live and any visas you hold. See what's visa-free, what's an e-visa and what needs an embassy, each with a link to its source and the date we last checked it."
           points={[
             "Search any country, city or even a typo. “germny” works.",
             "Honest “not yet verified” answers instead of guesses.",
-            "Step-by-step guides for Schengen, US and UK visas.",
+            "Step-by-step how-to-apply guides: Schengen for any passport, and the US and UK for Indian passports.",
           ]}
           cta={{ href: "/visa", label: "Open the visa explorer" }}
           media={
@@ -244,10 +245,10 @@ export default function Home() {
               Say the mood. Get the <span className="font-serif font-normal italic text-clay">whole</span> trip.
             </>
           }
-          text="Describe the trip in a sentence: dates, vibe, budget. The concierge, powered by Claude Sonnet, drafts a day-by-day itinerary you can refine. The first three are on us."
+          text={`Describe the trip in a sentence: dates, vibe, budget. The concierge, powered by Claude Sonnet, drafts a day-by-day itinerary; change the brief and generate again to refine it. The first ${FREE_GENERATION_LIMIT} are on us. Check the paperwork in the visa explorer before you book.`}
           points={[
             "Morning, afternoon and evening plans for every day.",
-            "Built around the passport and residence you set.",
+            "Plans around what you tell it: dates, mood, budget, who’s coming.",
             "No card needed to try it.",
           ]}
           cta={{ href: "/register", label: "Try the concierge free" }}
@@ -271,11 +272,11 @@ export default function Home() {
               Plan in chat. <span className="font-serif font-normal italic text-clay">Keep</span> it here.
             </>
           }
-          text="Already sketching trips with Claude or ChatGPT? Connect once and say “save this trip”. Plans land in your PackYourBags inbox, next to the visa check."
+          text="Already sketching trips with Claude or ChatGPT? Connect once and say “save this trip”. Plans land in the “From your assistant” inbox on your Connect page, ready to import."
           points={[
             "Sign in with Google to authorise. No tokens to copy.",
             "Works as a connector in Claude and ChatGPT.",
-            "Your saved plans stay private to your account.",
+            "Your saved plans belong to your account: no other traveller can see them.",
           ]}
           cta={{ href: "/connect", label: "See how to connect" }}
           media={
@@ -299,11 +300,11 @@ export default function Home() {
               A plan that <span className="font-serif font-normal italic text-clay">reads</span> like a good day.
             </>
           }
-          text="Every itinerary is a clean, day-by-day timeline, from first coffee to the last ferry. It's built to be opened one-handed on a street corner."
+          text="Every itinerary is a clean day-by-day timeline you can scan in seconds. It's built to be opened one-handed on a street corner."
           points={[
-            "Mobile-first, readable in bright sunlight.",
-            "Morning, afternoon and evening at a glance.",
-            "Regenerate any trip when plans change.",
+            "Mobile-first and easy to read on a small screen.",
+            "Morning, afternoon and evening in every day.",
+            "Plans changed? Edit the brief and generate a fresh itinerary.",
           ]}
           media={
             <LoopVideo
@@ -354,8 +355,8 @@ export default function Home() {
               Start free. Pay only when you <span className="font-serif font-normal italic text-clay">outgrow</span> it.
             </h2>
             <p className="mt-6 max-w-lg text-lg leading-8 text-muted">
-              The visa explorer is free forever and needs no account. Your first three AI itineraries are on us;
-              upgrade only if you want more.
+              The visa explorer is free and needs no account. Your first {FREE_GENERATION_LIMIT} AI itineraries
+              are on us; upgrade only if you want more.
             </p>
           </Reveal>
 
@@ -376,7 +377,7 @@ export default function Home() {
                 <ul className="space-y-3.5 px-7 py-6 text-sm font-medium text-ink/85">
                   {[
                     "Visa explorer for every passport we cover",
-                    "3 AI concierge itineraries included",
+                    `${FREE_GENERATION_LIMIT} AI concierge itineraries included`,
                     "Trip briefs and day-by-day timelines",
                     "Claude and ChatGPT connectors",
                   ].map((item) => (

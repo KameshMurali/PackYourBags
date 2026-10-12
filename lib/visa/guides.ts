@@ -1,8 +1,8 @@
 // How-to-apply guides for destinations that need a visa before travel.
 //
-// Guides are keyed by destination and attach automatically to visa-required and eVisa
-// results for that destination (see GUIDE_BY_DESTINATION). A rule can still point at a
-// specific guide with its own `guide` key.
+// A guide attaches to visa-required and eVisa results either by destination (see
+// GUIDE_BY_DESTINATION, for guides that suit any passport) or because a rule points at it
+// with its own `guide` key (for guides written for one passport).
 
 import type { VisaGuide } from "./types";
 
@@ -110,9 +110,13 @@ export const VISA_GUIDES: Record<string, VisaGuide> = {
   },
 };
 
-/** Destination rule code → guide key, applied when the traveller needs a visa or eVisa. */
+/**
+ * Destination rule code → guide key, applied when the traveller needs a visa or eVisa.
+ *
+ * Only guides that are true for any passport belong here. The US and UK guides are written for
+ * Indian passport holders, so they are attached by the Indian rules that name them
+ * (`guide: "us"` / `guide: "uk"` in data/in.ts) and never by destination alone.
+ */
 export const GUIDE_BY_DESTINATION: Record<string, string> = {
   SCHENGEN: "schengen",
-  US: "us",
-  GB: "uk",
 };

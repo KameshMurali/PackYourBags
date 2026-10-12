@@ -227,7 +227,8 @@ export default function Connect() {
           </div>
           <p className="mt-4 text-xs leading-6 text-muted">
             Your assistant only gets access to PackYourBags trips, itineraries, and visa checks, never
-            your Google account. Remove the connector in its settings to disconnect.
+            your Google account. Remove the connector in your assistant’s settings to disconnect. Access
+            you’ve already given lapses on its own after 30 days without use.
           </p>
         </div>
 

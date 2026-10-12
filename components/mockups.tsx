@@ -1,38 +1,61 @@
-import { ArrowRight, CheckCircle2, Compass, Globe2, MapPinned, Sparkles, Stars } from "lucide-react";
+import { CalendarDays, CheckCircle2, Compass, Download, Globe2, MapPinned, Sparkles } from "lucide-react";
 
-// Illustrative product cards for the landing page. The visa rows mirror rules that
-// are verified in lib/visa for an Indian passport with UAE residence.
+// Illustrative cards for the landing page, each tagged "Example". The visa rows mirror rules
+// verified in lib/visa for an Indian passport with UAE residence. The chat and connect cards
+// only show things the product really does: there is no weather, route, remote-work or
+// connection-status feature behind them.
+
+function ExampleTag({ tone }: { tone: "on-light" | "on-dark" | "on-sun" }) {
+  const colours = {
+    "on-light": "bg-ink/[0.06] text-muted",
+    "on-dark": "bg-white/15 text-white/80",
+    "on-sun": "bg-night/10 text-night/70",
+  }[tone];
+  return (
+    <span
+      className={`shrink-0 rounded-full px-2.5 py-1 text-[0.62rem] font-extrabold uppercase tracking-[0.18em] ${colours}`}
+    >
+      Example
+    </span>
+  );
+}
 
 export function ConnectCard() {
   return (
     <div className="story-shadow overflow-hidden rounded-[2rem] border border-ink/10 bg-white">
       <div className="bg-sunset px-6 py-5 text-night">
-        <p className="text-[0.68rem] font-extrabold uppercase tracking-[0.2em]">Connect once</p>
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-[0.68rem] font-extrabold uppercase tracking-[0.2em]">Connect once</p>
+          <ExampleTag tone="on-sun" />
+        </div>
         <p className="mt-1 font-display text-2xl font-bold leading-tight">Plan in chat. Keep it here.</p>
       </div>
       <div className="space-y-3 p-6">
-        {["Claude", "ChatGPT"].map((name) => (
-          <div
-            key={name}
-            className="flex items-center justify-between rounded-[1.25rem] border border-ink/10 bg-cream px-4 py-3.5"
-          >
-            <span className="font-bold text-ink">{name}</span>
-            <span className="flex items-center gap-1.5 rounded-full bg-lagoon/10 px-3 py-1 text-xs font-bold text-lagoon">
-              <CheckCircle2 className="h-3.5 w-3.5" />
-              Connected
+        <div className="flex flex-wrap gap-2">
+          {["Claude", "ChatGPT"].map((name) => (
+            <span
+              key={name}
+              className="rounded-full border border-ink/10 bg-cream px-4 py-2 text-sm font-bold text-ink"
+            >
+              {name}
             </span>
-          </div>
-        ))}
+          ))}
+        </div>
         <div className="rounded-[1.25rem] bg-night p-4 text-sm leading-6 text-white/90">
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-sun">You, in Claude</p>
           <p className="mt-1.5">&ldquo;Save this Istanbul itinerary to PackYourBags.&rdquo;</p>
         </div>
-        <div className="flex items-center gap-3 rounded-[1.25rem] border border-dashed border-lagoon/50 bg-lagoon/5 px-4 py-3.5">
-          <MapPinned className="h-5 w-5 shrink-0 text-lagoon" />
+        {/* Mirrors a row of the "From your assistant" inbox on the Connect page. */}
+        <div className="flex items-center justify-between gap-3 rounded-[1.25rem] border border-dashed border-lagoon/50 bg-lagoon/5 px-4 py-3.5">
           <div className="min-w-0">
-            <p className="font-bold text-ink">Istanbul · 5 days</p>
-            <p className="text-sm text-muted">Saved from Claude, waiting in your inbox</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-clay">Itinerary</p>
+            <p className="mt-1 font-bold text-ink">Istanbul</p>
+            <p className="text-xs text-muted">from your assistant</p>
           </div>
+          <span className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-ink px-4 text-sm font-semibold text-white">
+            <Download className="h-4 w-4" />
+            Import
+          </span>
         </div>
       </div>
     </div>
@@ -51,7 +74,10 @@ export function VisaCard() {
     <div className="story-shadow rounded-[2rem] border border-ink/10 bg-white p-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-sm font-semibold text-muted">Indian passport · UAE resident</p>
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-sm font-semibold text-muted">Indian passport · UAE resident</p>
+            <ExampleTag tone="on-light" />
+          </div>
           <h3 className="mt-1 font-display text-3xl font-bold text-ink">Where can I go next month?</h3>
         </div>
         <div className="rounded-2xl bg-lagoon/10 p-3 text-lagoon">
@@ -96,20 +122,19 @@ export function ChatCard() {
           <Sparkles className="h-4 w-4 text-sun" />
           PackYourBags concierge
         </div>
-        <div className="rounded-full border border-white/15 px-3 py-1 text-xs text-white/70">Claude Sonnet</div>
+        <ExampleTag tone="on-dark" />
       </div>
 
       <div className="ml-auto max-w-[86%] rounded-[1.6rem] rounded-tr-md bg-sun p-4 text-sm font-medium leading-6 text-night">
-        Plan a 6-day summer trip with beach clubs, one design hotel, and two days of remote work.
+        Plan a 6-day summer trip to Bodrum with beach clubs and one design hotel.
       </div>
 
       <div className="mt-4 rounded-[1.7rem] rounded-tl-md bg-white/10 p-5 text-sm leading-6 text-white/90">
-        <p className="font-bold text-white">Done. Here&apos;s your trip stack:</p>
+        <p className="font-bold text-white">Done. Here&apos;s what you get:</p>
         {[
           "Day-by-day itinerary with morning, afternoon and evening plans",
-          "Visa check for your passport and where you live",
-          "Remote-work blocks placed between activity days",
-          "Saved to your dashboard, ready to refine",
+          "A short overview of the trip’s shape and pacing",
+          "Saved in this browser, ready to regenerate",
         ].map((item) => (
           <p key={item} className="mt-2 flex gap-2">
             <CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-sun" />
@@ -122,22 +147,22 @@ export function ChatCard() {
         <div className="rounded-[1.35rem] bg-white/[0.08] p-4">
           <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-white/55">
             <MapPinned className="h-3.5 w-3.5" />
-            Route
+            Destination
           </div>
-          <p className="mt-2 font-bold text-white">Dubai → Bodrum → Istanbul</p>
+          <p className="mt-2 font-bold text-white">Bodrum</p>
         </div>
         <div className="rounded-[1.35rem] bg-white/[0.08] p-4">
           <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-white/55">
-            <Stars className="h-3.5 w-3.5" />
-            Style
+            <CalendarDays className="h-3.5 w-3.5" />
+            Length
           </div>
-          <p className="mt-2 font-bold text-white">Quiet luxury, local food spots</p>
+          <p className="mt-2 font-bold text-white">6 days</p>
         </div>
       </div>
 
-      <div className="mt-6 flex w-full items-center justify-between rounded-full border border-white/15 bg-white/[0.06] px-4 py-3 text-left text-sm text-white/70">
-        Ask for the next itinerary
-        <ArrowRight className="h-4 w-4" />
+      <div className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-white/10 px-4 py-3 text-sm font-bold text-white">
+        Plan another trip
+        <Sparkles className="h-4 w-4 text-sun" />
       </div>
     </div>
   );

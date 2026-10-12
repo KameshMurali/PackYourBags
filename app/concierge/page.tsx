@@ -177,9 +177,18 @@ export default function Concierge() {
           {itinerary ? "Your itinerary is ready." : "Describe the trip in your own words."}
         </h1>
         <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-muted">
-          {itinerary
-            ? "Review the day-by-day plan, save it to your dashboard, or start a fresh brief."
-            : "Keep it loose. Mention timing, mood, budget, passport, or one thing the trip must include."}
+          {itinerary ? (
+            "Review the day-by-day plan, find it on your dashboard, or start a fresh brief."
+          ) : (
+            <>
+              Keep it loose. Mention timing, mood, budget or one thing the trip must include. Plans run 3 to 7
+              days. Visa rules aren’t part of the plan, so check them in the{" "}
+              <Link href="/visa" className="font-semibold text-ink underline underline-offset-4">
+                visa explorer
+              </Link>
+              .
+            </>
+          )}
         </p>
         {usage && (
           <p className="mx-auto mt-5 inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/70 px-4 py-2 text-sm font-semibold text-ink">
@@ -229,7 +238,7 @@ export default function Concierge() {
                   className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-full bg-ink px-6 text-sm font-semibold text-white shadow-[0_18px_48px_rgba(10,34,51,0.22)] transition hover:-translate-y-0.5 hover:bg-[#0a2233]"
                   href="/dashboard"
                 >
-                  Save and return to dashboard <ArrowRight className="h-4 w-4" />
+                  Go to dashboard <ArrowRight className="h-4 w-4" />
                 </Link>
                 <button
                   className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-black/10 bg-white/70 px-6 text-sm font-semibold text-ink transition hover:bg-white"

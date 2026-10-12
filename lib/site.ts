@@ -8,4 +8,4 @@ export const SITE_URL = "https://packyourbags.tonewbeginning.com";
 export const OPERATOR_NAME = "Kameshwar Murali";
 export const CONTACT_EMAIL = process.env.NEXT_PUBLIC_CONTACT_EMAIL || "kameshwar.murali@gmail.com";
 
-export const LEGAL_LAST_UPDATED = "10 October 2026";
+export const LEGAL_LAST_UPDATED = "12 October 2026";

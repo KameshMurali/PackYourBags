@@ -215,7 +215,7 @@ export default function Dashboard() {
             icon={Globe2}
             label="Visa rules at hand"
             value={`${verifiedRules}`}
-            detail="Each linked to its official source"
+            detail="Each linked to the page we checked"
           />
           <Stat
             icon={MapPinned}
@@ -398,7 +398,8 @@ export default function Dashboard() {
               <Sparkles className="h-6 w-6 text-clay" />
             </div>
             <p className="mt-4 text-sm leading-7 text-muted">
-              Describe the mood, timing, and budget. PackYourBags will shape a visa-aware shortlist.
+              Describe the mood, timing and budget and the concierge sketches a day-by-day plan. Check the
+              visa side in the visa explorer.
             </p>
             <button
               className="mt-7 flex w-full items-center justify-between rounded-full border border-black/10 bg-white/70 px-5 py-4 text-left text-sm font-semibold text-ink"
@@ -413,7 +414,7 @@ export default function Dashboard() {
         <section className="mt-5 rounded-[2rem] border border-black/10 bg-white/55 p-7 backdrop-blur md:p-8">
           <div className="flex items-end justify-between gap-4">
             <div>
-              <p className="text-sm font-semibold text-muted">Visa-free from where you live</p>
+              <p className="text-sm font-semibold text-muted">Visa-free for an Indian passport living in the UAE</p>
               <h2 className="mt-2 font-display text-3xl text-ink">Easy places for your next escape</h2>
             </div>
             <Link
@@ -421,7 +422,7 @@ export default function Dashboard() {
               className="hidden shrink-0 items-center gap-2 rounded-full border border-black/10 bg-white/70 px-4 py-2 text-sm font-semibold text-ink transition hover:bg-white sm:inline-flex"
             >
               <Globe2 className="h-4 w-4 text-clay" />
-              Open visa explorer
+              Check yours
             </Link>
           </div>
           <div className="mt-6 grid gap-3 md:grid-cols-3">
@@ -445,13 +446,14 @@ export default function Dashboard() {
             ))}
           </div>
           <p className="mt-4 text-xs leading-5 text-muted">
-            Based on an Indian passport with UAE residence. Change both in the visa explorer.
+            Shown for an Indian passport with UAE residence. Pick your own passport and residence in the
+            visa explorer.
           </p>
           <Link
             href="/visa"
             className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-clay transition hover:text-ink sm:hidden"
           >
-            Open visa explorer <ArrowRight className="h-4 w-4" />
+            Check yours <ArrowRight className="h-4 w-4" />
           </Link>
         </section>
 

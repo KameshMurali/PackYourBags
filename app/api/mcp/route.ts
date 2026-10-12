@@ -63,7 +63,7 @@ const baseHandler = createMcpHandler(
       {
         title: "Save a trip brief to PackYourBags",
         description:
-          "Save a traveller's trip brief (destination, timing, who's going, mood, notes) into their PackYourBags workspace so it appears in their dashboard inbox.",
+          "Save a traveller's trip brief (destination, timing, who's going, mood, notes) into their PackYourBags workspace so it appears under 'From your assistant' on their Connect page.",
         inputSchema: z.object({
           destination: z.string().trim().min(1).max(120).describe("Destination or region, e.g. 'Kyoto, Japan'"),
           dates: z.string().max(200).optional().describe("Timing, e.g. 'Late October, 6 nights'"),
@@ -91,7 +91,7 @@ const baseHandler = createMcpHandler(
           createdAt: new Date().toISOString(),
         };
         await store.push(namespace, item);
-        return text(`Saved trip brief for ${args.destination} to PackYourBags. Open the Connected inbox to import it.`);
+        return text(`Saved trip brief for ${args.destination} to PackYourBags. Open your Connect page to import it.`);
       },
     );
 

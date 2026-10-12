@@ -24,8 +24,9 @@ export default function PrivacyPage() {
           </li>
           <li>
             <strong>Basic activity on your account:</strong> when you first and last visited, how many
-            times you signed in, how many AI itineraries you have generated, and whether you are on the
-            free or Pro plan.
+            times you signed in, how many AI itineraries you have generated, whether you are on the free
+            or Pro plan (or have asked for Pro), and a daily count of requests the concierge turned down
+            as off-topic.
           </li>
           <li>
             <strong>What you type into the AI concierge:</strong> your trip brief is sent to Anthropic
@@ -42,7 +43,20 @@ export default function PrivacyPage() {
           </li>
         </ul>
         <p className="mt-3">
-          The visa explorer works without an account and does not collect anything about you.
+          The visa explorer works without an account and does not store anything about you (our host
+          keeps standard request logs).
+        </p>
+      </section>
+
+      <section>
+        <h2>What the site owner can see</h2>
+        <p>
+          To run the service and keep the free allowance fair, the site owner can see your name, email
+          address and photo link, your plan, when you last visited, how many times you’ve signed in and
+          how many itineraries you’ve generated. The admin screen also lists the destination and date of
+          any plan saved from Claude or ChatGPT; the plan itself is stored in our database, which the
+          site owner can access. We don’t keep what you type into the concierge, so there is nothing to
+          look at there.
         </p>
       </section>
 
@@ -88,9 +102,9 @@ export default function PrivacyPage() {
         <h2>How long we keep it</h2>
         <p>
           Your account record and saved plans stay until you delete them. If you delete your data, one
-          small thing remains: a count of how many free itineraries that email address has used, stored
-          under a one-way hash rather than your email. It exists only so the free allowance can’t be
-          reset by deleting and re-creating an account.
+          small thing remains: a count of how many free itineraries that email address has used, and
+          whether it has Pro, stored under a one-way hash rather than your email. It exists only so the
+          free allowance can’t be reset by deleting and re-creating an account.
         </p>
       </section>
 
@@ -98,7 +112,9 @@ export default function PrivacyPage() {
         <h2>Your choices</h2>
         <p>
           You can delete your data yourself, right now, from this page. It removes your profile record,
-          your assistant-saved plans, and the trips saved in this browser, and signs you out.
+          your assistant-saved plans, and the trips saved in this browser, and signs you out. It doesn’t
+          disconnect an assistant you’ve already connected, so remove the connector in that assistant’s
+          settings too.
         </p>
         <DeleteAccount />
         <p className="mt-4">

@@ -40,7 +40,7 @@ function matchSummary(verified: number, notices: readonly CountryNotice[]): stri
 
 export function VisaExplorer() {
   const [passport, setPassport] = useState("IN");
-  const [residence, setResidence] = useState<CredentialCode | "NONE">("AE");
+  const [residence, setResidence] = useState<CredentialCode | "NONE">("NONE");
   const [visas, setVisas] = useState<CredentialCode[]>([]);
   const [query, setQuery] = useState("");
   const [openGuide, setOpenGuide] = useState<string | null>(null);
@@ -187,7 +187,7 @@ export function VisaExplorer() {
           <p className="mt-3 text-xs leading-5 text-muted">
             {stats.total} verified destinations for {nationality.demonym} passports
             {reviewed ? `, last reviewed ${reviewDateLabel(reviewed)}` : ""}. Search any other
-            country to get its official source.
+            country for its official visa page, or the IATA Travel Centre that airlines check.
           </p>
 
           <VisaTicker destinations={resolved} />

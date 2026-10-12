@@ -117,7 +117,7 @@ export default async function AuthorizePage({ searchParams }: { searchParams: Pr
   const permissions = [
     { icon: BookmarkPlus, text: "Save trip briefs and day-by-day itineraries to your workspace" },
     { icon: ListChecks, text: "Read the trips and itineraries you've saved" },
-    { icon: Globe2, text: "Check visa requirements for your passport and residence" },
+    { icon: Globe2, text: "Check visa requirements for the passport and residence you give it" },
   ];
 
   return (
@@ -146,7 +146,8 @@ export default async function AuthorizePage({ searchParams }: { searchParams: Pr
         <p className="mt-5 rounded-[1.1rem] border border-black/10 bg-white/60 p-4 text-xs leading-5 text-muted">
           It can&apos;t see your Google account or anything outside PackYourBags. You&apos;ll be sent back
           to <span className="font-semibold text-ink">{hostOf(redirectUri)}</span>. Remove the connector in
-          your assistant&apos;s settings to disconnect.
+          your assistant’s settings to disconnect. Access you’ve already given lapses on its own after 30
+          days without use.
         </p>
 
         <form action={approveConnection} className="mt-6">

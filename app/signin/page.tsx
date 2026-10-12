@@ -24,7 +24,7 @@ export default async function SignIn({
       callbackUrl={destination}
       notice={signInNotice(error)}
       title="Welcome back."
-      subtitle="Continue with your trips, visa shortlists, and travel concierge plans."
+      subtitle="Pick up your trip briefs, itineraries and the visa explorer."
     />
   );
 }

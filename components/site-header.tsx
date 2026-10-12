@@ -71,7 +71,7 @@ export function SiteHeader() {
                   Admin
                 </ButtonLink>
               )}
-              <ButtonLink href="/dashboard">My trips</ButtonLink>
+              <ButtonLink href="/dashboard">Dashboard</ButtonLink>
             </>
           ) : (
             <>

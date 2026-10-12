@@ -136,10 +136,20 @@ describe("resolveRules", () => {
 
   it("attaches how-to-apply guides only when a visa is needed", () => {
     const none = resolveRules(RULES, [], { residence: "NONE" });
+    // The Schengen guide suits any passport, so it attaches by destination.
     expect(byCode(none, "SCHENGEN").guide).toBe("schengen");
-    expect(byCode(none, "GB").guide).toBe("uk");
     expect(byCode(none, "TH").guide).toBeUndefined();
     expect(byCode(resolveRules(RULES, ["UK"], { residence: "UK" }), "GB").guide).toBeUndefined();
+  });
+
+  it("attaches a passport-specific guide only where a rule names it", () => {
+    // The UK guide is written for one passport, so a bare GB rule must not pick it up.
+    expect(byCode(resolveRules(RULES, [], { residence: "NONE" }), "GB").guide).toBeUndefined();
+
+    const named = RULES.map((rule) => (rule.code === "GB" ? { ...rule, guide: "uk" } : rule));
+    expect(byCode(resolveRules(named, [], { residence: "NONE" }), "GB").guide).toBe("uk");
+    // Still only when a visa is actually needed.
+    expect(byCode(resolveRules(named, ["UK"], { residence: "UK" }), "GB").guide).toBeUndefined();
   });
 
   it("sorts by category, then name", () => {
