@@ -5,7 +5,8 @@ import { Check, Compass, Info, Search, X } from "lucide-react";
 import {
   CATEGORY_META,
   CATEGORY_ORDER,
-  HELDVISAS,
+  describeSelectionImpact,
+  heldVisaOptionsFor,
   IATA_TRAVEL_CENTRE,
   latestReview,
   NATIONALITIES,
@@ -16,9 +17,11 @@ import {
   summarise,
   type CountryNotice,
   type CredentialCode,
+  type CredentialUnlock,
 } from "@/lib/visa";
 import { Reveal } from "@/components/reveal";
 import { VisaExternalLink } from "@/components/visa-external-link";
+import { VisaImpact } from "@/components/visa-impact";
 import { VisaNoticeCard } from "@/components/visa-notice-card";
 import { VisaResultCard } from "@/components/visa-result-card";
 import { VisaStats } from "@/components/visa-stats";
@@ -46,9 +49,16 @@ export function VisaExplorer() {
   const [openGuide, setOpenGuide] = useState<string | null>(null);
 
   const nationality = NATIONALITIES.find((n) => n.code === passport) ?? NATIONALITIES[0];
-  // A residence already covers its own country, so its "valid visa" pill is hidden.
-  const heldOptions = HELDVISAS.filter((v) => v.code !== residence);
-  const activeVisas = useMemo(() => visas.filter((v) => v !== residence), [visas, residence]);
+  // A residence already covers its own country, and a passport never needs its own country's
+  // visa, so those "valid visa" pills are hidden (and ignored if they were picked earlier).
+  const heldOptions = useMemo(
+    () => heldVisaOptionsFor(passport).filter((v) => v.code !== residence),
+    [passport, residence],
+  );
+  const activeVisas = useMemo(
+    () => visas.filter((v) => heldOptions.some((option) => option.code === v)),
+    [visas, heldOptions],
+  );
 
   const credentials = useMemo(
     () =>
@@ -67,6 +77,19 @@ export function VisaExplorer() {
   );
   const stats = useMemo(() => summarise(resolved), [resolved]);
   const reviewed = useMemo(() => latestReview(resolved), [resolved]);
+  // What a residence and held visas change (or don't), so the page never goes silent when
+  // they leave the numbers alone, as they do for passports that already travel freely.
+  const reachableBefore = useMemo(
+    () => summarise(resolveDestinations(passport, [], { residence: "NONE" })).freedom,
+    [passport],
+  );
+  const impact = useMemo(() => {
+    const selection: CredentialUnlock[] = [
+      ...(residence === "NONE" ? [] : [{ code: residence, via: "residence" as const }]),
+      ...activeVisas.map((code) => ({ code, via: "visa" as const })),
+    ];
+    return describeSelectionImpact({ selection, demonym: nationality.demonym, resolved, reachableBefore });
+  }, [residence, activeVisas, nationality.demonym, resolved, reachableBefore]);
 
   const trimmed = query.trim();
   const nothingFound = trimmed.length > 0 && search.rules.length === 0 && search.notices.length === 0;
@@ -167,6 +190,8 @@ export function VisaExplorer() {
           }
         />
       </div>
+
+      <VisaImpact impact={impact} />
 
       <div
         role="note"

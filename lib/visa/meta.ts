@@ -70,6 +70,15 @@ export const HELDVISAS: Array<{ code: CredentialCode; name: string; flag: string
   { code: "JP", name: "Valid Japan visa", flag: "🇯🇵" },
 ];
 
+// A passport's own country (or bloc) never issues its citizens a visa for itself.
+const OWN_VISA: Record<string, CredentialCode> = { US: "US", GB: "UK", IT: "SCHENGEN" };
+
+/** The visas a traveller with this passport could hold: all of them except their own country's. */
+export function heldVisaOptionsFor(passport: string) {
+  const own = OWN_VISA[passport.toUpperCase()];
+  return HELDVISAS.filter((v) => v.code !== own);
+}
+
 const PASSPORTS: Array<Omit<Nationality, "supported">> = [
   { code: "IN", name: "India", flag: "🇮🇳", demonym: "Indian" },
   { code: "PK", name: "Pakistan", flag: "🇵🇰", demonym: "Pakistani" },

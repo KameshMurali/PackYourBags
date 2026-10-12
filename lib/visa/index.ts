@@ -14,10 +14,13 @@ export {
   CREDENTIAL_LABELS,
   EASY_ACCESS,
   HELDVISAS,
+  heldVisaOptionsFor,
   NATIONALITIES,
   RESIDENCIES,
 } from "./meta";
 export { GUIDE_BY_DESTINATION, VISA_GUIDES } from "./guides";
+export { describeSelectionImpact, selectionImpact } from "./impact";
+export type { SelectionImpact } from "./impact";
 export { SCHENGEN_FACTS } from "./schengen";
 export { COUNTRIES } from "./countries";
 export { COUNTRY_SOURCES } from "./country-sources";
